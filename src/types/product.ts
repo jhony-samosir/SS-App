@@ -2,21 +2,15 @@ export interface Product {
   id: string;
   name: string;
   slug: string;
-  description: string;
+  status: string;
   price: number;
-  stock: number;
-  category_id: string;
-  images: string[];
-  created_at: string;
-  updated_at: string;
+  image_url: string;
+  rating: number;
+  brand_id?: number;
 }
 
 export interface PaginatedResponse<T> {
   data: T[];
-  meta: {
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-  };
+  limit: number;
+  offset: number;
 }
