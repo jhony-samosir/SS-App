@@ -1,34 +1,32 @@
 import axios from "axios";
+import { useAuthStore } from "@/store/use-auth-store";
 
+/**
+ * Enterprise API Client
+ * 
+ * - Client-side: Uses relative paths (empty baseURL) to leverage Next.js rewrites.
+ * - Server-side: Uses API_GATEWAY_URL for direct SSR/Server Component calls.
+ * - withCredentials: true enables HttpOnly cookie session propagation.
+ */
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081/api/v1",
+  baseURL: typeof window === "undefined" 
+    ? (process.env.API_GATEWAY_URL || "https://localhost:7091")
+    : (process.env.NEXT_PUBLIC_API_BASE_URL || ""),
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
-
-// Request interceptor for API calls
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("auth-token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
 
 // Response interceptor for API calls
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized error (e.g., logout user)
-      localStorage.removeItem("auth-token");
-      // Optional: redirect to login
+      // Handle unauthorized error: Sync UI state with expired/missing cookie
+      if (typeof window !== "undefined") {
+        useAuthStore.getState().logout();
+      }
     }
     return Promise.reject(error);
   }

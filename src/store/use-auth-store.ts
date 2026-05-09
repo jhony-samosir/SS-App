@@ -10,9 +10,8 @@ interface User {
 
 interface AuthState {
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
-  setAuth: (user: User, token: string) => void;
+  setAuth: (user: User) => void;
   logout: () => void;
 }
 
@@ -20,15 +19,15 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      token: null,
       isAuthenticated: false,
-      setAuth: (user, token) => {
-        localStorage.setItem("auth-token", token);
-        set({ user, token, isAuthenticated: true });
+      setAuth: (user) => {
+        set({ user, isAuthenticated: true });
       },
       logout: () => {
-        localStorage.removeItem("auth-token");
-        set({ user: null, token: null, isAuthenticated: false });
+        // Session cookie will be cleared by a dedicated API call to /api/auth/logout.
+        // The apiClient response interceptor also calls this method on 401 errors
+        // to keep the UI state in sync with the server session.
+        set({ user: null, isAuthenticated: false });
       },
     }),
     {

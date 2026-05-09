@@ -27,19 +27,19 @@ export interface Category {
 
 export const catalogService = {
   getProducts: async (params: SearchParams = {}) => {
-    const response = await apiClient.get<SearchResponse>("/products/search", {
+    const response = await apiClient.get<SearchResponse>("/api/catalog/v1/products/search", {
       params,
     });
     return response.data;
   },
 
   getProductById: async (id: string) => {
-    const response = await apiClient.get<Product>(`/products/${id}`);
+    const response = await apiClient.get<Product>(`/api/catalog/v1/products/${id}`);
     return response.data;
   },
 
   getCategories: async () => {
-    const response = await apiClient.get<{ data: Category[] }>("/categories");
+    const response = await apiClient.get<{ data: Category[] }>("/api/catalog/v1/categories");
     return response.data;
   },
 };
