@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Loader2, Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
 import { authService } from "@/services/auth-service";
@@ -105,7 +106,7 @@ export function LoginForm() {
           <div className="space-y-2">
             <div className="flex items-center justify-between pl-1">
               <label className="text-sm font-medium" htmlFor="password">Password</label>
-              <button type="button" className="text-xs text-primary hover:underline">Forgot password?</button>
+              <Link href="/forgot-password" className="text-xs text-primary hover:underline">Forgot password?</Link>
             </div>
             <div className="relative group">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />

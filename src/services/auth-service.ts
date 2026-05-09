@@ -4,7 +4,9 @@ import {
   LoginResponse, 
   RegisterRequest, 
   RegisterResponse, 
-  MfaVerifyRequest 
+  MfaVerifyRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest
 } from "@/types/auth";
 
 /**
@@ -35,6 +37,22 @@ export const authService = {
    */
   verifyMfa: async (data: MfaVerifyRequest): Promise<LoginResponse> => {
     const response = await apiClient.post("/api/auth/mfa/verify", data);
+    return response.data;
+  },
+
+  /**
+   * Request a password reset email
+   */
+  forgotPassword: async (data: ForgotPasswordRequest): Promise<{ message: string }> => {
+    const response = await apiClient.post("/api/auth/forgot-password", data);
+    return response.data;
+  },
+
+  /**
+   * Reset password using token
+   */
+  resetPassword: async (data: ResetPasswordRequest): Promise<{ message: string }> => {
+    const response = await apiClient.post("/api/auth/reset-password", data);
     return response.data;
   },
 
