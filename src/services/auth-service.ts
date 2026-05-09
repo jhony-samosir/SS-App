@@ -36,7 +36,7 @@ export const authService = {
    * Verify MFA code using the mfaToken
    */
   verifyMfa: async (data: MfaVerifyRequest): Promise<LoginResponse> => {
-    const response = await apiClient.post("/api/auth/mfa/verify", data);
+    const response = await apiClient.post("/api/mfa/verify", data);
     return response.data;
   },
 
