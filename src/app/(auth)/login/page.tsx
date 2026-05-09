@@ -1,5 +1,6 @@
 import { LoginForm } from "@/components/auth/LoginForm";
 import { AuthLayout } from "@/components/auth/AuthLayout";
+import { GuestGuard } from "@/components/auth/GuestGuard";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,8 +10,10 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <AuthLayout>
-      <LoginForm />
-    </AuthLayout>
+    <GuestGuard>
+      <AuthLayout>
+        <LoginForm />
+      </AuthLayout>
+    </GuestGuard>
   );
 }

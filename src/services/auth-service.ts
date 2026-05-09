@@ -91,7 +91,7 @@ export const authService = {
    * Get current user session info (useful for initialization/sync)
    */
   getCurrentUser: async (): Promise<{ user: any }> => {
-    const response = await apiClient.get("/api/auth/me");
+    const response = await apiClient.get("/api/user/me");
     return response.data;
   }
 };
