@@ -79,9 +79,32 @@
 }
 
 .dark {
-  --background: oklch(0.2 0.02 60);
-  --foreground: oklch(0.95 0.01 85);
-  /* ... rest of dark mode refined ... */
+  --background: oklch(0.18 0.02 240); /* Deep Charcoal Navy */
+  --foreground: oklch(0.92 0.01 240);
+  --card: oklch(0.22 0.02 240);
+  --card-foreground: oklch(0.92 0.01 240);
+  --popover: oklch(0.22 0.02 240);
+  --popover-foreground: oklch(0.92 0.01 240);
+  --primary: oklch(0.85 0.08 150); /* Slightly more vibrant Sage */
+  --primary-foreground: oklch(0.2 0.02 240);
+  --secondary: oklch(0.3 0.05 45); /* Darker Peach/Amber */
+  --secondary-foreground: oklch(0.95 0.05 45);
+  --muted: oklch(0.25 0.02 240);
+  --muted-foreground: oklch(0.65 0.02 240);
+  --accent: oklch(0.28 0.03 150);
+  --accent-foreground: oklch(0.92 0.01 240);
+  --destructive: oklch(0.5 0.15 30);
+  --border: oklch(0.28 0.02 240);
+  --input: oklch(0.28 0.02 240);
+  --ring: oklch(0.85 0.08 150);
+  --sidebar: oklch(0.2 0.02 240);
+  --sidebar-foreground: oklch(0.92 0.01 240);
+  --sidebar-primary: oklch(0.85 0.08 150);
+  --sidebar-primary-foreground: oklch(0.2 0.02 240);
+  --sidebar-accent: oklch(0.28 0.02 240);
+  --sidebar-accent-foreground: oklch(0.92 0.01 240);
+  --sidebar-border: oklch(0.25 0.02 240);
+  --sidebar-ring: oklch(0.85 0.08 150);
 }
 
 @layer base {
@@ -90,7 +113,7 @@
   }
   body {
     @apply text-foreground bg-fixed;
-    background: linear-gradient(135deg, oklch(0.98 0.01 85) 0%, oklch(1 0 0) 100%);
+    background: radial-gradient(circle at top left, var(--background) 0%, oklch(from var(--background) l c h / 0.8) 100%);
   }
   html {
     @apply font-sans;

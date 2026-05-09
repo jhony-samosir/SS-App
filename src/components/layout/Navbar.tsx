@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "@/store/use-auth-store";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -22,7 +23,7 @@ export function Navbar() {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4 bg-white/90 backdrop-blur-md border-b border-border shadow-sm",
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4 bg-background/80 backdrop-blur-md border-b border-border shadow-sm",
         isScrolled ? "py-3 shadow-md" : "py-4"
       )}
     >
@@ -34,7 +35,7 @@ export function Navbar() {
               whileHover={{ scale: 1.1, rotate: 5 }}
               className="text-primary bg-primary/10 p-2 rounded-xl"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M12 2a10 10 0 1 0 10 10" />
                 <path d="M12 22a10 10 0 1 0-10-10" />
                 <circle cx="12" cy="12" r="4" fill="currentColor" fillOpacity="0.2" />
@@ -73,15 +74,17 @@ export function Navbar() {
           <input 
             type="text" 
             placeholder="Search for snacks..." 
-            className="w-full bg-muted/50 border-none rounded-2xl py-2.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+            className="w-full bg-muted/50 border border-transparent focus:border-primary/20 rounded-2xl py-2.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/10 transition-all outline-none"
           />
         </div>
 
         {/* Icons */}
-        <div className="flex items-center gap-4 text-foreground">
+        <div className="flex items-center gap-2 text-foreground">
+          <ThemeToggle />
+          
           <Link href="/cart" className="relative p-2.5 hover:bg-muted rounded-xl transition-all">
             <ShoppingCart size={20} strokeWidth={2} />
-            <span className="absolute top-1 right-1 bg-secondary text-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+            <span className="absolute top-1 right-1 bg-secondary text-secondary-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-background shadow-sm">
               3
             </span>
           </Link>
