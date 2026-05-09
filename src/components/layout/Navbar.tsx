@@ -1,16 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, User, Search, Menu } from "lucide-react";
+import { ShoppingCart, User, Search, Menu, LogOut, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useAuthStore } from "@/store/use-auth-store";
+import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "./ThemeToggle";
+import { authService } from "@/services/auth-service";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { user, isAuthenticated, logout, isHydrated } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,6 +23,20 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      logout();
+      setIsLoggingOut(false);
+      router.refresh();
+      router.push("/login");
+    }
+  };
 
   return (
     <nav
@@ -91,16 +109,33 @@ export function Navbar() {
 
           <div className="h-6 w-px bg-border mx-1" />
 
-          {isAuthenticated ? (
-            <button 
-              onClick={() => logout()}
-              className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group"
-            >
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all overflow-hidden border border-primary/20">
-                <User size={20} strokeWidth={2} />
-              </div>
-              <span className="text-sm font-medium hidden sm:inline-block">Profile</span>
-            </button>
+          {!isHydrated ? (
+            <div className="w-24 h-9 bg-muted/50 animate-pulse rounded-2xl" />
+          ) : isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <Link 
+                href="/profile"
+                className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group"
+              >
+                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all overflow-hidden border border-primary/20">
+                  <User size={20} strokeWidth={2} />
+                </div>
+                <span className="text-sm font-medium hidden sm:inline-block">Profile</span>
+              </Link>
+              
+              <button 
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="p-2.5 hover:bg-destructive/10 hover:text-destructive rounded-xl transition-all group"
+                title="Logout"
+              >
+                {isLoggingOut ? (
+                  <Loader2 size={20} className="animate-spin" />
+                ) : (
+                  <LogOut size={20} strokeWidth={2} />
+                )}
+              </button>
+            </div>
           ) : (
             <Link href="/login" className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group">
               <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all border border-primary/20">
