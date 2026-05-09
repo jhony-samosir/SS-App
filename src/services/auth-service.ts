@@ -57,6 +57,14 @@ export const authService = {
   },
 
   /**
+   * Verify email using token from query parameters
+   */
+  verifyEmail: async (token: string): Promise<{ message: string }> => {
+    const response = await apiClient.get(`/api/auth/verify-email?token=${token}`);
+    return response.data;
+  },
+
+  /**
    * Logout user and clear session cookies
    */
   logout: async (): Promise<void> => {
