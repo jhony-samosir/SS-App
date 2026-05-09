@@ -34,6 +34,15 @@ export interface MfaVerifyRequest {
   code: string;
 }
 
+export interface MfaSetupResponse {
+  secret: string;
+  provisioningUri: string;
+}
+
+export interface MfaEnableRequest {
+  code: string;
+}
+
 export interface ForgotPasswordRequest {
   email: string;
 }

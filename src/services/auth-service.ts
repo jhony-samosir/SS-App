@@ -41,6 +41,22 @@ export const authService = {
   },
 
   /**
+   * Initiate MFA setup for the current logged-in user
+   */
+  mfaSetup: async (): Promise<MfaSetupResponse> => {
+    const response = await apiClient.post("/api/mfa/setup");
+    return response.data;
+  },
+
+  /**
+   * Finalize and enable MFA for the current logged-in user
+   */
+  mfaEnable: async (data: MfaEnableRequest): Promise<{ message: string }> => {
+    const response = await apiClient.post("/api/mfa/enable", data);
+    return response.data;
+  },
+
+  /**
    * Request a password reset email
    */
   forgotPassword: async (data: ForgotPasswordRequest): Promise<{ message: string }> => {
