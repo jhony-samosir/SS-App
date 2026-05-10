@@ -1,5 +1,5 @@
 import apiClient from "@/lib/api-client";
-import { Role, RoleCreateRequest, RoleUpdateRequest, RoleListResponse } from "@/types/role";
+import { Role, RoleCreateRequest, RoleUpdateRequest, RoleListResponse, RolePermission, RolePermissionsUpdateRequest } from "@/types/role";
 
 export const roleService = {
   /**
@@ -41,5 +41,20 @@ export const roleService = {
    */
   deleteRole: async (publicId: string): Promise<void> => {
     await apiClient.delete(`/api/roles/${publicId}`);
+  },
+
+  /**
+   * Get permissions assigned to a role
+   */
+  getRolePermissions: async (publicId: string): Promise<RolePermission[]> => {
+    const response = await apiClient.get(`/api/roles/${publicId}/permissions`);
+    return response.data;
+  },
+
+  /**
+   * Update permissions for a role
+   */
+  updateRolePermissions: async (publicId: string, data: RolePermissionsUpdateRequest): Promise<void> => {
+    await apiClient.put(`/api/roles/${publicId}/permissions`, data);
   }
 };

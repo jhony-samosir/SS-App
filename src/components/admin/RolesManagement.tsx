@@ -10,7 +10,8 @@ import {
   AlertCircle,
   Loader2,
   Shield,
-  X
+  X,
+  Lock
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { roleService } from "@/services/role-service";
@@ -21,6 +22,7 @@ import * as z from "zod";
 import axios from "axios";
 import { useDebounce } from "@/hooks/use-debounce";
 import { DataTable } from "@/components/ui/DataTable";
+import { RolePermissionsEditor } from "./RolePermissionsEditor";
 
 const roleSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
@@ -39,6 +41,10 @@ export function RolesManagement() {
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  // Permission Editor state
+  const [isPermsOpen, setIsPermsOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<{ id: string, name: string } | null>(null);
   
   const queryClient = useQueryClient();
 
@@ -160,14 +166,23 @@ export function RolesManagement() {
       render: (role: Role) => (
         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button 
+            onClick={() => { setSelectedRole({ id: role.publicId, name: role.name }); setIsPermsOpen(true); }}
+            className="p-2 hover:bg-background rounded-lg transition-all text-muted-foreground hover:text-secondary"
+            title="Manage Permissions"
+          >
+            <Lock size={18} />
+          </button>
+          <button 
             onClick={() => handleOpenForm(role)}
             className="p-2 hover:bg-background rounded-lg transition-all text-muted-foreground hover:text-primary"
+            title="Edit Role"
           >
             <Pencil size={18} />
           </button>
           <button 
             onClick={() => setDeleteConfirmId(role.publicId)}
             className="p-2 hover:bg-background rounded-lg transition-all text-muted-foreground hover:text-destructive"
+            title="Delete Role"
           >
             <Trash2 size={18} />
           </button>
@@ -340,6 +355,12 @@ export function RolesManagement() {
           </div>
         )}
       </AnimatePresence>
+      <RolePermissionsEditor 
+        isOpen={isPermsOpen}
+        onClose={() => setIsPermsOpen(false)}
+        roleId={selectedRole?.id || ""}
+        roleName={selectedRole?.name || ""}
+      />
     </div>
   );
 }
