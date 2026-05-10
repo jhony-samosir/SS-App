@@ -11,9 +11,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <GuestGuard>
-      <AuthLayout>
-        <LoginForm />
-      </AuthLayout>
+      <LoginForm />
     </GuestGuard>
   );
 }

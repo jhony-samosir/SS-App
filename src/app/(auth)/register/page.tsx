@@ -1,5 +1,4 @@
 import { RegisterForm } from "@/components/auth/RegisterForm";
-import { AuthLayout } from "@/components/auth/AuthLayout";
 import { GuestGuard } from "@/components/auth/GuestGuard";
 import { Metadata } from "next";
 
@@ -11,9 +10,7 @@ export const metadata: Metadata = {
 export default function RegisterPage() {
   return (
     <GuestGuard>
-      <AuthLayout>
-        <RegisterForm />
-      </AuthLayout>
+      <RegisterForm />
     </GuestGuard>
   );
 }
