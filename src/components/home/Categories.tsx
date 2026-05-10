@@ -23,7 +23,7 @@ export function Categories() {
   ];
 
   return (
-    <section id="categories" className="py-24 bg-white/50">
+    <section id="categories" className="py-24 bg-muted/30">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
@@ -50,17 +50,18 @@ export function Categories() {
               whileHover={{ y: -8 }}
               className="group cursor-pointer"
             >
-              <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden mb-6 shadow-xl shadow-black/5 border-4 border-white transition-all group-hover:shadow-2xl group-hover:shadow-primary/10">
+              <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden mb-6 shadow-xl shadow-black/5 border-4 border-card transition-all group-hover:shadow-2xl group-hover:shadow-primary/10">
                 <Image
                   src={cat.image}
                   alt={cat.name}
                   fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
               <div className="text-center">
-                <h3 className="text-foreground font-bold tracking-tight text-2xl mb-1 group-hover:text-primary transition-colors">
+                <h3 className="text-foreground font-bold tracking-tight text-2xl mb-1 group-hover:text-primary transition-colors font-sans">
                   {cat.name}
                 </h3>
                 <p className="text-muted-foreground text-sm font-medium">{cat.label}</p>

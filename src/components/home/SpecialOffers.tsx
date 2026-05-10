@@ -1,17 +1,12 @@
-"use client";
-
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { Gift, ArrowRight } from "lucide-react";
+import { ScaleIn } from "@/components/animations/MotionWrapper";
 
 export function SpecialOffers() {
   return (
     <section className="py-24 bg-background">
       <div className="max-w-7xl mx-auto px-6">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
+        <ScaleIn 
           className="relative overflow-hidden rounded-[3rem] bg-secondary/10 border border-secondary/20 p-8 md:p-16"
         >
           {/* Decorative Elements */}
@@ -38,7 +33,7 @@ export function SpecialOffers() {
                   <span className="text-muted-foreground text-sm line-through decoration-2">Rp 150.000</span>
                   <span className="text-3xl font-bold text-foreground">Rp 99.000</span>
                 </div>
-                <button className="px-10 py-5 bg-foreground text-white font-bold rounded-2xl transition-all transform hover:-translate-y-1 flex items-center gap-2 shadow-xl shadow-black/10">
+                <button className="px-10 py-5 bg-foreground text-background font-bold rounded-2xl transition-all transform hover:-translate-y-1 flex items-center gap-2 shadow-xl shadow-foreground/10 active:scale-95">
                   Claim Offer
                   <ArrowRight size={20} />
                 </button>
@@ -46,21 +41,18 @@ export function SpecialOffers() {
             </div>
 
             <div className="relative h-[300px] md:h-[400px]">
-              <motion.div
-                animate={{ rotate: [0, 2, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="relative h-full w-full rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white"
-              >
+              <div className="relative h-full w-full rounded-[2rem] overflow-hidden shadow-2xl border-4 border-card">
                 <Image
                   src="/images/special-offer.png"
                   alt="Special Snack Bundle"
                   fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
                 />
-              </motion.div>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </ScaleIn>
       </div>
     </section>
   );

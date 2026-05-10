@@ -1,8 +1,6 @@
-"use client";
-
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { ArrowRight, ShoppingCart } from "lucide-react";
+import { SlideIn, Float, FadeIn } from "@/components/animations/MotionWrapper";
 
 export function Hero() {
   return (
@@ -14,20 +12,13 @@ export function Hero() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+        <SlideIn
+          direction="left"
           className="max-w-2xl"
         >
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-6"
-          >
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-6">
             Authentic Local Flavors
-          </motion.div>
+          </div>
           
           <h1 className="text-6xl md:text-8xl font-bold tracking-tight text-foreground leading-[1.05] mb-6 font-sans">
             Your Daily <br />
@@ -40,11 +31,11 @@ export function Hero() {
           </p>
 
           <div className="flex flex-wrap gap-4">
-            <button className="px-10 py-5 bg-primary hover:bg-primary/90 text-foreground font-bold rounded-2xl transition-all transform hover:-translate-y-1 flex items-center gap-2 shadow-xl shadow-primary/10">
+            <button className="px-10 py-5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-2xl transition-all transform hover:-translate-y-1 flex items-center gap-2 shadow-xl shadow-primary/10 active:scale-95">
               Shop All Snacks
               <ArrowRight size={20} strokeWidth={2.5} />
             </button>
-            <button className="px-10 py-5 bg-white hover:bg-muted text-foreground font-bold rounded-2xl transition-all border border-border">
+            <button className="px-10 py-5 bg-card hover:bg-muted text-foreground font-bold rounded-2xl transition-all border border-border active:scale-95">
               Best Sellers
             </button>
           </div>
@@ -52,11 +43,11 @@ export function Hero() {
           <div className="mt-12 flex items-center gap-8">
             <div className="flex -space-x-3">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-muted flex items-center justify-center text-[10px] font-bold">
+                <div key={i} className="w-10 h-10 rounded-full border-2 border-card bg-muted flex items-center justify-center text-[10px] font-bold">
                   JS
                 </div>
               ))}
-              <div className="w-10 h-10 rounded-full border-2 border-white bg-secondary flex items-center justify-center text-[10px] font-bold">
+              <div className="w-10 h-10 rounded-full border-2 border-card bg-secondary flex items-center justify-center text-[10px] font-bold">
                 +2k
               </div>
             </div>
@@ -64,29 +55,25 @@ export function Hero() {
               Join <span className="text-foreground font-bold">2,000+</span> happy snackers this week!
             </p>
           </div>
-        </motion.div>
+        </SlideIn>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        <FadeIn
           className="relative lg:h-[600px] h-[400px]"
         >
-          <div className="relative h-full w-full rounded-[3rem] overflow-hidden shadow-2xl shadow-black/5 border-8 border-white">
+          <div className="relative h-full w-full rounded-[3rem] overflow-hidden shadow-2xl shadow-primary/5 border-8 border-card">
             <Image
               src="/images/hero.png"
               alt="Curated Local Snacks"
               fill
               className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
               priority
             />
           </div>
           
           {/* Floating Card */}
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -bottom-6 -left-6 p-6 bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl z-20 border border-white/50 flex items-center gap-4"
+          <Float
+            className="absolute -bottom-6 -left-6 p-6 bg-card/90 backdrop-blur-xl rounded-3xl shadow-xl z-20 border border-border flex items-center gap-4"
           >
             <div className="w-12 h-12 bg-secondary/20 rounded-2xl flex items-center justify-center text-secondary">
               <ShoppingCart size={24} />
@@ -95,8 +82,8 @@ export function Hero() {
               <p className="text-foreground text-sm font-bold">Free Shipping</p>
               <p className="text-muted-foreground text-xs font-medium">On orders over 100k</p>
             </div>
-          </motion.div>
-        </motion.div>
+          </Float>
+        </FadeIn>
       </div>
     </section>
   );
