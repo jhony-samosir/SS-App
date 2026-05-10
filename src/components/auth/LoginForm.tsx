@@ -13,6 +13,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import axios from "axios";
 
+import { SoftInput } from "@/components/ui/SoftInput";
+import { Button } from "@/components/ui/button";
+
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -64,12 +67,14 @@ export function LoginForm() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="w-full max-w-md space-y-8 p-8 bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-2xl"
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="w-full max-w-md space-y-8 p-10 bg-card/40 backdrop-blur-2xl rounded-[2.5rem] border border-border/50 shadow-2xl shadow-foreground/5"
     >
-      <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight font-heading">Welcome Back</h1>
-        <p className="text-muted-foreground">Enter your credentials to access your account</p>
+      <div className="space-y-3 text-center">
+        <h1 className="text-4xl font-bold tracking-tight font-sans">Welcome Back</h1>
+        <p className="text-muted-foreground text-sm font-medium leading-relaxed">
+          Enter your credentials to continue your <br /> snack journey
+        </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -77,78 +82,67 @@ export function LoginForm() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-4 bg-destructive/10 border border-destructive/20 rounded-2xl flex items-center gap-3 text-destructive text-sm"
+            className="p-4 bg-destructive/5 border border-destructive/10 rounded-2xl flex items-center gap-3 text-destructive text-sm font-medium"
           >
             <AlertCircle size={18} />
             <p>{error}</p>
           </motion.div>
         )}
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium pl-1" htmlFor="email">Email Address</label>
-            <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
-              <input
-                {...register("email")}
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                className={cn(
-                  "w-full bg-muted/50 border border-transparent focus:border-primary/20 rounded-2xl py-3 pl-12 pr-4 text-sm transition-all outline-none ring-primary/10 focus:ring-4",
-                  errors.email && "border-destructive/50 ring-destructive/10 focus:ring-destructive/10"
-                )}
-              />
-            </div>
-            {errors.email && <p className="text-xs text-destructive pl-1">{errors.email.message}</p>}
-          </div>
+        <div className="space-y-5">
+          <SoftInput
+            {...register("email")}
+            id="email"
+            type="email"
+            label="Email Address"
+            placeholder="name@example.com"
+            icon={Mail}
+            error={errors.email?.message}
+          />
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between pl-1">
-              <label className="text-sm font-medium" htmlFor="password">Password</label>
-              <Link href="/forgot-password" className="text-xs text-primary hover:underline">Forgot password?</Link>
+            <div className="flex items-center justify-end pr-1">
+              <Link href="/forgot-password" title="Reset your password" className="text-xs text-primary font-bold hover:underline underline-offset-4">
+                Forgot password?
+              </Link>
             </div>
-            <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
-              <input
-                {...register("password")}
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                className={cn(
-                  "w-full bg-muted/50 border border-transparent focus:border-primary/20 rounded-2xl py-3 pl-12 pr-4 text-sm transition-all outline-none ring-primary/10 focus:ring-4",
-                  errors.password && "border-destructive/50 ring-destructive/10 focus:ring-destructive/10"
-                )}
-              />
-            </div>
-            {errors.password && <p className="text-xs text-destructive pl-1">{errors.password.message}</p>}
+            <SoftInput
+              {...register("password")}
+              id="password"
+              type="password"
+              label="Password"
+              placeholder="••••••••"
+              icon={Lock}
+              error={errors.password?.message}
+            />
           </div>
         </div>
 
-        <button
+        <Button
           type="submit"
+          variant="soft"
           disabled={isLoading}
-          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
+          className="w-full py-7 text-base group"
         >
           {isLoading ? (
             <Loader2 className="animate-spin" size={20} />
           ) : (
             <>
               Sign In
-              <ArrowRight size={18} />
+              <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
             </>
           )}
-        </button>
+        </Button>
       </form>
 
-      <div className="text-center text-sm text-muted-foreground">
+      <div className="text-center text-sm text-muted-foreground font-medium pt-2">
         Don't have an account?{" "}
-        <button 
-          onClick={() => router.push("/register")} 
-          className="text-primary font-bold hover:underline"
+        <Link 
+          href="/register" 
+          className="text-primary font-bold hover:underline underline-offset-4"
         >
           Create an account
-        </button>
+        </Link>
       </div>
     </motion.div>
   );

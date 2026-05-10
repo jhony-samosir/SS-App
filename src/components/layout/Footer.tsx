@@ -1,7 +1,14 @@
+"use client";
+
 import Link from "next/link";
-import { Mail, Phone, MapPin } from "lucide-react";
-import { ElementType, SVGProps } from "react";
+import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { FOOTER_NAVIGATION } from "@/config/navigation";
+
+const socialIcons = [
+  { name: "Instagram", label: "Instagram" },
+  { name: "Twitter", label: "Twitter" },
+  { name: "Facebook", label: "Facebook" },
+];
 
 export function Footer() {
   return (
@@ -27,14 +34,14 @@ export function Footer() {
               Bringing the authentic taste of local Indonesian snacks to your doorstep. Quality, tradition, and the perfect crunch.
             </p>
             <div className="flex items-center gap-4">
-              {socialIcons.map(({ Icon, label }, i) => (
+              {socialIcons.map(({ name, label }, i) => (
                 <Link 
                   key={i} 
                   href="#" 
                   aria-label={`Follow us on ${label}`}
                   className="w-10 h-10 rounded-xl bg-muted/50 border border-border/50 flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all group shadow-sm"
                 >
-                  <Icon className="w-4 h-4 transition-transform group-hover:scale-110" />
+                  <DynamicIcon name={name} className="w-4 h-4 transition-transform group-hover:scale-110" />
                 </Link>
               ))}
             </div>

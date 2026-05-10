@@ -23,7 +23,7 @@ const userSchema = z.object({
   email: z.string().email("Invalid email address"),
   fullName: z.string().min(3, "Name must be at least 3 characters"),
   roleName: z.string().min(1, "Please select a role"),
-  isActive: z.boolean().default(true),
+  isActive: z.boolean(),
 });
 
 type UserFormValues = z.infer<typeof userSchema>;

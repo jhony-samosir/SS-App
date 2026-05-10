@@ -29,9 +29,9 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 const menuSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   path: z.string().min(1, "Path is required"),
-  icon: z.string().optional().default("Circle"),
-  sortOrder: z.coerce.number().min(0),
-  parentId: z.string().nullable().transform(v => v === "" ? null : v),
+  icon: z.string().min(1, "Icon is required"),
+  sortOrder: z.number().min(0),
+  parentId: z.string().nullable().optional(),
 });
 
 type MenuFormValues = z.infer<typeof menuSchema>;
@@ -322,7 +322,7 @@ export function MenusManagement() {
                             <label className="text-sm font-bold ml-1">Sort Order</label>
                             <input 
                               type="number" 
-                              {...register("sortOrder")} 
+                              {...register("sortOrder", { valueAsNumber: true })} 
                               className="w-full bg-muted/30 border border-border rounded-2xl px-5 py-3 outline-none focus:border-primary transition-all" 
                             />
                           </div>

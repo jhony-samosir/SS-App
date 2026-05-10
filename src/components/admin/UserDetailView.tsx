@@ -43,7 +43,6 @@ export function UserDetailView({ publicId }: { publicId: string }) {
   const [editError, setEditError] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<{ type: "unlock" | "reset" | "delete" | "disable_mfa" | "reset_recovery" | "resend_verify", label: string } | null>(null);
   const [actionReason, setActionReason] = useState("");
-  const [actionReason, setActionReason] = useState("");
 
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["user", publicId],

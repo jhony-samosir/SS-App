@@ -121,10 +121,10 @@ export const PinInput = forwardRef<PinInputHandle, PinInputProps>(({
           disabled={disabled}
           autoComplete="one-time-code"
           className={cn(
-            "w-12 h-14 text-center text-2xl font-bold bg-muted/50 border-2 border-transparent rounded-xl transition-all outline-none",
-            "focus:bg-background focus:border-primary focus:ring-4 focus:ring-primary/10",
+            "w-12 h-14 text-center text-2xl font-bold bg-muted/30 border border-border/50 rounded-2xl transition-all outline-none",
+            "focus:bg-card focus:border-primary/30 focus:ring-8 focus:ring-primary/5 focus:shadow-lg focus:shadow-primary/5",
             disabled && "opacity-50 cursor-not-allowed",
-            error && "border-destructive/50 bg-destructive/5"
+            error && "border-destructive/30 bg-destructive/5 ring-destructive/5"
           )}
           aria-label={`Digit ${i + 1}`}
         />
