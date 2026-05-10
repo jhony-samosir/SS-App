@@ -14,7 +14,7 @@ import { toast } from "sonner";
  */
 const apiClient = axios.create({
   baseURL: typeof window === "undefined" 
-    ? (process.env.API_BASE_URL || "https://localhost:7091")
+    ? (process.env.API_BASE_URL || "http://localhost:8080")
     : (process.env.NEXT_PUBLIC_API_BASE_URL || ""),
   withCredentials: true,
   headers: {

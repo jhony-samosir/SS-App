@@ -6,7 +6,7 @@ This document outlines the configuration for communicating with the SAMSTORE mic
 - `NEXT_PUBLIC_API_BASE_URL`: The public-facing URL of the API Gateway (used by the browser).
 - `API_BASE_URL`: The internal/server-facing URL of the API Gateway (used by Server Components and SSR).
 
-In development, these are typically set to `https://localhost:7091`.
+In development, these are typically set to `http://localhost:8080`.
 
 ## Key Integration Patterns
 
