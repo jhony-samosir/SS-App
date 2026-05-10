@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, User, Search, Menu, LogOut, Loader2, Shield, FolderTree } from "lucide-react";
+import { ShoppingCart, User, Search, Menu, LogOut, Loader2, Shield, FolderTree, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -138,6 +138,18 @@ export function Navbar() {
                         <FolderTree size={20} strokeWidth={2} />
                       </div>
                       <span className="text-sm font-medium hidden sm:inline-block">Menus</span>
+                    </Link>
+                  )}
+                  {hasPermission("UserManagement Read") && (
+                    <Link 
+                      href="/users"
+                      className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group"
+                      title="User Management"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-all overflow-hidden border border-emerald-500/20">
+                        <Users size={20} strokeWidth={2} />
+                      </div>
+                      <span className="text-sm font-medium hidden sm:inline-block">Users</span>
                     </Link>
                   )}
                 </div>
