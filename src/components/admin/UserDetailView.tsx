@@ -41,7 +41,9 @@ export function UserDetailView({ publicId }: { publicId: string }) {
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
-  const [confirmAction, setConfirmAction] = useState<{ type: "unlock" | "reset" | "delete", label: string } | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ type: "unlock" | "reset" | "delete" | "disable_mfa" | "reset_recovery" | "resend_verify", label: string } | null>(null);
+  const [actionReason, setActionReason] = useState("");
+  const [actionReason, setActionReason] = useState("");
 
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["user", publicId],
@@ -104,6 +106,52 @@ export function UserDetailView({ publicId }: { publicId: string }) {
     onError: (err: unknown) => {
       if (axios.isAxiosError(err)) {
         toast.error(err.response?.data?.message || "Failed to delete user");
+      }
+      setConfirmAction(null);
+    }
+  });
+
+  const disableMfaMutation = useMutation({
+    mutationFn: () => userService.disableMfa(publicId, actionReason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user", publicId] });
+      toast.success("MFA disabled successfully");
+      setConfirmAction(null);
+      setActionReason("");
+    },
+    onError: (err: unknown) => {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || "Failed to disable MFA");
+      }
+    }
+  });
+
+  const resetRecoveryMutation = useMutation({
+    mutationFn: () => userService.resetRecoveryCodes(publicId),
+    onSuccess: () => {
+      toast.success("Recovery codes reset successfully and sent to user");
+      setConfirmAction(null);
+    },
+    onError: (err: unknown) => {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || "Failed to reset recovery codes");
+      }
+    }
+  });
+
+  const resendVerifyMutation = useMutation({
+    mutationFn: () => userService.resendVerificationEmail(publicId),
+    onSuccess: () => {
+      toast.success("Verification email resent successfully");
+      setConfirmAction(null);
+    },
+    onError: (err: unknown) => {
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 429) {
+          toast.error("Please wait before requesting another email");
+        } else {
+          toast.error(err.response?.data?.message || "Failed to resend verification email");
+        }
       }
       setConfirmAction(null);
     }
@@ -229,6 +277,36 @@ export function UserDetailView({ publicId }: { publicId: string }) {
                 <RefreshCw size={18} />
                 Force Reset
               </button>
+
+              {user.mfaEnabled && (
+                <>
+                  <button 
+                    onClick={() => setConfirmAction({ type: "disable_mfa", label: "Disable MFA" })}
+                    className="flex-1 md:flex-none px-6 py-3 bg-rose-500/10 text-rose-600 border border-rose-500/20 hover:bg-rose-500 hover:text-white rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
+                  >
+                    <ShieldAlert size={18} />
+                    Disable MFA
+                  </button>
+
+                  <button 
+                    onClick={() => setConfirmAction({ type: "reset_recovery", label: "Reset Recovery Codes" })}
+                    className="flex-1 md:flex-none px-6 py-3 bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 hover:bg-indigo-500 hover:text-white rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
+                  >
+                    <RefreshCw size={18} />
+                    Reset Recovery
+                  </button>
+                </>
+              )}
+
+              {!user.isEmailVerified && (
+                <button 
+                  onClick={() => setConfirmAction({ type: "resend_verify", label: "Resend Verification" })}
+                  className="flex-1 md:flex-none px-6 py-3 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
+                >
+                  <Mail size={18} />
+                  Resend Verification
+                </button>
+              )}
             </>
           )}
 
@@ -377,8 +455,25 @@ export function UserDetailView({ publicId }: { publicId: string }) {
               <p className="text-muted-foreground mb-8">
                 {confirmAction.type === "delete" ? "Are you sure you want to delete this user? This action cannot be undone." : 
                  confirmAction.type === "reset" ? "Are you sure you want to force a password reset for this user? They will be required to change it upon next login." : 
+                 confirmAction.type === "disable_mfa" ? "Are you sure you want to disable MFA for this user? This should only be done after verifying identity." :
+                 confirmAction.type === "reset_recovery" ? "Are you sure you want to reset MFA recovery codes? New codes will be generated and sent via email." :
+                 confirmAction.type === "resend_verify" ? "Are you sure you want to resend the verification email to this user?" :
                  "Are you sure you want to unlock this account?"}
               </p>
+
+              {confirmAction.type === "disable_mfa" && (
+                <div className="mb-6 text-left space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                    Audit Reason (Required)
+                  </label>
+                  <textarea
+                    value={actionReason}
+                    onChange={(e) => setActionReason(e.target.value)}
+                    placeholder="e.g., User lost device and verified via phone..."
+                    className="w-full bg-muted/50 border border-border rounded-2xl p-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none min-h-[100px] resize-none"
+                  />
+                </div>
+              )}
               <div className="flex gap-4">
                 <button
                   onClick={() => setConfirmAction(null)}
@@ -391,16 +486,30 @@ export function UserDetailView({ publicId }: { publicId: string }) {
                     if (confirmAction.type === "unlock") unlockMutation.mutate();
                     if (confirmAction.type === "reset") resetMutation.mutate();
                     if (confirmAction.type === "delete") deleteMutation.mutate();
+                    if (confirmAction.type === "disable_mfa") disableMfaMutation.mutate();
+                    if (confirmAction.type === "reset_recovery") resetRecoveryMutation.mutate();
+                    if (confirmAction.type === "resend_verify") resendVerifyMutation.mutate();
                   }}
-                  disabled={unlockMutation.isPending || resetMutation.isPending || deleteMutation.isPending}
+                  disabled={
+                    unlockMutation.isPending || 
+                    resetMutation.isPending || 
+                    deleteMutation.isPending || 
+                    disableMfaMutation.isPending || 
+                    resetRecoveryMutation.isPending ||
+                    resendVerifyMutation.isPending ||
+                    (confirmAction.type === "disable_mfa" && !actionReason.trim())
+                  }
                   className={cn(
                     "flex-1 px-4 py-3 rounded-2xl font-bold transition-all flex items-center justify-center gap-2",
                     confirmAction.type === "delete" ? "bg-destructive text-white hover:bg-destructive/90" : 
                     confirmAction.type === "reset" ? "bg-secondary text-white hover:bg-secondary/90" : 
+                    confirmAction.type === "disable_mfa" ? "bg-rose-500 text-white hover:bg-rose-600 disabled:opacity-50" :
+                    confirmAction.type === "reset_recovery" ? "bg-indigo-500 text-white hover:bg-indigo-600" :
+                    confirmAction.type === "resend_verify" ? "bg-emerald-500 text-white hover:bg-emerald-600" :
                     "bg-amber-500 text-white hover:bg-amber-600"
                   )}
                 >
-                  {(unlockMutation.isPending || resetMutation.isPending || deleteMutation.isPending) ? (
+                  {(unlockMutation.isPending || resetMutation.isPending || deleteMutation.isPending || disableMfaMutation.isPending || resetRecoveryMutation.isPending || resendVerifyMutation.isPending) ? (
                     <Loader2 className="animate-spin" size={20} />
                   ) : "Confirm"}
                 </button>

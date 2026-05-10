@@ -60,3 +60,13 @@ export interface UserUpdateRequest {
   roleName: string;
   isActive: boolean;
 }
+
+export interface UserSession {
+  id: string;
+  userAgent: string;
+  ipAddress: string;
+  location: string;
+  lastActiveAt: string;
+  createdAt: string;
+  isCurrentSession: boolean;
+}

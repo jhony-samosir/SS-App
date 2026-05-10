@@ -1,5 +1,5 @@
 import apiClient from "@/lib/api-client";
-import { UserListResponse, UserProfile, UserCreateRequest, UserUpdateRequest } from "@/types/user";
+import { UserListResponse, UserProfile, UserCreateRequest, UserUpdateRequest, UserSession } from "@/types/user";
 
 export const userService = {
   /**
@@ -65,5 +65,48 @@ export const userService = {
    */
   forceResetPassword: async (id: string): Promise<void> => {
     await apiClient.put(`/api/user/${id}/force-reset-password`);
+  },
+
+  /**
+   * Disable MFA for a specific user (admin action)
+   */
+  disableMfa: async (id: string, reason: string): Promise<void> => {
+    await apiClient.put(`/api/user/${id}/mfa/disable`, { reason });
+  },
+
+  /**
+   * Reset/Regenerate MFA recovery codes for a user
+   */
+  resetRecoveryCodes: async (id: string): Promise<void> => {
+    await apiClient.put(`/api/user/${id}/mfa/reset-recovery-codes`);
+  },
+
+  /**
+   * Resend verification email to a user
+   */
+  resendVerificationEmail: async (id: string): Promise<void> => {
+    await apiClient.post(`/api/user/${id}/resend-verification`);
+  },
+
+  /**
+   * Get all active sessions for a specific user
+   */
+  getUserSessions: async (id: string): Promise<UserSession[]> => {
+    const response = await apiClient.get(`/api/user/${id}/sessions`);
+    return response.data;
+  },
+
+  /**
+   * Revoke a specific user session
+   */
+  revokeUserSession: async (id: string, sessionId: string): Promise<void> => {
+    await apiClient.delete(`/api/user/${id}/sessions/${sessionId}`);
+  },
+
+  /**
+   * Revoke all active sessions for a user
+   */
+  revokeAllUserSessions: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/user/${id}/sessions`);
   }
 };

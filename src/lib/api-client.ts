@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/use-auth-store";
+import { toast } from "sonner";
 
 /**
  * Enterprise API Client
@@ -18,6 +19,8 @@ const apiClient = axios.create({
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
+    // CSRF Protection: Standard header to identify AJAX requests
+    "X-Requested-With": "XMLHttpRequest",
   },
 });
 
@@ -35,16 +38,47 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor for API calls
+// Response interceptor for Enterprise Security
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized error: Sync UI state with expired/missing cookie
+    const status = error.response?.status;
+    const path = error.config?.url;
+
+    if (status === 401) {
+      // Unauthorized: Clear local state as the session cookie is likely invalid/expired
       if (typeof window !== "undefined") {
         useAuthStore.getState().logout();
       }
+    } else if (status === 403) {
+      // Forbidden: Log for audit and show global notification
+      console.error(`[Security Audit] Access denied for path: ${path}`);
+      if (typeof window !== "undefined") {
+        toast.error("Access Denied: You do not have permission for this action.");
+      }
+    } else if (status === 429) {
+      // Rate Limited: Surface standardized message
+      console.warn(`[Security Guard] Rate limit exceeded for path: ${path}`);
+      if (typeof window !== "undefined") {
+        toast.error("Too many requests. Please slow down.");
+      }
     }
+
+    // Effective Error Sanitization: Mutate the response data so UI components 
+    // reading from error.response.data.message get the sanitized version.
+    if (error.response?.data) {
+      const originalMessage = error.response.data.message;
+      error.response.data.message = originalMessage || "An unexpected system error occurred. Please try again later.";
+      
+      // Clean up sensitive internal details if they exist
+      delete error.response.data.stackTrace;
+      delete error.response.data.exception;
+      delete error.response.data.internalDetails;
+    }
+
+    // Also set the root message for consistency with Standard Error objects
+    error.message = error.response?.data?.message || error.message || "An unexpected error occurred.";
+
     return Promise.reject(error);
   }
 );

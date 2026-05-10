@@ -4,5 +4,6 @@ export const ADMIN_PERMISSIONS = [
   "UserManagement Read",
   "UserManagement Create",
   "UserManagement Update",
-  "UserManagement Delete"
+  "UserManagement Delete",
+  "SecurityAudit"
 ];

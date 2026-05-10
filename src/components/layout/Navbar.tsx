@@ -152,6 +152,18 @@ export function Navbar() {
                       <span className="text-sm font-medium hidden sm:inline-block">Users</span>
                     </Link>
                   )}
+                  {hasPermission("SecurityAudit") && (
+                    <Link 
+                      href="/admin/security/login-attempts"
+                      className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group"
+                      title="Security Audit"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-all overflow-hidden border border-rose-500/20">
+                        <Shield size={20} strokeWidth={2} />
+                      </div>
+                      <span className="text-sm font-medium hidden sm:inline-block">Security</span>
+                    </Link>
+                  )}
                 </div>
               )}
               
