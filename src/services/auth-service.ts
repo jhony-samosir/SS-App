@@ -5,6 +5,8 @@ import {
   RegisterRequest, 
   RegisterResponse, 
   MfaVerifyRequest,
+  MfaSetupResponse,
+  MfaEnableRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest
 } from "@/types/auth";

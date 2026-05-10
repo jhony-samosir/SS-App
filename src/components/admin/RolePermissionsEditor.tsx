@@ -95,12 +95,12 @@ export function RolePermissionsEditor({ roleId, roleName, isOpen, onClose }: Rol
     setLocalPermissions(prev => {
       const newPerms = [...prev];
       allMenus.forEach(menu => {
-        const existingIdx = newPerms.findIndex(p => p.menuId === menu.id);
+        const existingIdx = newPerms.findIndex(p => p.menuId === menu.publicId);
         if (existingIdx >= 0) {
           newPerms[existingIdx] = { ...newPerms[existingIdx], [action]: value };
         } else {
           newPerms.push({
-            menuId: menu.id,
+            menuId: menu.publicId,
             menuName: menu.name,
             canRead: false,
             canCreate: false,
@@ -218,7 +218,7 @@ export function RolePermissionsEditor({ roleId, roleName, isOpen, onClose }: Rol
                    <div className="divide-y divide-border/50">
                      {menuTree?.map(menu => (
                        <PermissionRow 
-                         key={menu.id} 
+                         key={menu.publicId} 
                          menu={menu} 
                          localPermissions={localPermissions} 
                          onToggle={togglePermission} 
@@ -291,7 +291,7 @@ export function RolePermissionsEditor({ roleId, roleName, isOpen, onClose }: Rol
 }
 
 function PermissionRow({ menu, localPermissions, onToggle, depth }: { menu: MenuItem, localPermissions: RolePermission[], onToggle: (id: string, a: PermissionAction, name: string) => void, depth: number }) {
-  const perm = localPermissions.find(p => p.menuId === menu.id) || { menuId: menu.id, canRead: false, canCreate: false, canUpdate: false, canDelete: false };
+  const perm = localPermissions.find(p => p.menuId === menu.publicId) || { menuId: menu.publicId, canRead: false, canCreate: false, canUpdate: false, canDelete: false };
   const hasChildren = menu.children && menu.children.length > 0;
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -310,22 +310,22 @@ function PermissionRow({ menu, localPermissions, onToggle, depth }: { menu: Menu
           <span className={cn("text-sm font-medium", depth === 0 ? "text-foreground" : "text-muted-foreground")}>{menu.name}</span>
         </div>
         <div className="col-span-2 flex justify-center">
-          <Checkbox checked={perm.canRead} onChange={() => onToggle(menu.id, "canRead", menu.name)} />
+          <Checkbox checked={perm.canRead} onChange={() => onToggle(menu.publicId, "canRead", menu.name)} />
         </div>
         <div className="col-span-2 flex justify-center">
-          <Checkbox checked={perm.canCreate} onChange={() => onToggle(menu.id, "canCreate", menu.name)} />
+          <Checkbox checked={perm.canCreate} onChange={() => onToggle(menu.publicId, "canCreate", menu.name)} />
         </div>
         <div className="col-span-2 flex justify-center">
-          <Checkbox checked={perm.canUpdate} onChange={() => onToggle(menu.id, "canUpdate", menu.name)} />
+          <Checkbox checked={perm.canUpdate} onChange={() => onToggle(menu.publicId, "canUpdate", menu.name)} />
         </div>
         <div className="col-span-2 flex justify-center">
-          <Checkbox checked={perm.canDelete} onChange={() => onToggle(menu.id, "canDelete", menu.name)} />
+          <Checkbox checked={perm.canDelete} onChange={() => onToggle(menu.publicId, "canDelete", menu.name)} />
         </div>
       </div>
       {isExpanded && hasChildren && (
         <div className="space-y-1">
           {menu.children?.map(child => (
-            <PermissionRow key={child.id} menu={child} localPermissions={localPermissions} onToggle={onToggle} depth={depth + 1} />
+            <PermissionRow key={child.publicId} menu={child} localPermissions={localPermissions} onToggle={onToggle} depth={depth + 1} />
           ))}
         </div>
       )}

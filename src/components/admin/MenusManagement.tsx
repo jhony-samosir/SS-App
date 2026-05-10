@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   Plus, 
@@ -103,20 +103,7 @@ export function MenusManagement() {
     defaultValues: { parentId: null, sortOrder: 0, icon: "Circle" }
   });
 
-  // Sync form with editing data
-  useState(() => {
-    if (editingMenu) {
-      reset({
-        name: editingMenu.name,
-        path: editingMenu.path,
-        icon: editingMenu.icon,
-        sortOrder: editingMenu.sortOrder,
-        parentId: editingMenu.parentId,
-      });
-    }
-  });
-
-  // Effect to reset form when editingMenu changes (alternative to the above)
+  // Effect to reset form when editingMenu changes
   useEffect(() => {
     if (editingMenu) {
       reset({
@@ -141,7 +128,7 @@ export function MenusManagement() {
     }
   };
 
-  // Helper to get all descendant IDs to prevent circular dependencies
+  // Helper to get all descendant publicIds to prevent circular dependencies
   const getDescendantIds = (nodes: MenuItem[], targetId: string): string[] => {
     const targetNode = nodes.find(n => n.publicId === targetId);
     if (!targetNode || !targetNode.children) return [];
@@ -149,7 +136,7 @@ export function MenusManagement() {
     let ids: string[] = [];
     const traverse = (children: MenuItem[]) => {
       children.forEach(child => {
-        ids.push(child.id); // Assuming ID used in parentId is the database ID
+        ids.push(child.publicId);
         if (child.children) traverse(child.children);
       });
     };
@@ -159,7 +146,7 @@ export function MenusManagement() {
 
   const descendantIds = editingId && menuTree ? getDescendantIds(menuTree, editingId) : [];
   const validParents = flatMenus?.filter(m => 
-    m.publicId !== editingId && !descendantIds.includes(m.id)
+    m.publicId !== editingId && !descendantIds.includes(m.publicId)
   );
 
   // Client-side pagination logic
@@ -347,7 +334,7 @@ export function MenusManagement() {
                             >
                               <option value="">None (Root)</option>
                               {validParents?.map(m => (
-                                <option key={m.id} value={m.id}>{m.name}</option>
+                                <option key={m.publicId} value={m.publicId}>{m.name}</option>
                               ))}
                             </select>
                           </div>
@@ -411,7 +398,7 @@ function MenuTreeNode({ node, onEdit, onDelete }: { node: MenuItem, onEdit: (m: 
       
       {isExpanded && hasChildren && (
         <div className="ml-8 border-l border-border pl-2 mt-1 space-y-1">
-          {node.children?.map(child => <MenuTreeNode key={child.id} node={child} onEdit={onEdit} onDelete={onDelete} />)}
+          {node.children?.map(child => <MenuTreeNode key={child.publicId} node={child} onEdit={onEdit} onDelete={onDelete} />)}
         </div>
       )}
     </div>

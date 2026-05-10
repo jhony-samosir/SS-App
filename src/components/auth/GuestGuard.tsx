@@ -15,9 +15,13 @@ export function GuestGuard({ children }: { children: React.ReactNode }) {
     }
   }, [isAuthenticated, isInitialized, router]);
 
-  // While initializing, return null to avoid flashing guest content for authenticated users
+  // While initializing, show a subtle loader to prevent flash of empty content
   if (!isInitialized) {
-    return null; 
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
   }
 
   // If already authenticated after initialization, don't render children (redirect will trigger)
