@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, User, Search, Menu, LogOut, Loader2 } from "lucide-react";
+import { ShoppingCart, User, Search, Menu, LogOut, Loader2, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -113,6 +113,18 @@ export function Navbar() {
             <div className="w-24 h-9 bg-muted/50 animate-pulse rounded-2xl" />
           ) : isAuthenticated ? (
             <div className="flex items-center gap-2">
+              {hasPermission("RoleManagement") && (
+                <Link 
+                  href="/roles"
+                  className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-all overflow-hidden border border-amber-500/20">
+                    <Shield size={20} strokeWidth={2} />
+                  </div>
+                  <span className="text-sm font-medium hidden sm:inline-block">Admin</span>
+                </Link>
+              )}
+              
               <Link 
                 href="/profile"
                 className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group"

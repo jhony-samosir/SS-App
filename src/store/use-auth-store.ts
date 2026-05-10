@@ -6,6 +6,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  permissions: string[];
 }
 
 interface AuthState {
@@ -19,11 +20,12 @@ interface AuthState {
   setMfaChallenge: (token: string) => void;
   clearMfaChallenge: () => void;
   logout: () => void;
+  hasPermission: (permission: string) => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
       isInitialized: false,
@@ -44,10 +46,15 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         set({ user: null, isAuthenticated: false, mfaToken: null, isMfaRequired: false });
       },
+      hasPermission: (permission) => {
+        const { user } = get();
+        if (!user) return false;
+        // Support specific permissions or wildcard access
+        return user.permissions.includes(permission) || user.permissions.includes("*");
+      },
     }),
     {
       name: "auth-storage",
-      // Only persist user and auth status, not initialization or MFA tokens
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
