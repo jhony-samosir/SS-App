@@ -21,6 +21,7 @@ interface AuthState {
   clearMfaChallenge: () => void;
   logout: () => void;
   hasPermission: (permission: string) => boolean;
+  hasAnyPermission: (permissions: string[]) => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -51,6 +52,12 @@ export const useAuthStore = create<AuthState>()(
         if (!user) return false;
         // Support specific permissions or wildcard access
         return user.permissions.includes(permission) || user.permissions.includes("*");
+      },
+      hasAnyPermission: (permissions) => {
+        const { user } = get();
+        if (!user) return false;
+        if (user.permissions.includes("*")) return true;
+        return permissions.some(p => user.permissions.includes(p));
       },
     }),
     {

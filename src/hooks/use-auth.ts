@@ -25,9 +25,11 @@ export function useAuth() {
       setMfaChallenge: auth.setMfaChallenge,
       clearMfaChallenge: auth.clearMfaChallenge,
       logout: auth.logout,
+      hasPermission: () => false,
+      hasAnyPermission: () => false,
       isHydrated: false,
     };
   }
 
-  return { ...auth, isHydrated: true };
+  return { ...auth, hasAnyPermission: auth.hasAnyPermission, isHydrated: true };
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, User, Search, Menu, LogOut, Loader2, Shield } from "lucide-react";
+import { ShoppingCart, User, Search, Menu, LogOut, Loader2, Shield, FolderTree } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -9,11 +9,12 @@ import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "./ThemeToggle";
 import { authService } from "@/services/auth-service";
 import { useRouter } from "next/navigation";
+import { ADMIN_PERMISSIONS } from "@/lib/constants";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { user, isAuthenticated, logout, isHydrated } = useAuth();
+  const { user, isAuthenticated, logout, isHydrated, hasPermission, hasAnyPermission } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -113,16 +114,33 @@ export function Navbar() {
             <div className="w-24 h-9 bg-muted/50 animate-pulse rounded-2xl" />
           ) : isAuthenticated ? (
             <div className="flex items-center gap-2">
-              {hasPermission("RoleManagement") && (
-                <Link 
-                  href="/roles"
-                  className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group"
-                >
-                  <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-all overflow-hidden border border-amber-500/20">
-                    <Shield size={20} strokeWidth={2} />
-                  </div>
-                  <span className="text-sm font-medium hidden sm:inline-block">Admin</span>
-                </Link>
+              {hasAnyPermission(ADMIN_PERMISSIONS) && (
+                <div className="flex items-center gap-1">
+                  {hasPermission("RoleManagement") && (
+                    <Link 
+                      href="/roles"
+                      className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group"
+                      title="Role Management"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-all overflow-hidden border border-amber-500/20">
+                        <Shield size={20} strokeWidth={2} />
+                      </div>
+                      <span className="text-sm font-medium hidden sm:inline-block">Roles</span>
+                    </Link>
+                  )}
+                  {hasPermission("MenuManagement") && (
+                    <Link 
+                      href="/menus"
+                      className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group"
+                      title="Menu Management"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white transition-all overflow-hidden border border-indigo-500/20">
+                        <FolderTree size={20} strokeWidth={2} />
+                      </div>
+                      <span className="text-sm font-medium hidden sm:inline-block">Menus</span>
+                    </Link>
+                  )}
+                </div>
               )}
               
               <Link 

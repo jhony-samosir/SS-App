@@ -3,20 +3,21 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/use-auth-store";
+import { ADMIN_PERMISSIONS } from "@/lib/constants";
 
 export function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isInitialized, hasPermission } = useAuthStore();
+  const { isAuthenticated, isInitialized, hasAnyPermission } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
     if (isInitialized) {
       if (!isAuthenticated) {
         router.push("/login");
-      } else if (!hasPermission("RoleManagement")) {
+      } else if (!hasAnyPermission(ADMIN_PERMISSIONS)) {
         router.push("/");
       }
     }
-  }, [isAuthenticated, isInitialized, hasPermission, router]);
+  }, [isAuthenticated, isInitialized, hasAnyPermission, router]);
 
   if (!isInitialized) {
     return (
@@ -27,7 +28,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAuthenticated || !hasPermission("RoleManagement")) {
+  if (!isAuthenticated || !hasAnyPermission(ADMIN_PERMISSIONS)) {
     return null;
   }
 
