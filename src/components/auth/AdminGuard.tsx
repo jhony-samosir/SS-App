@@ -14,7 +14,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
       if (!isAuthenticated) {
         router.push("/login");
       } else if (!hasAnyPermission(ADMIN_PERMISSIONS)) {
-        router.push("/");
+        router.push("/unauthorized");
       }
     }
   }, [isAuthenticated, isInitialized, hasAnyPermission, router]);

@@ -27,6 +27,7 @@ export function useAuth() {
       logout: auth.logout,
       hasPermission: () => false,
       hasAnyPermission: () => false,
+      hasRole: () => false,
       isHydrated: false,
     };
   }
