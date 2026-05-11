@@ -68,9 +68,25 @@ function MfaContent() {
         code: data.code,
       });
 
+      // Capture token from response
+      const token = (response as any).access_token || (response as any).accessToken;
+
       if (response.user) {
-        setAuth(response.user);
+        setAuth(response.user, token);
         handlePostLoginRedirect(response.user);
+      } else if (token) {
+        // Fallback for JWT strategies where user is missing in body
+        setAuth({ id: "", name: "", email: "", roleName: "", permissions: [] }, token);
+        try {
+          const userResponse = await authService.getCurrentUser();
+          if (userResponse?.user) {
+            setAuth(userResponse.user, token);
+            handlePostLoginRedirect(userResponse.user);
+            return;
+          }
+        } catch (fetchErr) {
+          console.error("Failed to fetch user profile after MFA:", fetchErr);
+        }
       }
     } catch (err: unknown) {
       let message = "Invalid verification code. Please try again.";
@@ -82,7 +98,6 @@ function MfaContent() {
       setError(message);
       setValue("code", "");
       
-      // UX Best Practice: requestAnimationFrame for focus after state update
       requestAnimationFrame(() => {
         pinRef.current?.focus();
       });
@@ -96,7 +111,7 @@ function MfaContent() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full max-w-md space-y-8 p-10 bg-card/40 backdrop-blur-2xl rounded-[2.5rem] border border-border/50 shadow-2xl shadow-foreground/5"
+      className="w-full max-w-md space-y-8 p-10 bg-card/95 rounded-[2.5rem] border border-border/50 shadow-xl"
     >
       <div className="space-y-3 text-center">
         <div className="w-16 h-16 bg-primary/10 text-primary rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 border border-primary/20">

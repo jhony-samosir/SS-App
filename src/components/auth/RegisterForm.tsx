@@ -94,7 +94,7 @@ export function RegisterForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full max-w-md space-y-8 p-10 bg-card/40 backdrop-blur-2xl rounded-[2.5rem] border border-border/50 shadow-2xl shadow-foreground/5"
+      className="w-full max-w-md space-y-8 p-10 bg-card/95 rounded-[2.5rem] border border-border/50 shadow-xl"
     >
       <div className="space-y-3 text-center">
         <h1 className="text-4xl font-bold tracking-tight font-sans">Join SamStore</h1>

@@ -11,10 +11,13 @@ import { AUTH_COOKIE_NAMES } from "@/lib/constants";
 export function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  // Define protected and guest-only routes
+  // Define protected routes
   // Corrected: /account is the parent for profile
   const isProtectedRoute = pathname.startsWith("/admin") || pathname.startsWith("/account");
-  const isGuestRoute = pathname.startsWith("/login") || pathname.startsWith("/register");
+  
+  // Note: We removed the Guest Guard (redirecting from /login to /) 
+  // to prevent redirection loops when a session cookie exists but the 
+  // session is invalid or expired at the API level.
 
   // Check for session signals using centralized constants
   const hasSession = AUTH_COOKIE_NAMES.some(cookieName => request.cookies.has(cookieName));
@@ -29,11 +32,6 @@ export function middleware(request: NextRequest) {
     url.searchParams.set("returnUrl", currentPath);
     
     return NextResponse.redirect(url);
-  }
-
-  // 2. Guest Guard: Auth user trying to access login/register
-  if (isGuestRoute && hasSession) {
-    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

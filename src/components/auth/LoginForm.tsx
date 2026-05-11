@@ -49,19 +49,51 @@ function LoginContent() {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
+    if (isLoading) return;
     setIsLoading(true);
     setError(null);
 
     try {
+      // 1. Attempt login
       const response = await authService.login(data);
+      
+      // Capture token from response (could be access_token or accessToken)
+      const token = (response as any).access_token || (response as any).accessToken;
 
+      // 2. Handle MFA requirement
       if (response.isMfaRequired && response.mfaToken) {
         setMfaChallenge(response.mfaToken);
         router.push("/mfa");
-      } else if (response.user) {
-        setAuth(response.user);
-        handlePostLoginRedirect(response.user);
+        return;
       }
+
+      // 3. Handle successful login and redirection
+      if (response.user) {
+        setAuth(response.user, token);
+        handlePostLoginRedirect(response.user);
+        return;
+      }
+
+      // 4. Fallback: If login succeeded but user object is missing,
+      // fetch the user profile manually (Authorization interceptor will now use the token if we save it first)
+      if (token) {
+        // We set the token first so getCurrentUser can use it
+        setAuth({ id: "", name: "", email: "", roleName: "", permissions: [] }, token);
+        
+        try {
+          const userResponse = await authService.getCurrentUser();
+          if (userResponse?.user) {
+            setAuth(userResponse.user, token);
+            handlePostLoginRedirect(userResponse.user);
+            return;
+          }
+        } catch (fetchErr) {
+          console.error("Failed to fetch user profile after successful login:", fetchErr);
+        }
+      }
+
+      setError("Authentication successful, but could not retrieve user profile. Please try again.");
+      
     } catch (err: unknown) {
       let message = "Invalid email or password. Please try again.";
       if (axios.isAxiosError(err)) {
@@ -78,7 +110,7 @@ function LoginContent() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full max-w-md space-y-8 p-10 bg-card/40 backdrop-blur-2xl rounded-[2.5rem] border border-border/50 shadow-2xl shadow-foreground/5"
+      className="w-full max-w-md space-y-8 p-10 bg-card/95 rounded-[2.5rem] border border-border/50 shadow-xl"
     >
       <div className="space-y-3 text-center">
         <h1 className="text-4xl font-bold tracking-tight font-sans">Welcome Back</h1>
@@ -135,7 +167,10 @@ function LoginContent() {
           className="w-full py-7 text-base group"
         >
           {isLoading ? (
-            <Loader2 className="animate-spin" size={20} />
+            <div className="flex items-center gap-2">
+              <Loader2 className="animate-spin" size={20} />
+              <span>Signing in...</span>
+            </div>
           ) : (
             <>
               Sign In

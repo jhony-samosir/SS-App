@@ -35,6 +35,14 @@ export const authService = {
   },
 
   /**
+   * Refresh the access token using the HttpOnly refresh cookie
+   */
+  refresh: async (): Promise<{ accessToken: string }> => {
+    const response = await apiClient.post("/api/auth/refresh");
+    return response.data;
+  },
+
+  /**
    * Verify MFA code using the mfaToken
    */
   verifyMfa: async (data: MfaVerifyRequest): Promise<LoginResponse> => {

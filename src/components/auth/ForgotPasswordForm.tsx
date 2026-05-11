@@ -52,7 +52,7 @@ export function ForgotPasswordForm() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md p-8 bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-2xl text-center space-y-6"
+        className="w-full max-w-md p-8 bg-card/95 rounded-3xl border border-border shadow-xl text-center space-y-6"
       >
         <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto">
           <CheckCircle2 size={40} />
@@ -78,7 +78,7 @@ export function ForgotPasswordForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-md space-y-8 p-8 bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-2xl"
+      className="w-full max-w-md space-y-8 p-8 bg-card/95 rounded-3xl border border-border shadow-xl"
     >
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-bold tracking-tight font-heading">Reset Password</h1>

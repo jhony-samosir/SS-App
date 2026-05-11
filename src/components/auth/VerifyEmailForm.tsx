@@ -60,7 +60,7 @@ export function VerifyEmailForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-md space-y-8 p-8 bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-2xl text-center"
+      className="w-full max-w-md space-y-8 p-8 bg-card/95 rounded-3xl border border-border shadow-xl text-center"
     >
       {verificationState === "loading" && (
         <div className="space-y-6">

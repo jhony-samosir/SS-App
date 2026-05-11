@@ -11,11 +11,13 @@ interface User {
 
 interface AuthState {
   user: User | null;
+  accessToken: string | null;
   isAuthenticated: boolean;
   isInitialized: boolean;
   mfaToken: string | null;
   isMfaRequired: boolean;
-  setAuth: (user: User) => void;
+  setAuth: (user: User, accessToken?: string) => void;
+  setAccessToken: (token: string) => void; // New action for refreshing
   setInitialized: (val: boolean) => void;
   setMfaChallenge: (token: string) => void;
   clearMfaChallenge: () => void;
@@ -29,12 +31,22 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
+      accessToken: null,
       isAuthenticated: false,
       isInitialized: false,
       mfaToken: null,
       isMfaRequired: false,
-      setAuth: (user) => {
-        set({ user, isAuthenticated: true, isMfaRequired: false, mfaToken: null });
+      setAuth: (user, accessToken) => {
+        set({ 
+          user, 
+          accessToken: accessToken || get().accessToken, 
+          isAuthenticated: true, 
+          isMfaRequired: false, 
+          mfaToken: null 
+        });
+      },
+      setAccessToken: (accessToken) => {
+        set({ accessToken, isAuthenticated: true });
       },
       setInitialized: (val) => {
         set({ isInitialized: val });
@@ -46,12 +58,11 @@ export const useAuthStore = create<AuthState>()(
         set({ mfaToken: null, isMfaRequired: false });
       },
       logout: () => {
-        set({ user: null, isAuthenticated: false, mfaToken: null, isMfaRequired: false });
+        set({ user: null, accessToken: null, isAuthenticated: false, mfaToken: null, isMfaRequired: false });
       },
       hasPermission: (permission) => {
         const { user } = get();
         if (!user) return false;
-        // Support specific permissions or wildcard access
         return user.permissions.includes(permission) || user.permissions.includes("*");
       },
       hasAnyPermission: (permissions) => {
@@ -67,6 +78,8 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
+      // Security Hardening: Only persist non-sensitive UI state.
+      // accessToken is NO LONGER persisted to localStorage.
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,

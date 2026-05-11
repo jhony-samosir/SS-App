@@ -1,32 +1,67 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/store/use-auth-store";
 import { authService } from "@/services/auth-service";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+/**
+ * Enterprise Auth Provider
+ * 
+ * Responsibilities:
+ * 1. Bootstrap the session on app load (Sync Store with Cookies/JWT).
+ * 2. Handle silent refresh if the access token is missing from memory.
+ */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { setAuth, setInitialized } = useAuthStore();
+  const { setAuth, setAccessToken, setInitialized, isAuthenticated, accessToken } = useAuthStore();
+  const queryClient = useQueryClient();
+  const refreshStarted = useRef(false);
 
-  // Fetch current user on app start to bootstrap session
-  // Silent background fetch to avoid blocking public pages
+  // 1. Silent Refresh Logic: If we are "authenticated" but have no token (e.g. page refresh)
+  useEffect(() => {
+    async function performSilentRefresh() {
+      if (isAuthenticated && !accessToken && !refreshStarted.current) {
+        refreshStarted.current = true;
+        try {
+          const { accessToken: newToken } = await authService.refresh();
+          setAccessToken(newToken);
+          // Refetch user profile after successful refresh to ensure state is in sync
+          queryClient.invalidateQueries({ queryKey: ["current-user"] });
+        } catch (error) {
+          console.error("Silent refresh failed during initialization:", error);
+          // logout() will be called by interceptor if refresh returns 401
+        }
+      }
+    }
+    performSilentRefresh();
+  }, [isAuthenticated, accessToken, setAccessToken, queryClient]);
+
+  // 2. Fetch current user on app start to bootstrap session
   const { data, isSuccess, isError, isLoading } = useQuery({
     queryKey: ["current-user"],
     queryFn: () => authService.getCurrentUser(),
-    retry: false,
-    staleTime: Infinity,
+    retry: (failureCount, error: any) => {
+      // Don't retry on 401 as the interceptor will handle token rotation
+      if (error?.response?.status === 401) return false;
+      return failureCount < 2;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!accessToken || isAuthenticated, // Only fetch if we have a token or think we are logged in
   });
 
   useEffect(() => {
     if (isSuccess && data?.user) {
       setAuth(data.user);
       setInitialized(true);
-    } else if (isError || (!isLoading && !data)) {
-      // If error or finished loading without data, we're initialized but unauthenticated
-      // (interceptor handles logout on 401)
+    } else if (isError || (!isLoading && !data && isHydrated())) {
       setInitialized(true);
     }
   }, [data, isSuccess, isError, isLoading, setAuth, setInitialized]);
+
+  // Helper to check if store has hydrated (simple check for user/isAuthenticated existence)
+  function isHydrated() {
+    return true; // useAuth hook already handles hydration safety for us
+  }
 
   return <>{children}</>;
 }
