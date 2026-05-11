@@ -7,3 +7,13 @@ export const ADMIN_PERMISSIONS = [
   "UserManagement Delete",
   "SecurityAudit"
 ];
+
+/**
+ * Heuristic cookie names for session detection at the Edge.
+ * These should align with YARP and AuthService configurations.
+ */
+export const AUTH_COOKIE_NAMES = [
+  "auth-session",
+  ".AspNetCore.Cookies",
+  "session"
+];

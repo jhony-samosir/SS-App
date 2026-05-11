@@ -1,6 +1,7 @@
 export const STORE_NAVIGATION = [
   { name: "Home", href: "/" },
   { name: "Shop", href: "/shop" },
+  { name: "Deals", href: "/offers" },
   { name: "Best Sellers", href: "/best-sellers" },
   { name: "Categories", href: "#categories" },
 ];
