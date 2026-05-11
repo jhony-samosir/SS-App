@@ -1,31 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, Suspense } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/use-auth-store";
 import { ADMIN_PERMISSIONS } from "@/lib/constants";
+import { GuardFallback } from "./guards/GuardFallback";
 
-export function AdminGuard({ children }: { children: React.ReactNode }) {
+function AdminGuardContent({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isInitialized, hasAnyPermission } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (isInitialized) {
       if (!isAuthenticated) {
-        router.push("/login");
+        const params = new URLSearchParams(searchParams.toString());
+        const currentPath = pathname + (params.toString() ? `?${params.toString()}` : "");
+        router.push(`/login?returnUrl=${encodeURIComponent(currentPath)}`);
       } else if (!hasAnyPermission(ADMIN_PERMISSIONS)) {
         router.push("/unauthorized");
       }
     }
-  }, [isAuthenticated, isInitialized, hasAnyPermission, router]);
+  }, [isAuthenticated, isInitialized, hasAnyPermission, router, pathname, searchParams]);
 
   if (!isInitialized) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-        <p className="text-sm text-muted-foreground animate-pulse">Verifying administrative access...</p>
-      </div>
-    );
+    return <GuardFallback message="Verifying administrative access..." />;
   }
 
   if (!isAuthenticated || !hasAnyPermission(ADMIN_PERMISSIONS)) {
@@ -33,4 +33,12 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
+}
+
+export function AdminGuard({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<GuardFallback message="Verifying administrative access..." />}>
+      <AdminGuardContent>{children}</AdminGuardContent>
+    </Suspense>
+  );
 }

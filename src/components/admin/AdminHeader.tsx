@@ -57,7 +57,7 @@ export function AdminHeader() {
           <div className="flex items-center gap-3 pl-1">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-bold leading-none">{user?.name || "Admin"}</p>
-              <p className="text-[10px] text-muted-foreground font-medium mt-1 uppercase tracking-wider">{user?.role || "System Admin"}</p>
+              <p className="text-[10px] text-muted-foreground font-medium mt-1 uppercase tracking-wider">{user?.roleName || "System Admin"}</p>
             </div>
             <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
               <User size={20} />

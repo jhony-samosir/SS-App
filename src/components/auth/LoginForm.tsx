@@ -10,8 +10,10 @@ import { motion } from "framer-motion";
 import { Loader2, Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
 import { authService } from "@/services/auth-service";
 import { useAuth } from "@/hooks/use-auth";
+import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { cn } from "@/lib/utils";
 import axios from "axios";
+import { Suspense } from "react";
 
 import { SoftInput } from "@/components/ui/SoftInput";
 import { Button } from "@/components/ui/button";
@@ -24,10 +26,19 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
+  return (
+    <Suspense fallback={<div className="w-full max-w-md h-[400px] bg-card/40 animate-pulse rounded-[2.5rem]" />}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { setAuth, setMfaChallenge } = useAuth();
+  const { handlePostLoginRedirect } = useAuthRedirect();
 
   const {
     register,
@@ -49,8 +60,7 @@ export function LoginForm() {
         router.push("/mfa");
       } else if (response.user) {
         setAuth(response.user);
-        router.push("/");
-        router.refresh();
+        handlePostLoginRedirect(response.user);
       }
     } catch (err: unknown) {
       let message = "Invalid email or password. Please try again.";

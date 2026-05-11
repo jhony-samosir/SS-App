@@ -9,9 +9,11 @@ import { motion } from "framer-motion";
 import { Loader2, ShieldCheck, ArrowRight, AlertCircle } from "lucide-react";
 import { authService } from "@/services/auth-service";
 import { useAuth } from "@/hooks/use-auth";
+import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { PinInput, type PinInputHandle } from "./PinInput";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { Suspense } from "react";
 
 const mfaSchema = z.object({
   code: z.string().length(6, "Verification code must be 6 digits"),
@@ -20,12 +22,21 @@ const mfaSchema = z.object({
 type MfaFormValues = z.infer<typeof mfaSchema>;
 
 export function MfaForm() {
+  return (
+    <Suspense fallback={<div className="w-full max-w-md h-[400px] bg-card/40 animate-pulse rounded-[2.5rem]" />}>
+      <MfaContent />
+    </Suspense>
+  );
+}
+
+function MfaContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const pinRef = useRef<PinInputHandle>(null);
 
   const { mfaToken, isMfaRequired, setAuth, clearMfaChallenge, isHydrated } = useAuth();
+  const { handlePostLoginRedirect } = useAuthRedirect();
 
   const {
     control,
@@ -59,8 +70,7 @@ export function MfaForm() {
 
       if (response.user) {
         setAuth(response.user);
-        router.push("/");
-        router.refresh();
+        handlePostLoginRedirect(response.user);
       }
     } catch (err: unknown) {
       let message = "Invalid verification code. Please try again.";
