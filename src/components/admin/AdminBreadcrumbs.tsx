@@ -20,6 +20,12 @@ export function AdminBreadcrumbs() {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
 
+  /**
+   * TODO: Implement dynamic route mapping.
+   * Instead of a static SEGMENT_LABELS map, we should use a centralized route configuration 
+   * or fetch metadata from the active route to ensure scalability as the application grows.
+   */
+
   return (
     <nav className="flex items-center space-x-1 text-sm font-medium text-muted-foreground">
       <Link

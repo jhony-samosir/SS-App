@@ -32,24 +32,40 @@ interface NavSection {
 
 const navigation: NavSection[] = [
   {
-    title: "Identity & Access",
+    title: "Users",
     items: [
       { name: "User Management", href: "/admin/users", icon: Users, permission: "UserManagement Read" },
-      { name: "Roles & Policies", href: "/admin/roles", icon: ShieldCheck, permission: "RoleManagement" },
     ]
   },
   {
-    title: "System Config",
+    title: "Roles",
     items: [
-      { name: "Menus & Routes", href: "/admin/menus", icon: LayoutGrid, permission: "MenuManagement" },
-      { name: "Security Audit", href: "/admin/security/login-attempts", icon: Lock, permission: "SecurityAudit" },
+      { name: "Role Policies", href: "/admin/roles", icon: ShieldCheck, permission: "RoleManagement" },
     ]
   },
   {
-    title: "Infrastructure",
+    title: "Permissions",
+    items: [
+      { name: "Registry", href: "/admin/permissions", icon: Lock, permission: "RoleManagement" },
+    ]
+  },
+  {
+    title: "Menus",
+    items: [
+      { name: "Navigation Tree", href: "/admin/menus", icon: LayoutGrid, permission: "MenuManagement" },
+    ]
+  },
+  {
+    title: "Security",
+    items: [
+      { name: "Security Audit", href: "/admin/security/login-attempts", icon: Activity, permission: "SecurityAudit" },
+    ]
+  },
+  {
+    title: "System (Dev)",
     items: [
       { name: "System Logs", href: "/admin/logs", icon: Activity, permission: "SecurityAudit" },
-      { name: "General Settings", href: "/admin/settings", icon: Settings, permission: "*" },
+      { name: "Settings", href: "/admin/settings", icon: Settings, permission: "*" },
     ]
   }
 ];
@@ -57,11 +73,19 @@ const navigation: NavSection[] = [
 export function AdminSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const { user, hasPermission } = useAuth();
+  const isProd = process.env.NODE_ENV === "production";
 
-  const filteredNavigation = navigation.map(section => ({
-    ...section,
-    items: section.items.filter(item => !item.permission || hasPermission(item.permission))
-  })).filter(section => section.items.length > 0);
+  const filteredNavigation = navigation
+    .filter(section => {
+      // Hide Infrastructure/System (Dev) section in production as it's under construction
+      if (isProd && section.title.includes("(Dev)")) return false;
+      return true;
+    })
+    .map(section => ({
+      ...section,
+      items: section.items.filter(item => !item.permission || hasPermission(item.permission))
+    }))
+    .filter(section => section.items.length > 0);
 
   return (
     <aside className={cn("w-72 border-r border-border/50 bg-background h-screen sticky top-0 flex flex-col z-40 hidden lg:flex", className)}>
