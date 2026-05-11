@@ -13,7 +13,7 @@ export const ADMIN_PERMISSIONS = [
  * These should align with YARP and AuthService configurations.
  */
 export const AUTH_COOKIE_NAMES = [
-  "auth-session",
+  "refreshToken",
   ".AspNetCore.Cookies",
   "session"
 ];

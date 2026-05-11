@@ -13,14 +13,22 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
  * 2. Handle silent refresh if the access token is missing from memory.
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { setAuth, setAccessToken, setInitialized, isAuthenticated, accessToken } = useAuthStore();
+  const { 
+    setAuth, 
+    setAccessToken, 
+    setInitialized, 
+    isAuthenticated, 
+    accessToken,
+    isHydrated 
+  } = useAuthStore();
   const queryClient = useQueryClient();
   const refreshStarted = useRef(false);
 
   // 1. Silent Refresh Logic: If we are "authenticated" but have no token (e.g. page refresh)
   useEffect(() => {
     async function performSilentRefresh() {
-      if (isAuthenticated && !accessToken && !refreshStarted.current) {
+      // Wait for hydration before deciding if we need refresh
+      if (isHydrated && isAuthenticated && !accessToken && !refreshStarted.current) {
         refreshStarted.current = true;
         try {
           const { accessToken: newToken } = await authService.refresh();
@@ -34,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
     performSilentRefresh();
-  }, [isAuthenticated, accessToken, setAccessToken, queryClient]);
+  }, [isAuthenticated, accessToken, setAccessToken, queryClient, isHydrated]);
 
   // 2. Fetch current user on app start to bootstrap session
   const { data, isSuccess, isError, isLoading } = useQuery({
@@ -46,22 +54,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return failureCount < 2;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: !!accessToken || isAuthenticated, // Only fetch if we have a token or think we are logged in
+    enabled: isHydrated && (!!accessToken || isAuthenticated), // Only fetch if hydrated AND we have a token or think we are logged in
   });
 
   useEffect(() => {
     if (isSuccess && data?.user) {
       setAuth(data.user);
       setInitialized(true);
-    } else if (isError || (!isLoading && !data && isHydrated())) {
+    } else if (isError || (!isLoading && !data && isHydrated)) {
       setInitialized(true);
     }
-  }, [data, isSuccess, isError, isLoading, setAuth, setInitialized]);
-
-  // Helper to check if store has hydrated (simple check for user/isAuthenticated existence)
-  function isHydrated() {
-    return true; // useAuth hook already handles hydration safety for us
-  }
+  }, [data, isSuccess, isError, isLoading, setAuth, setInitialized, isHydrated]);
 
   return <>{children}</>;
 }

@@ -36,7 +36,7 @@ export function RoleGuard({
   fallback = null,
   loadingFallback = null,
 }: RoleGuardProps) {
-  const { user, isHydrated } = useAuth();
+  const { isHydrated, hasAnyRole } = useAuth();
 
   // Handle hydration to prevent flash of unauthorized state and layout shift
   if (!isHydrated) return <>{loadingFallback}</>;
@@ -46,8 +46,8 @@ export function RoleGuard({
   // If no roles are specified, allow by default
   if (allowedRoles.length === 0) return <>{children}</>;
 
-  // Use roleName for consistency with backend UserProfile
-  const hasAccess = user && allowedRoles.includes(user.roleName);
+  // Use centralized logic from the store
+  const hasAccess = hasAnyRole(allowedRoles);
 
   if (!hasAccess) return <>{fallback}</>;
 

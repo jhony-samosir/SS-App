@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 interface PermissionGuardProps {
   children: React.ReactNode;
-  /** Single permission required (e.g. "UserManagement:Read") */
+  /** Single permission required (e.g. "UserManagement Read") */
   permission?: string;
   /** List of permissions required */
   permissions?: string[];

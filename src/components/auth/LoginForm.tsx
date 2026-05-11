@@ -37,7 +37,7 @@ function LoginContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { setAuth, setMfaChallenge } = useAuth();
+  const { setAuth, setAccessToken, setMfaChallenge } = useAuth();
   const { handlePostLoginRedirect } = useAuthRedirect();
 
   const {
@@ -58,7 +58,7 @@ function LoginContent() {
       const response = await authService.login(data);
       
       // Capture token from response (could be access_token or accessToken)
-      const token = (response as any).access_token || (response as any).accessToken;
+      const token = response.access_token || response.accessToken;
 
       // 2. Handle MFA requirement
       if (response.isMfaRequired && response.mfaToken) {
@@ -75,10 +75,10 @@ function LoginContent() {
       }
 
       // 4. Fallback: If login succeeded but user object is missing,
-      // fetch the user profile manually (Authorization interceptor will now use the token if we save it first)
+      // fetch the user profile manually.
       if (token) {
-        // We set the token first so getCurrentUser can use it
-        setAuth({ id: "", name: "", email: "", roleName: "", permissions: [] }, token);
+        // We set the token in memory/cookies first so getCurrentUser can use it
+        setAccessToken(token);
         
         try {
           const userResponse = await authService.getCurrentUser();

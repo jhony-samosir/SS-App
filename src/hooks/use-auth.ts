@@ -22,15 +22,17 @@ export function useAuth() {
       mfaToken: null,
       isMfaRequired: false,
       setAuth: auth.setAuth,
+      setAccessToken: auth.setAccessToken,
       setMfaChallenge: auth.setMfaChallenge,
       clearMfaChallenge: auth.clearMfaChallenge,
       logout: auth.logout,
       hasPermission: () => false,
       hasAnyPermission: () => false,
       hasRole: () => false,
+      hasAnyRole: () => false,
       isHydrated: false,
     };
   }
 
-  return { ...auth, hasAnyPermission: auth.hasAnyPermission, isHydrated: true };
+  return { ...auth, hasAnyPermission: auth.hasAnyPermission, isHydrated: auth.isHydrated };
 }

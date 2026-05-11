@@ -13,6 +13,9 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   user?: User;
+  accessToken?: string;
+  access_token?: string; // Support for varied backend naming
+  refreshToken?: string;
   mfaToken?: string;
   isMfaRequired?: boolean;
   message?: string;

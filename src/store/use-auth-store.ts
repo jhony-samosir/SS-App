@@ -16,15 +16,19 @@ interface AuthState {
   isInitialized: boolean;
   mfaToken: string | null;
   isMfaRequired: boolean;
+  isHydrated: boolean;
   setAuth: (user: User, accessToken?: string) => void;
   setAccessToken: (token: string) => void; // New action for refreshing
   setInitialized: (val: boolean) => void;
+  setHydrated: (val: boolean) => void;
+  setAuthenticated: (val: boolean) => void;
   setMfaChallenge: (token: string) => void;
   clearMfaChallenge: () => void;
   logout: () => void;
   hasPermission: (permission: string) => boolean;
   hasAnyPermission: (permissions: string[]) => boolean;
   hasRole: (role: string) => boolean;
+  hasAnyRole: (roles: string[]) => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -36,6 +40,7 @@ export const useAuthStore = create<AuthState>()(
       isInitialized: false,
       mfaToken: null,
       isMfaRequired: false,
+      isHydrated: false,
       setAuth: (user, accessToken) => {
         set({ 
           user, 
@@ -50,6 +55,12 @@ export const useAuthStore = create<AuthState>()(
       },
       setInitialized: (val) => {
         set({ isInitialized: val });
+      },
+      setHydrated: (val) => {
+        set({ isHydrated: val });
+      },
+      setAuthenticated: (val) => {
+        set({ isAuthenticated: val });
       },
       setMfaChallenge: (token) => {
         set({ mfaToken: token, isMfaRequired: true, isAuthenticated: false });
@@ -75,15 +86,27 @@ export const useAuthStore = create<AuthState>()(
         const { user } = get();
         return user?.roleName === role;
       },
+      hasAnyRole: (roles) => {
+        const { user } = get();
+        return user ? roles.includes(user.roleName) : false;
+      },
     }),
     {
       name: "auth-storage",
       // Security Hardening: Only persist non-sensitive UI state.
-      // accessToken is NO LONGER persisted to localStorage.
+      // accessToken and isAuthenticated are NOT persisted.
       partialize: (state) => ({
         user: state.user,
-        isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHydrated(true);
+          // If we have a user from storage, assume we should attempt to bootstrap the session
+          if (state.user) {
+            state.setAuthenticated(true);
+          }
+        }
+      },
     }
   )
 );

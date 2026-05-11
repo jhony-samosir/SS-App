@@ -12,6 +12,20 @@ import {
 } from "@/types/auth";
 
 /**
+ * Helper to map backend UserProfileDto to frontend User interface
+ */
+const mapBackendUserToFrontend = (backendUser: any) => {
+  if (!backendUser) return null;
+  return {
+    id: backendUser.publicId,
+    name: backendUser.fullName,
+    email: backendUser.email,
+    roleName: backendUser.role?.name || "User",
+    permissions: backendUser.permissions || []
+  };
+};
+
+/**
  * Enterprise Authentication Service
  * 
  * Handles all authentication-related API interactions.
@@ -22,7 +36,11 @@ export const authService = {
    */
   register: async (data: RegisterRequest): Promise<RegisterResponse> => {
     const response = await apiClient.post("/api/auth/register", data);
-    return response.data;
+    const result = response.data;
+    return {
+      ...result,
+      user: result.user ? mapBackendUserToFrontend(result.user) : undefined
+    };
   },
 
   /**
@@ -31,7 +49,11 @@ export const authService = {
    */
   login: async (data: LoginRequest): Promise<LoginResponse> => {
     const response = await apiClient.post("/api/auth/login", data);
-    return response.data;
+    const result = response.data;
+    return {
+      ...result,
+      user: result.user ? mapBackendUserToFrontend(result.user) : undefined
+    };
   },
 
   /**
@@ -47,7 +69,11 @@ export const authService = {
    */
   verifyMfa: async (data: MfaVerifyRequest): Promise<LoginResponse> => {
     const response = await apiClient.post("/api/mfa/verify", data);
-    return response.data;
+    const result = response.data;
+    return {
+      ...result,
+      user: result.user ? mapBackendUserToFrontend(result.user) : undefined
+    };
   },
 
   /**
@@ -102,6 +128,10 @@ export const authService = {
    */
   getCurrentUser: async (): Promise<{ user: any }> => {
     const response = await apiClient.get("/api/user/me");
-    return response.data;
+    const data = response.data;
+    return {
+      ...data,
+      user: data.user ? mapBackendUserToFrontend(data.user) : null
+    };
   }
 };
