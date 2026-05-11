@@ -24,26 +24,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const refreshStarted = useRef(false);
 
-  // 1. Silent Refresh Logic: If we are "authenticated" but have no token (e.g. page refresh)
-  useEffect(() => {
-    async function performSilentRefresh() {
-      // Wait for hydration before deciding if we need refresh
-      if (isHydrated && isAuthenticated && !accessToken && !refreshStarted.current) {
-        refreshStarted.current = true;
-        try {
-          const { accessToken: newToken } = await authService.refresh();
-          setAccessToken(newToken);
-          // Refetch user profile after successful refresh to ensure state is in sync
-          queryClient.invalidateQueries({ queryKey: ["current-user"] });
-        } catch (error) {
-          console.error("Silent refresh failed during initialization:", error);
-          // logout() will be called by interceptor if refresh returns 401
-        }
-      }
-    }
-    performSilentRefresh();
-  }, [isAuthenticated, accessToken, setAccessToken, queryClient, isHydrated]);
-
+  // 1. Initial Bootstrap: The api-client interceptor will handle silent refresh 
+  // automatically when getCurrentUser() below returns a 401. 
+  // We just need to ensure the query is enabled when hydrated.
+  
   // 2. Fetch current user on app start to bootstrap session
   const { data, isSuccess, isError, isLoading } = useQuery({
     queryKey: ["current-user"],
@@ -54,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return failureCount < 2;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: isHydrated && (!!accessToken || isAuthenticated), // Only fetch if hydrated AND we have a token or think we are logged in
+    enabled: isHydrated, // Always attempt to fetch current user on hydration to bootstrap session from cookies
   });
 
   useEffect(() => {

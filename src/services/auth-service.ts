@@ -1,9 +1,9 @@
 import apiClient from "@/lib/api-client";
-import { 
-  LoginRequest, 
-  LoginResponse, 
-  RegisterRequest, 
-  RegisterResponse, 
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
   MfaVerifyRequest,
   MfaSetupResponse,
   MfaEnableRequest,
