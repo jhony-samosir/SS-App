@@ -36,19 +36,16 @@ export function useAuthRedirect() {
       return returnUrl;
     }
 
-    // 2. Check for Admin persona
-    const isAdmin = user.permissions.some(p => 
-      p === "*" || 
-      p === "RoleManagement" || 
-      p === "MenuManagement" || 
-      p.startsWith("UserManagement")
-    );
-
-    if (isAdmin) {
+    // 2. Check Persona via RoleName
+    if (user.roleName === "Admin") {
       return "/admin";
     }
 
-    // 3. Default to Storefront Home for customers
+    if (user.roleName === "Seller") {
+      return "/seller";
+    }
+
+    // 3. Default to Storefront Home for Customers
     return "/";
   }, [returnUrl]);
 

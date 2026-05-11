@@ -60,7 +60,10 @@ export const authService = {
    * Refresh the access token using the HttpOnly refresh cookie
    */
   refresh: async (): Promise<{ accessToken: string }> => {
-    const response = await apiClient.post("/api/auth/refresh");
+    // We pass _retry: true to prevent the interceptor from trying to refresh during a refresh call
+    const response = await apiClient.post("/api/auth/refresh", {}, { 
+      headers: { "X-Skip-Interceptor": "true" } 
+    } as any);
     return response.data;
   },
 
@@ -129,9 +132,14 @@ export const authService = {
   getCurrentUser: async (): Promise<{ user: any }> => {
     const response = await apiClient.get("/api/user/me");
     const data = response.data;
+    
+    // The backend returns the user object directly. 
+    // We map it to the frontend format.
+    const user = mapBackendUserToFrontend(data);
+    
     return {
       ...data,
-      user: data.user ? mapBackendUserToFrontend(data.user) : null
+      user
     };
   }
 };

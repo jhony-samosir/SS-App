@@ -87,12 +87,12 @@ export function UsersManagement() {
         throw err;
       }
     },
-    enabled: isHydrated && hasPermission("UserManagement Read"),
+    enabled: isHydrated && hasPermission("Users Read"),
     retry: false
   });
 
   useEffect(() => {
-    if (isHydrated && !hasPermission("UserManagement Read")) {
+    if (isHydrated && !hasPermission("Users Read")) {
       setForbiddenError(true);
     }
   }, [isHydrated, hasPermission]);
@@ -110,7 +110,7 @@ export function UsersManagement() {
         <ShieldAlert className="text-destructive mb-4" size={64} />
         <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
         <p className="text-muted-foreground mb-8 max-w-md">
-          You do not have the required permission (<strong>UserManagement Read</strong>) to view this page. 
+          You do not have the required permission (<strong>Users Read</strong>) to view this page. 
           Please contact your administrator if you believe this is an error.
         </p>
         <button 
@@ -207,7 +207,7 @@ export function UsersManagement() {
           <p className="text-muted-foreground">Monitor and manage all system users and their access levels</p>
         </div>
 
-        {hasPermission("UserManagement Create") && (
+        {hasPermission("Users Create") && (
           <button
             onClick={() => {
               setSubmitError(null);

@@ -47,7 +47,7 @@ export function UserDetailView({ publicId }: { publicId: string }) {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["user", publicId],
     queryFn: () => userService.getUser(publicId),
-    enabled: isHydrated && hasPermission("UserManagement Read"),
+    enabled: isHydrated && hasPermission("Users Read"),
     retry: false
   });
 
@@ -157,7 +157,7 @@ export function UserDetailView({ publicId }: { publicId: string }) {
   });
 
   const isForbidden = (error && axios.isAxiosError(error) && error.response?.status === 403) || 
-                      (isHydrated && !hasPermission("UserManagement Read"));
+                      (isHydrated && !hasPermission("Users Read"));
 
   if (isLoading) {
     return (
@@ -249,7 +249,7 @@ export function UserDetailView({ publicId }: { publicId: string }) {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {hasPermission("UserManagement Update") && (
+          {hasPermission("Users Update") && (
             <>
               <button 
                 onClick={() => setIsEditModalOpen(true)}
@@ -309,7 +309,7 @@ export function UserDetailView({ publicId }: { publicId: string }) {
             </>
           )}
 
-          {hasPermission("UserManagement Delete") && (
+          {hasPermission("Users Delete") && (
             <button 
               onClick={() => setConfirmAction({ type: "delete", label: "Delete User" })}
               className="flex-1 md:flex-none px-6 py-3 bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive hover:text-white rounded-2xl font-bold transition-all flex items-center justify-center gap-2"

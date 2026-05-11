@@ -1,10 +1,10 @@
 export const ADMIN_PERMISSIONS = [
-  "RoleManagement", 
-  "MenuManagement", 
-  "UserManagement Read",
-  "UserManagement Create",
-  "UserManagement Update",
-  "UserManagement Delete",
+  "Admin",
+  "Users",
+  "Users Read",
+  "Roles",
+  "Menus",
+  "Permissions",
   "SecurityAudit"
 ];
 

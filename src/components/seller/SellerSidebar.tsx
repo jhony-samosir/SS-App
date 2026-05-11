@@ -4,15 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { 
-  Users, 
-  ShieldCheck, 
-  Lock, 
-  Settings,
-  LayoutGrid,
+  Package, 
+  ShoppingCart, 
+  Store,
   ChevronRight,
   LogOut,
   AppWindow,
-  Activity,
   UserCircle,
   LucideIcon
 } from "lucide-react";
@@ -22,7 +19,6 @@ interface NavItem {
   name: string;
   href: string;
   icon: LucideIcon;
-  permission?: string;
 }
 
 interface NavSection {
@@ -32,84 +28,48 @@ interface NavSection {
 
 const navigation: NavSection[] = [
   {
-    title: "Users",
+    title: "Overview",
     items: [
-      { name: "User Management", href: "/admin/users", icon: Users, permission: "Users Read" },
+      { name: "Dashboard", href: "/seller", icon: AppWindow },
     ]
   },
   {
-    title: "Roles",
+    title: "Store Management",
     items: [
-      { name: "Role Policies", href: "/admin/roles", icon: ShieldCheck, permission: "Roles" },
-    ]
-  },
-  {
-    title: "Permissions",
-    items: [
-      { name: "Registry", href: "/admin/permissions", icon: Lock, permission: "Permissions" },
-    ]
-  },
-  {
-    title: "Menus",
-    items: [
-      { name: "Navigation Tree", href: "/admin/menus", icon: LayoutGrid, permission: "Menus" },
-    ]
-  },
-  {
-    title: "Security",
-    items: [
-      { name: "Security Audit", href: "/admin/security/login-attempts", icon: Activity, permission: "SecurityAudit" },
-    ]
-  },
-  {
-    title: "System (Dev)",
-    items: [
-      { name: "System Logs", href: "/admin/logs", icon: Activity, permission: "SecurityAudit" },
-      { name: "Settings", href: "/admin/settings", icon: Settings, permission: "*" },
+      { name: "My Products", href: "/seller/products", icon: Package },
+      { name: "Orders", href: "/seller/orders", icon: ShoppingCart },
+      { name: "Store Settings", href: "/seller/settings", icon: Store },
     ]
   }
 ];
 
-export function AdminSidebar({ className }: { className?: string }) {
+export function SellerSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
-  const { user, hasPermission } = useAuth();
-  const isProd = process.env.NODE_ENV === "production";
-
-  const filteredNavigation = navigation
-    .filter(section => {
-      // Hide Infrastructure/System (Dev) section in production as it's under construction
-      if (isProd && section.title.includes("(Dev)")) return false;
-      return true;
-    })
-    .map(section => ({
-      ...section,
-      items: section.items.filter(item => !item.permission || hasPermission(item.permission))
-    }))
-    .filter(section => section.items.length > 0);
+  const { user } = useAuth();
 
   return (
     <aside className={cn("w-72 border-r border-border/50 bg-background h-screen sticky top-0 flex flex-col z-40 hidden lg:flex", className)}>
       <div className="h-20 flex items-center px-8 border-b border-border/50">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 transition-transform group-hover:scale-105">
-            <AppWindow className="text-primary-foreground" size={22} />
+            <Store className="text-primary-foreground" size={22} />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold tracking-tight text-base leading-none">Console</span>
-            <span className="text-[10px] font-bold text-primary tracking-widest uppercase mt-1">SamStore Admin</span>
+            <span className="font-bold tracking-tight text-base leading-none">Seller Hub</span>
+            <span className="text-[10px] font-bold text-primary tracking-widest uppercase mt-1">SamStore</span>
           </div>
         </Link>
       </div>
 
       <nav className="flex-grow overflow-y-auto py-6 px-4 space-y-8 scrollbar-thin scrollbar-thumb-border/50">
-        {filteredNavigation.map((section) => (
+        {navigation.map((section) => (
           <div key={section.title} className="space-y-2">
             <h3 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
               {section.title}
             </h3>
             <div className="space-y-1">
               {section.items.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                const isActive = pathname === item.href || (item.href !== "/seller" && pathname.startsWith(item.href + "/"));
                 return (
                   <Link
                     key={item.name}
@@ -156,7 +116,7 @@ export function AdminSidebar({ className }: { className?: string }) {
           className="flex items-center gap-3 px-4 py-3 rounded-2xl text-muted-foreground hover:bg-destructive/5 hover:text-destructive transition-all duration-300 font-bold text-sm"
         >
           <LogOut size={18} />
-          <span>Exit Console</span>
+          <span>Exit Hub</span>
         </Link>
       </div>
     </aside>

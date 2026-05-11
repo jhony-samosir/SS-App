@@ -57,8 +57,8 @@ function LoginContent() {
       // 1. Attempt login
       const response = await authService.login(data);
       
-      // Capture token from response (could be access_token or accessToken)
-      const token = response.access_token || response.accessToken;
+      // Capture token from response (could be accessToken or access_token)
+      const token = response.accessToken || response.access_token;
 
       // 2. Handle MFA requirement
       if (response.isMfaRequired && response.mfaToken) {
@@ -67,23 +67,18 @@ function LoginContent() {
         return;
       }
 
-      // 3. Handle successful login and redirection
-      if (response.user) {
-        setAuth(response.user, token);
-        handlePostLoginRedirect(response.user);
-        return;
-      }
-
-      // 4. Fallback: If login succeeded but user object is missing,
-      // fetch the user profile manually.
+      // 3. Fetch User Profile & Apply Role-Based Routing
       if (token) {
-        // We set the token in memory/cookies first so getCurrentUser can use it
+        // We set the token in memory first so the Axios Interceptor can attach it
         setAccessToken(token);
         
         try {
+          // Hit the /api/user/me endpoint via Gateway
           const userResponse = await authService.getCurrentUser();
           if (userResponse?.user) {
+            // Hydrate store with user profile and token
             setAuth(userResponse.user, token);
+            // Route based on role
             handlePostLoginRedirect(userResponse.user);
             return;
           }

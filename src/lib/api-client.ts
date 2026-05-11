@@ -56,7 +56,9 @@ apiClient.interceptors.response.use(
     const status = error.response?.status;
 
     // 1. Handle 401 Unauthorized (Expired or Missing Token)
-    if (status === 401 && !originalRequest._retry) {
+    const isRefreshRequest = originalRequest.url?.includes("/api/auth/refresh") || originalRequest.headers?.["X-Skip-Interceptor"];
+
+    if (status === 401 && !originalRequest._retry && !isRefreshRequest) {
       if (isRefreshing) {
         // If already refreshing, add this request to the queue
         return new Promise((resolve, reject) => {

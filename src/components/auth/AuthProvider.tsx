@@ -42,10 +42,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    if (isSuccess && data?.user) {
-      setAuth(data.user);
-      setInitialized(true);
-    } else if (isError || (!isLoading && !data && isHydrated)) {
+    // If the bootstrap query has finished (Success or Error), we mark initialization as complete.
+    // This unblocks GuestGuard and other protected routes.
+    if (!isLoading && isHydrated) {
+      if (isSuccess && data?.user) {
+        setAuth(data.user);
+      }
       setInitialized(true);
     }
   }, [data, isSuccess, isError, isLoading, setAuth, setInitialized, isHydrated]);
