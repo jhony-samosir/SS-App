@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserFormModal } from "./UserFormModal";
+import { SoftSelect } from "@/components/ui/SoftSelect";
 import { toast } from "sonner";
 
 export function UsersManagement() {
@@ -236,47 +237,41 @@ export function UsersManagement() {
           </div>
           
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-            <div className="flex items-center gap-2 bg-background border border-border rounded-xl px-3 py-1.5 shadow-sm">
-              <Filter size={16} className="text-muted-foreground" />
-              <select 
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-                className="bg-transparent text-sm font-medium outline-none cursor-pointer"
-              >
-                <option value="">All Roles</option>
-                <option value="Admin">Admin</option>
-                <option value="User">User</option>
-                <option value="Moderator">Moderator</option>
-              </select>
-            </div>
+            <SoftSelect 
+              icon={<Filter size={16} />}
+              value={roleFilter}
+              onChange={setRoleFilter}
+              options={[
+                { value: "", label: "All Roles" },
+                { value: "Admin", label: "Admin" },
+                { value: "User", label: "User" },
+                { value: "Moderator", label: "Moderator" },
+              ]}
+            />
 
-            <div className="flex items-center gap-2 bg-background border border-border rounded-xl px-3 py-1.5 shadow-sm">
-              <UserCheck size={16} className="text-muted-foreground" />
-              <select 
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-transparent text-sm font-medium outline-none cursor-pointer"
-              >
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="locked">Locked</option>
-              </select>
-            </div>
+            <SoftSelect 
+              icon={<UserCheck size={16} />}
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { value: "", label: "All Statuses" },
+                { value: "active", label: "Active" },
+                { value: "inactive", label: "Inactive" },
+                { value: "locked", label: "Locked" },
+              ]}
+            />
 
-            <div className="flex items-center gap-2 bg-background border border-border rounded-xl px-3 py-1.5 shadow-sm">
-              <ArrowUpDown size={16} className="text-muted-foreground" />
-              <select 
-                value={sortConfig.key}
-                onChange={(e) => handleSort(e.target.value)}
-                className="bg-transparent text-sm font-medium outline-none cursor-pointer"
-              >
-                <option value="createdAt">Sort by Date</option>
-                <option value="fullName">Sort by Name</option>
-                <option value="email">Sort by Email</option>
-                <option value="roleName">Sort by Role</option>
-              </select>
-            </div>
+            <SoftSelect 
+              icon={<ArrowUpDown size={16} />}
+              value={sortConfig.key}
+              onChange={handleSort}
+              options={[
+                { value: "createdAt", label: "Sort by Date" },
+                { value: "fullName", label: "Sort by Name" },
+                { value: "email", label: "Sort by Email" },
+                { value: "roleName", label: "Sort by Role" },
+              ]}
+            />
           </div>
 
           {isLoading && <Loader2 className="animate-spin text-primary ml-auto" size={20} />}

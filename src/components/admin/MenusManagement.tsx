@@ -25,6 +25,7 @@ import axios from "axios";
 import { useDebounce } from "@/hooks/use-debounce";
 import { DataTable } from "@/components/ui/DataTable";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { SoftSelect } from "@/components/ui/SoftSelect";
 
 const menuSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -239,7 +240,7 @@ export function MenusManagement() {
                 <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-primary" size={40} /></div>
               ) : (
                 <div className="space-y-2">
-                  {menuTree?.map(node => <MenuTreeNode key={node.id} node={node} onEdit={handleOpenForm} onDelete={setDeleteConfirmId} />)}
+                  {menuTree?.map(node => <MenuTreeNode key={node.publicId} node={node} onEdit={handleOpenForm} onDelete={setDeleteConfirmId} />)}
                 </div>
               )}
            </div>
@@ -328,15 +329,14 @@ export function MenusManagement() {
                           </div>
                           <div className="space-y-1.5">
                             <label className="text-sm font-bold ml-1">Parent Menu</label>
-                            <select 
-                              {...register("parentId")} 
-                              className="w-full bg-muted/30 border border-border rounded-2xl px-5 py-3 outline-none focus:border-primary transition-all appearance-none"
-                            >
-                              <option value="">None (Root)</option>
-                              {validParents?.map(m => (
-                                <option key={m.publicId} value={m.publicId}>{m.name}</option>
-                              ))}
-                            </select>
+                            <SoftSelect 
+                              value={watch("parentId") || ""}
+                              onChange={(val) => setValue("parentId", val === "" ? null : val)}
+                              options={[
+                                { value: "", label: "None (Root)" },
+                                ...(validParents?.map(m => ({ value: m.publicId, label: m.name })) || [])
+                              ]}
+                            />
                           </div>
                         </div>
 

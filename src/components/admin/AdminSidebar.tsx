@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -9,11 +10,13 @@ import {
   Lock, 
   Settings,
   LayoutGrid,
+  ChevronLeft,
   ChevronRight,
   LogOut,
   AppWindow,
   Activity,
   UserCircle,
+  Menu as MenuIcon,
   LucideIcon
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -31,6 +34,12 @@ interface NavSection {
 }
 
 const navigation: NavSection[] = [
+  {
+    title: "Overview",
+    items: [
+      { name: "Dashboard", href: "/admin", icon: LayoutGrid, permission: "Admin" },
+    ]
+  },
   {
     title: "Users",
     items: [
@@ -52,7 +61,7 @@ const navigation: NavSection[] = [
   {
     title: "Menus",
     items: [
-      { name: "Navigation Tree", href: "/admin/menus", icon: LayoutGrid, permission: "Menus" },
+      { name: "Navigation Tree", href: "/admin/menus", icon: AppWindow, permission: "Menus" },
     ]
   },
   {
@@ -70,95 +79,200 @@ const navigation: NavSection[] = [
   }
 ];
 
+// UI state and animations
+import { useUIStore } from "@/store/use-ui-store";
+import { motion, AnimatePresence } from "framer-motion";
+
 export function AdminSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
-  const { user, hasPermission } = useAuth();
+  const { user, hasPermission, isHydrated } = useAuth();
+  const { isAdminSidebarCollapsed: isLocked, toggleAdminSidebar } = useUIStore();
+  const [isHovered, setIsHovered] = useState(false);
   const isProd = process.env.NODE_ENV === "production";
 
-  const filteredNavigation = navigation
-    .filter(section => {
-      // Hide Infrastructure/System (Dev) section in production as it's under construction
-      if (isProd && section.title.includes("(Dev)")) return false;
-      return true;
-    })
-    .map(section => ({
-      ...section,
-      items: section.items.filter(item => !item.permission || hasPermission(item.permission))
-    }))
-    .filter(section => section.items.length > 0);
+  // Effective state: expanded if NOT locked OR if hovered
+  const isCollapsed = isLocked && !isHovered;
+
+  if (!isHydrated) return <aside className={cn("w-[72px] border-r border-border/40 bg-background h-screen sticky top-0 lg:flex hidden", className)} />;
+
+  const topNav = [
+    { name: "Dashboard", href: "/admin", icon: LayoutGrid, permission: "Admin" },
+    { name: "Users", href: "/admin/users", icon: Users, permission: "Users Read" },
+    { name: "Security", href: "/admin/roles", icon: ShieldCheck, permission: "Roles" },
+    { name: "Access", href: "/admin/permissions", icon: Lock, permission: "Permissions" },
+  ].filter(item => !item.permission || hasPermission(item.permission));
+
+  const middleNav = [
+    { name: "Menus", href: "/admin/menus", icon: AppWindow, permission: "Menus" },
+    { name: "Audit", href: "/admin/security/login-attempts", icon: Activity, permission: "SecurityAudit" },
+  ].filter(item => !item.permission || hasPermission(item.permission));
+
+  const bottomNav = [
+    { name: "Logs", href: "/admin/logs", icon: Activity, permission: "SecurityAudit", devOnly: true },
+    { name: "Settings", href: "/admin/settings", icon: Settings, permission: "*" },
+  ].filter(item => {
+    if (isProd && item.devOnly) return false;
+    return !item.permission || hasPermission(item.permission);
+  });
+
+  const renderNavItems = (items: typeof topNav) => (
+    <div className="flex flex-col gap-1.5 px-3">
+      {items.map((item) => {
+        const isActive = item.href === "/admin" 
+          ? pathname === "/admin" 
+          : pathname === item.href || pathname.startsWith(item.href + "/");
+        
+        return (
+          <Link
+            key={item.name}
+            href={item.href}
+            className={cn(
+              "group relative flex items-center rounded-xl transition-all duration-200",
+              isCollapsed ? "h-11 w-11 justify-center mx-auto" : "px-3 py-2 gap-3",
+              isActive 
+                ? "bg-primary/[0.06] text-primary" 
+                : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+            )}
+          >
+            <div className={cn(
+              "flex shrink-0 items-center justify-center transition-all duration-200",
+              isCollapsed ? "w-11" : "w-6"
+            )}>
+              <item.icon 
+                size={20} 
+                className={cn(
+                  "transition-all duration-200",
+                  isActive ? "opacity-100 scale-110" : "opacity-50 group-hover:opacity-100"
+                )} 
+              />
+            </div>
+            
+            <AnimatePresence mode="wait">
+              {!isCollapsed && (
+                <motion.span 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.15 }}
+                  className="font-medium text-[13px] tracking-tight truncate flex-grow"
+                >
+                  {item.name}
+                </motion.span>
+              )}
+            </AnimatePresence>
+
+            {isActive && (
+              <motion.div 
+                layoutId="active-indicator"
+                className={cn(
+                  "absolute bg-primary rounded-full",
+                  isCollapsed ? "bottom-1 w-1 h-1" : "right-3 w-1.5 h-1.5"
+                )}
+              />
+            )}
+          </Link>
+        );
+      })}
+    </div>
+  );
 
   return (
-    <aside className={cn("w-72 border-r border-border/50 bg-background h-screen sticky top-0 flex flex-col z-40 hidden lg:flex", className)}>
-      <div className="h-20 flex items-center px-8 border-b border-border/50">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 transition-transform group-hover:scale-105">
-            <AppWindow className="text-primary-foreground" size={22} />
+    <motion.aside 
+      initial={false}
+      onMouseEnter={() => isLocked && setIsHovered(true)}
+      onMouseLeave={() => isLocked && setIsHovered(false)}
+      animate={{ width: isCollapsed ? 72 : 240 }}
+      transition={{ type: "spring", stiffness: 400, damping: 35 }}
+      className={cn(
+        "border-r border-border/40 bg-background h-screen sticky top-0 flex flex-col z-40 hidden lg:flex select-none", 
+        className
+      )}
+    >
+      {/* Header */}
+      <div className="h-14 flex items-center justify-between px-4">
+        <Link href="/" className="flex items-center gap-3 group min-w-0">
+          <div className="w-9 h-9 bg-primary/10 text-primary rounded-lg flex-shrink-0 flex items-center justify-center transition-all group-hover:scale-105">
+            <AppWindow size={20} />
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold tracking-tight text-base leading-none">Console</span>
-            <span className="text-[10px] font-bold text-primary tracking-widest uppercase mt-1">SamStore Admin</span>
-          </div>
+          {!isCollapsed && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col min-w-0"
+            >
+              <span className="font-bold text-[13px] tracking-tight truncate leading-tight">SamStore</span>
+              <span className="text-[10px] font-medium text-muted-foreground truncate uppercase tracking-widest leading-none">Console</span>
+            </motion.div>
+          )}
         </Link>
       </div>
 
-      <nav className="flex-grow overflow-y-auto py-6 px-4 space-y-8 scrollbar-thin scrollbar-thumb-border/50">
-        {filteredNavigation.map((section) => (
-          <div key={section.title} className="space-y-2">
-            <h3 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
-              {section.title}
-            </h3>
-            <div className="space-y-1">
-              {section.items.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 group relative",
-                      isActive 
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
-                        : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <div className="flex items-center gap-3.5">
-                      <item.icon 
-                        size={20} 
-                        className={cn(
-                          "transition-colors duration-300",
-                          isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary"
-                        )} 
-                      />
-                      <span className="font-semibold text-sm">{item.name}</span>
-                    </div>
-                    {isActive && <ChevronRight size={14} className="opacity-60" />}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </nav>
-
-      <div className="p-4 border-t border-border/50">
-        <div className="bg-muted/30 rounded-[2rem] p-4 flex items-center gap-3 border border-border/50 mb-4">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
-            <UserCircle size={24} />
-          </div>
-          <div className="flex-grow min-w-0">
-            <p className="text-xs font-bold truncate">{user?.name || "Loading..."}</p>
-            <p className="text-[10px] text-muted-foreground truncate uppercase tracking-tighter">Session Active</p>
-          </div>
+      {/* Main Navigation */}
+      <div className="flex-grow overflow-y-auto py-2 space-y-6 custom-scrollbar">
+        <div className="space-y-1">
+          {renderNavItems(topNav)}
         </div>
-        
+
+        <div className="px-5 opacity-40">
+          <div className="h-px bg-border" />
+        </div>
+
+        <div className="space-y-1">
+          {renderNavItems(middleNav)}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="p-2 border-t border-border/40 space-y-1">
+        {renderNavItems(bottomNav)}
+
+        <div className={cn(
+          "flex items-center gap-3 p-2 transition-all mt-2",
+          isCollapsed ? "justify-center" : "px-3"
+        )}>
+          <div className="w-8 h-8 rounded-full bg-secondary/10 flex-shrink-0 flex items-center justify-center text-secondary border border-secondary/20">
+            <UserCircle size={18} />
+          </div>
+          {!isCollapsed && (
+            <div className="flex-grow min-w-0">
+              <p className="text-[12px] font-bold truncate leading-none mb-1">{user?.name || "User"}</p>
+              <button 
+                onClick={toggleAdminSidebar}
+                className="text-[10px] text-muted-foreground hover:text-primary transition-colors font-medium"
+              >
+                {isLocked ? "Unlock Sidebar" : "Lock Sidebar"}
+              </button>
+            </div>
+          )}
+        </div>
+
         <Link 
           href="/"
-          className="flex items-center gap-3 px-4 py-3 rounded-2xl text-muted-foreground hover:bg-destructive/5 hover:text-destructive transition-all duration-300 font-bold text-sm"
+          className={cn(
+            "flex items-center gap-3 rounded-xl text-muted-foreground hover:bg-destructive/5 hover:text-destructive transition-all duration-150 font-medium text-[13px]",
+            isCollapsed ? "h-11 w-11 justify-center mx-auto" : "px-3 py-2.5"
+          )}
         >
-          <LogOut size={18} />
-          <span>Exit Console</span>
+          <LogOut size={18} className="shrink-0 opacity-50" />
+          {!isCollapsed && <span>Sign Out</span>}
         </Link>
       </div>
-    </aside>
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.05);
+          border-radius: 10px;
+        }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.1);
+        }
+      `}</style>
+    </motion.aside>
   );
 }

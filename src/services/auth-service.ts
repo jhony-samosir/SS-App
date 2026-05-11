@@ -14,7 +14,7 @@ import {
 /**
  * Helper to map backend UserProfileDto to frontend User interface
  */
-const mapBackendUserToFrontend = (backendUser: any) => {
+export const mapBackendUserToFrontend = (backendUser: any) => {
   if (!backendUser) return null;
   return {
     id: backendUser.publicId,

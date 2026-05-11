@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // automatically when getCurrentUser() below returns a 401. 
   // We just need to ensure the query is enabled when hydrated.
   
-  // 2. Fetch current user on app start to bootstrap session
+  // 2. Fetch current user on app start to bootstrap session if not already provided by server
   const { data, isSuccess, isError, isLoading } = useQuery({
     queryKey: ["current-user"],
     queryFn: () => authService.getCurrentUser(),
@@ -38,19 +38,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return failureCount < 2;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: isHydrated, // Always attempt to fetch current user on hydration to bootstrap session from cookies
+    // Only fetch if we are hydrated but NOT authenticated yet
+    enabled: isHydrated && !isAuthenticated, 
   });
 
   useEffect(() => {
-    // If the bootstrap query has finished (Success or Error), we mark initialization as complete.
-    // This unblocks GuestGuard and other protected routes.
+    // If already authenticated by server hydration, we are done
+    if (isHydrated && isAuthenticated) {
+      setInitialized(true);
+      return;
+    }
+
+    // If the bootstrap query has finished, we mark initialization as complete.
     if (!isLoading && isHydrated) {
       if (isSuccess && data?.user) {
         setAuth(data.user);
       }
       setInitialized(true);
     }
-  }, [data, isSuccess, isError, isLoading, setAuth, setInitialized, isHydrated]);
+  }, [data, isSuccess, isError, isLoading, setAuth, setInitialized, isHydrated, isAuthenticated]);
 
   return <>{children}</>;
 }

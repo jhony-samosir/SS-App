@@ -23,12 +23,16 @@ export const metadata: Metadata = {
 };
 
 import { Providers } from "@/components/providers";
+import { getServerSession } from "@/lib/session";
+import { StoreHydrator } from "@/components/auth/StoreHydrator";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getServerSession();
+
   return (
     <html
       lang="en"
@@ -36,6 +40,7 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", notoSans.variable, playfairDisplayHeading.variable)}
     >
       <body className="min-h-full flex flex-col">
+        <StoreHydrator user={user} />
         <Providers>
           {children}
         </Providers>
