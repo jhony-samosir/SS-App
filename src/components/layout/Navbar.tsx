@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, User, Search, Menu, LogOut, Loader2, ChevronDown, UserCircle, Settings, Package, Heart } from "lucide-react";
+import { ShoppingCart, User, Search, Menu, LogOut, Loader2, ChevronDown, UserCircle, Settings, Package, Heart, ShieldCheck, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,7 +22,7 @@ import {
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { user, isAuthenticated, logout, isHydrated } = useAuth();
+  const { user, isAuthenticated, logout, isHydrated, hasRole } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -149,37 +149,63 @@ export function Navbar() {
                     <ChevronDown size={14} className="text-muted-foreground group-hover:text-foreground transition-colors" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-border/50 bg-background/95 backdrop-blur-xl">
+                <DropdownMenuContent align="end" className="w-56 p-2 rounded-sm border-border bg-background/95 backdrop-blur-xl shadow-xl ring-1 ring-black/5">
                   <DropdownMenuLabel className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     My Account
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-border/50" />
                   
                   <DropdownMenuItem asChild>
-                    <Link href="/account/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-primary/5 transition-colors group">
+                    <Link href="/account/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer hover:bg-primary/5 transition-colors group">
                       <UserCircle size={18} className="text-muted-foreground group-hover:text-primary" />
                       <span className="font-semibold text-sm">Profile Details</span>
                     </Link>
                   </DropdownMenuItem>
                   
-                  <DropdownMenuItem asChild>
-                    <Link href="/account/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-primary/5 transition-colors group">
-                      <Package size={18} className="text-muted-foreground group-hover:text-primary" />
-                      <span className="font-semibold text-sm">My Orders</span>
-                    </Link>
-                  </DropdownMenuItem>
+                  {!hasRole("Admin") && !hasRole("Seller") && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/account/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer hover:bg-primary/5 transition-colors group">
+                          <Package size={18} className="text-muted-foreground group-hover:text-primary" />
+                          <span className="font-semibold text-sm">My Orders</span>
+                        </Link>
+                      </DropdownMenuItem>
 
-                  <DropdownMenuItem asChild>
-                    <Link href="/account/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-primary/5 transition-colors group">
-                      <Heart size={18} className="text-muted-foreground group-hover:text-primary" />
-                      <span className="font-semibold text-sm">Wishlist</span>
-                    </Link>
-                  </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/account/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer hover:bg-primary/5 transition-colors group">
+                          <Heart size={18} className="text-muted-foreground group-hover:text-primary" />
+                          <span className="font-semibold text-sm">Wishlist</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+
+                  {(hasRole("Admin") || hasRole("Seller")) && (
+                    <>
+                      <DropdownMenuSeparator className="bg-border/50" />
+                      {hasRole("Admin") && (
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer hover:bg-primary/5 transition-colors group">
+                            <ShieldCheck size={18} className="text-muted-foreground group-hover:text-primary" />
+                            <span className="font-semibold text-sm">Dashboard</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {hasRole("Seller") && (
+                        <DropdownMenuItem asChild>
+                          <Link href="/seller" className="flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer hover:bg-primary/5 transition-colors group">
+                            <LayoutDashboard size={18} className="text-muted-foreground group-hover:text-primary" />
+                            <span className="font-semibold text-sm">Dashboard</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                    </>
+                  )}
 
                   <DropdownMenuSeparator className="bg-border/50" />
                   
                   <DropdownMenuItem asChild>
-                    <Link href="/account/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-primary/5 transition-colors group">
+                    <Link href="/account/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer hover:bg-primary/5 transition-colors group">
                       <Settings size={18} className="text-muted-foreground group-hover:text-primary" />
                       <span className="font-semibold text-sm">Settings</span>
                     </Link>
@@ -190,7 +216,7 @@ export function Navbar() {
                   <DropdownMenuItem 
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer text-destructive hover:bg-destructive/5 transition-colors group"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer text-destructive hover:bg-destructive/5 transition-colors group"
                   >
                     {isLoggingOut ? (
                       <Loader2 size={18} className="animate-spin" />

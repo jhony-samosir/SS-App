@@ -4,10 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { 
-  Users, 
-  ShieldCheck, 
-  Lock, 
+import {
+  Users,
+  ShieldCheck,
+  Lock,
   Settings,
   LayoutGrid,
   ChevronLeft,
@@ -118,10 +118,10 @@ export function AdminSidebar({ className }: { className?: string }) {
   const renderNavItems = (items: typeof topNav) => (
     <div className="flex flex-col gap-1.5 px-3">
       {items.map((item) => {
-        const isActive = item.href === "/admin" 
-          ? pathname === "/admin" 
+        const isActive = item.href === "/admin"
+          ? pathname === "/admin"
           : pathname === item.href || pathname.startsWith(item.href + "/");
-        
+
         return (
           <Link
             key={item.name}
@@ -129,8 +129,8 @@ export function AdminSidebar({ className }: { className?: string }) {
             className={cn(
               "group relative flex items-center rounded-xl transition-all duration-200",
               isCollapsed ? "h-11 w-11 justify-center mx-auto" : "px-3 py-2 gap-3",
-              isActive 
-                ? "bg-primary/[0.06] text-primary" 
+              isActive
+                ? "bg-primary/[0.06] text-primary"
                 : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
             )}
           >
@@ -138,18 +138,18 @@ export function AdminSidebar({ className }: { className?: string }) {
               "flex shrink-0 items-center justify-center transition-all duration-200",
               isCollapsed ? "w-11" : "w-6"
             )}>
-              <item.icon 
-                size={20} 
+              <item.icon
+                size={20}
                 className={cn(
                   "transition-all duration-200",
                   isActive ? "opacity-100 scale-110" : "opacity-50 group-hover:opacity-100"
-                )} 
+                )}
               />
             </div>
-            
+
             <AnimatePresence mode="wait">
               {!isCollapsed && (
-                <motion.span 
+                <motion.span
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
@@ -162,7 +162,7 @@ export function AdminSidebar({ className }: { className?: string }) {
             </AnimatePresence>
 
             {isActive && (
-              <motion.div 
+              <motion.div
                 layoutId="active-indicator"
                 className={cn(
                   "absolute bg-primary rounded-full",
@@ -177,14 +177,14 @@ export function AdminSidebar({ className }: { className?: string }) {
   );
 
   return (
-    <motion.aside 
+    <motion.aside
       initial={false}
       onMouseEnter={() => isLocked && setIsHovered(true)}
       onMouseLeave={() => isLocked && setIsHovered(false)}
       animate={{ width: isCollapsed ? 72 : 240 }}
       transition={{ type: "spring", stiffness: 400, damping: 35 }}
       className={cn(
-        "border-r border-border/40 bg-background h-screen sticky top-0 flex flex-col z-40 hidden lg:flex select-none", 
+        "border-r border-border/40 bg-background h-screen sticky top-0 flex flex-col z-40 hidden lg:flex select-none",
         className
       )}
     >
@@ -195,7 +195,7 @@ export function AdminSidebar({ className }: { className?: string }) {
             <AppWindow size={20} />
           </div>
           {!isCollapsed && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="flex flex-col min-w-0"
@@ -236,7 +236,7 @@ export function AdminSidebar({ className }: { className?: string }) {
           {!isCollapsed && (
             <div className="flex-grow min-w-0">
               <p className="text-[12px] font-bold truncate leading-none mb-1">{user?.name || "User"}</p>
-              <button 
+              <button
                 onClick={toggleAdminSidebar}
                 className="text-[10px] text-muted-foreground hover:text-primary transition-colors font-medium"
               >
@@ -246,7 +246,7 @@ export function AdminSidebar({ className }: { className?: string }) {
           )}
         </div>
 
-        <Link 
+        <Link
           href="/"
           className={cn(
             "flex items-center gap-3 rounded-xl text-muted-foreground hover:bg-destructive/5 hover:text-destructive transition-all duration-150 font-medium text-[13px]",
@@ -254,7 +254,7 @@ export function AdminSidebar({ className }: { className?: string }) {
           )}
         >
           <LogOut size={18} className="shrink-0 opacity-50" />
-          {!isCollapsed && <span>Sign Out</span>}
+          {!isCollapsed && <span>Exit</span>}
         </Link>
       </div>
 
