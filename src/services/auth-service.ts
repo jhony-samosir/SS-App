@@ -8,7 +8,9 @@ import {
   MfaSetupResponse,
   MfaEnableRequest,
   ForgotPasswordRequest,
-  ResetPasswordRequest
+  ResetPasswordRequest,
+  UpdateProfileRequest,
+  ChangePasswordRequest
 } from "@/types/auth";
 
 /**
@@ -154,5 +156,30 @@ export const authService = {
       ...data,
       user
     };
+  },
+
+  /**
+   * Update current user's profile
+   */
+  updateProfile: async (data: UpdateProfileRequest): Promise<{ message: string }> => {
+    // Map to PascalCase for backend
+    const backendData = {
+      FullName: data.fullName
+    };
+    const response = await apiClient.patch("/api/user/me", backendData);
+    return response.data;
+  },
+
+  /**
+   * Change current user's password
+   */
+  changePassword: async (data: ChangePasswordRequest): Promise<{ message: string }> => {
+    // Map to PascalCase for backend
+    const backendData = {
+      CurrentPassword: data.currentPassword,
+      NewPassword: data.newPassword
+    };
+    const response = await apiClient.post("/api/user/me/change-password", backendData);
+    return response.data;
   }
 };

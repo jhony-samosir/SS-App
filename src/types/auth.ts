@@ -58,3 +58,12 @@ export interface ResetPasswordRequest {
   newPassword: string;
   confirmPassword?: string;
 }
+
+export interface UpdateProfileRequest {
+  fullName: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword?: string;
+  newPassword?: string;
+}
