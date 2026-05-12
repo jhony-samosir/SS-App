@@ -35,7 +35,15 @@ export const authService = {
    * Register a new user
    */
   register: async (data: RegisterRequest): Promise<RegisterResponse> => {
-    const response = await apiClient.post("/api/auth/register", data);
+    // Map to PascalCase as expected by the .NET backend validation
+    const backendData = {
+      FullName: data.fullName,
+      Email: data.email,
+      Password: data.password,
+      AcceptTos: data.acceptTos,
+      AcceptPrivacyPolicy: data.acceptPrivacyPolicy
+    };
+    const response = await apiClient.post("/api/auth/register", backendData);
     const result = response.data;
     return {
       ...result,
@@ -48,7 +56,12 @@ export const authService = {
    * Handles 200 OK (Success) and 202 Accepted (MFA Required)
    */
   login: async (data: LoginRequest): Promise<LoginResponse> => {
-    const response = await apiClient.post("/api/auth/login", data);
+    // Map to PascalCase for backend compatibility
+    const backendData = {
+      Email: data.email,
+      Password: data.password
+    };
+    const response = await apiClient.post("/api/auth/login", backendData);
     const result = response.data;
     return {
       ...result,

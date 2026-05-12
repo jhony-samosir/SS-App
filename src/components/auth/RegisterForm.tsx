@@ -20,6 +20,8 @@ const registerSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Confirm password must be at least 6 characters"),
+  acceptTos: z.boolean().refine(val => val === true, "You must accept the Terms of Service"),
+  acceptPrivacyPolicy: z.boolean().refine(val => val === true, "You must accept the Privacy Policy"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -47,9 +49,11 @@ export function RegisterForm() {
 
     try {
       await authService.register({
-        name: data.fullName,
+        fullName: data.fullName,
         email: data.email,
         password: data.password,
+        acceptTos: data.acceptTos,
+        acceptPrivacyPolicy: data.acceptPrivacyPolicy,
       });
       setIsSuccess(true);
       setTimeout(() => {
@@ -93,30 +97,33 @@ export function RegisterForm() {
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="w-full space-y-4"
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="w-full space-y-6"
     >
-      <div className="space-y-1 text-center">
-        <h1 className="text-3xl font-black tracking-tight text-foreground">Create Account</h1>
-        <p className="text-muted-foreground text-[11px] font-medium">
+      <div className="space-y-2 text-center">
+        <span className="text-[9px] font-black uppercase tracking-[0.6em] text-primary mb-1 block">
+          New Customer
+        </span>
+        <h1 className="text-4xl font-medium tracking-tight text-foreground font-heading italic">Create Account</h1>
+        <p className="text-muted-foreground/60 text-[10px] font-bold uppercase tracking-[0.2em]">
           Start your premium snack journey today
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3" aria-label="Registration form">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" aria-label="Registration form">
         {error && (
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-2.5 bg-destructive/5 border border-destructive/10 rounded-xl flex items-center gap-2.5 text-destructive text-[10px] font-black"
+            className="p-3 bg-destructive/5 border border-destructive/10 rounded-2xl flex items-center gap-3 text-destructive text-[10px] font-black"
             role="alert"
           >
-            <AlertCircle size={14} />
+            <div className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
             <p>{error}</p>
           </motion.div>
         )}
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <SoftInput
             {...register("fullName")}
             id="fullName"
@@ -124,7 +131,7 @@ export function RegisterForm() {
             placeholder="John Doe"
             icon={User}
             error={errors.fullName?.message}
-            className="py-2.5"
+            className="py-3 bg-white/40 border-border/40 focus:bg-white transition-all duration-500"
           />
 
           <SoftInput
@@ -135,10 +142,10 @@ export function RegisterForm() {
             placeholder="name@example.com"
             icon={Mail}
             error={errors.email?.message}
-            className="py-2.5"
+            className="py-3 bg-white/40 border-border/40 focus:bg-white transition-all duration-500"
           />
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <SoftInput
               {...register("password")}
               id="password"
@@ -147,7 +154,7 @@ export function RegisterForm() {
               placeholder="••••••••"
               icon={Lock}
               error={errors.password?.message}
-              className="py-2.5"
+              className="py-3 bg-white/40 border-border/40 focus:bg-white transition-all duration-500"
             />
 
             <SoftInput
@@ -158,8 +165,72 @@ export function RegisterForm() {
               placeholder="••••••••"
               icon={Lock}
               error={errors.confirmPassword?.message}
-              className="py-2.5"
+              className="py-3 bg-white/40 border-border/40 focus:bg-white transition-all duration-500"
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-6 px-1 pt-2">
+            {/* TOS Checkbox */}
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-3 cursor-pointer group select-none">
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    {...register("acceptTos")}
+                    className="peer sr-only"
+                  />
+                  <div className="w-4 h-4 rounded-md border border-border/40 bg-white/40 peer-checked:bg-primary peer-checked:border-primary transition-all duration-500 shadow-sm group-hover:border-primary/50" />
+                  <svg 
+                    className="absolute w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-500 pointer-events-none" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor" 
+                    strokeWidth="4"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span className="text-[10px] text-muted-foreground/50 font-black leading-tight group-hover:text-muted-foreground transition-colors uppercase tracking-[0.15em]">
+                  Accept <Link href="/tos" className="text-primary hover:underline underline-offset-4">TOS</Link>
+                </span>
+              </label>
+              {errors.acceptTos && (
+                <motion.p initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} className="text-[7px] text-destructive font-black leading-none pl-7">
+                  {errors.acceptTos.message}
+                </motion.p>
+              )}
+            </div>
+
+            {/* Privacy Checkbox */}
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-3 cursor-pointer group select-none">
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    {...register("acceptPrivacyPolicy")}
+                    className="peer sr-only"
+                  />
+                  <div className="w-4 h-4 rounded-md border border-border/40 bg-white/40 peer-checked:bg-primary peer-checked:border-primary transition-all duration-500 shadow-sm group-hover:border-primary/50" />
+                  <svg 
+                    className="absolute w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-500 pointer-events-none" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor" 
+                    strokeWidth="4"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span className="text-[10px] text-muted-foreground/50 font-black leading-tight group-hover:text-muted-foreground transition-colors uppercase tracking-[0.15em]">
+                  Accept <Link href="/privacy" className="text-primary hover:underline underline-offset-4">Privacy</Link>
+                </span>
+              </label>
+              {errors.acceptPrivacyPolicy && (
+                <motion.p initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} className="text-[7px] text-destructive font-black leading-none pl-7">
+                  {errors.acceptPrivacyPolicy.message}
+                </motion.p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -167,27 +238,28 @@ export function RegisterForm() {
           type="submit"
           variant="soft"
           disabled={isLoading}
-          className="w-full h-12 text-[10px] font-black uppercase tracking-[0.3em] group shadow-xl shadow-primary/10"
+          className="w-full h-14 text-[10px] font-black uppercase tracking-[0.4em] group shadow-2xl shadow-primary/10 rounded-2xl overflow-hidden relative"
         >
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
           {isLoading ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 relative z-10">
               <Loader2 className="animate-spin" size={14} />
-              <span>Creating...</span>
+              <span>Creating Account...</span>
             </div>
           ) : (
-            <>
+            <span className="relative z-10 flex items-center justify-center">
               Register Account
-              <ArrowRight size={14} className="ml-2 transition-transform group-hover:translate-x-1" />
-            </>
+              <ArrowRight size={14} className="ml-2 transition-transform duration-500 group-hover:translate-x-1" />
+            </span>
           )}
         </Button>
       </form>
 
-      <div className="text-center text-[9px] text-muted-foreground/50 font-black pt-1">
+      <div className="text-center text-[8px] text-muted-foreground/40 font-black pt-2 uppercase tracking-[0.4em]">
         ALREADY HAVE AN ACCOUNT?{" "}
         <Link 
           href="/login" 
-          className="text-primary hover:underline underline-offset-2 transition-all"
+          className="text-primary hover:text-primary/80 hover:underline underline-offset-4 transition-all duration-500"
         >
           SIGN IN HERE
         </Link>

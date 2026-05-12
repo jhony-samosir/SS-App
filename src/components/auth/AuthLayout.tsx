@@ -38,18 +38,18 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
 
         {/* Middle: Typography Wall & Hero Text */}
         <div className="relative z-10 flex flex-col items-center justify-center flex-grow overflow-hidden select-none">
-          {/* Background Typography */}
-          <div className="absolute inset-0 flex flex-wrap content-center justify-center gap-4 opacity-10 pointer-events-none">
+          {/* Background Typography - More Subtle & Layered */}
+          <div className="absolute inset-0 flex flex-wrap content-center justify-center gap-x-8 gap-y-4 opacity-[0.07] pointer-events-none blur-[0.5px]">
             {["KERUPUK", "KERIPIK", "SAMSTORE", "SNACK", "JAJANAN", "PREMIUM", "LOCAL", "TRADITIONAL", "AUTHENTIC", "DELICIOUS", "CRUNCHY", "SWEET", "SPICY", "INDONESIA", "MARKET"].map((word, i) => (
               <span 
                 key={i} 
                 className={cn(
                   "font-black tracking-tighter leading-none transition-all duration-1000",
                   i % 2 === 0 ? "text-white" : "text-primary-foreground",
-                  i % 3 === 0 ? "text-6xl" : i % 2 === 0 ? "text-4xl" : "text-2xl"
+                  i % 3 === 0 ? "text-7xl" : i % 2 === 0 ? "text-5xl" : "text-3xl"
                 )}
                 style={{
-                  transform: `rotate(${Math.sin(i) * 15}deg) translateY(${Math.cos(i) * 10}px)`,
+                  transform: `rotate(${Math.sin(i) * 12}deg) translateY(${Math.cos(i) * 15}px)`,
                 }}
               >
                 {word}
@@ -57,14 +57,25 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
             ))}
           </div>
 
-          {/* Centered Main Content */}
-          <div className="relative z-20 text-center space-y-4 max-w-md animate-in zoom-in duration-1000">
-            <h1 className="text-6xl font-black tracking-tighter text-white leading-[0.9] drop-shadow-2xl">
-              Simplify store <br /> management.
-            </h1>
-            <div className="h-1 w-20 bg-white/30 mx-auto rounded-full" />
-            <p className="text-base text-white font-bold leading-relaxed drop-shadow-lg">
-              Everything you need to scale your snack business <br /> in one intuitive, high-performance dashboard.
+          {/* Centered Main Content - Premium Typography */}
+          <div className="relative z-20 text-center space-y-6 max-w-lg animate-in zoom-in duration-1000">
+            <div className="space-y-4">
+              <span className="text-[10px] font-black uppercase tracking-[0.6em] text-white/50 mb-2 block">
+                The Art of Snacks
+              </span>
+              <h1 className="text-7xl font-medium tracking-tight text-white leading-[0.85] font-heading drop-shadow-2xl italic">
+                Simplify store <br /> management.
+              </h1>
+            </div>
+            
+            <div className="flex items-center justify-center gap-4">
+              <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-white/40" />
+              <div className="w-1.5 h-1.5 rounded-full bg-white/60" />
+              <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-white/40" />
+            </div>
+
+            <p className="text-lg text-white/90 font-medium leading-relaxed drop-shadow-lg max-w-sm mx-auto">
+              Everything you need to scale your snack business in one intuitive, high-performance dashboard.
             </p>
           </div>
         </div>

@@ -114,11 +114,20 @@ apiClient.interceptors.response.use(
       }
     }
 
-    // 3. Error Sanitization
+    // 3. Error Sanitization & Validation Extraction
     if (error.response?.data) {
-      error.response.data.message = error.response.data.message || "An unexpected system error occurred.";
-      delete error.response.data.stackTrace;
-      delete error.response.data.exception;
+      const data = error.response.data;
+      
+      // If there's an 'errors' object (typical for 400 Bad Request / Validation), extract the first error
+      if (data.errors && !data.message) {
+        const firstErrorKey = Object.keys(data.errors)[0];
+        const firstErrorValue = data.errors[firstErrorKey];
+        data.message = Array.isArray(firstErrorValue) ? firstErrorValue[0] : firstErrorValue;
+      }
+
+      data.message = data.message || "An unexpected system error occurred.";
+      delete data.stackTrace;
+      delete data.exception;
     }
 
     error.message = error.response?.data?.message || error.message || "An unexpected error occurred.";
