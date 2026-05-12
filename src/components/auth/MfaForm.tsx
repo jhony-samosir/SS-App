@@ -111,19 +111,19 @@ function MfaContent() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full max-w-md space-y-8 p-10 bg-card/95 rounded-[2.5rem] border border-border/50 shadow-xl"
+      className="w-full space-y-8"
     >
       <div className="space-y-3 text-center">
-        <div className="w-16 h-16 bg-primary/10 text-primary rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 border border-primary/20">
-          <ShieldCheck size={32} />
+        <div className="w-20 h-20 bg-primary/10 text-primary rounded-[2rem] border border-primary/20 flex items-center justify-center mx-auto mb-8 shadow-xl shadow-primary/5">
+          <ShieldCheck size={40} />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight font-sans">Verification Required</h1>
+        <h1 className="text-4xl font-black tracking-tight font-sans text-foreground">Verify Login</h1>
         <p className="text-muted-foreground text-sm font-medium leading-relaxed">
           Please enter the 6-digit code from your <br /> authenticator app
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" aria-label="MFA verification form">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-10" aria-label="MFA verification form">
         {error && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -156,8 +156,8 @@ function MfaContent() {
               </motion.div>
             )}
           />
-          <p className="text-center text-xs text-muted-foreground font-medium">
-            Having trouble? <button type="button" className="text-primary font-bold hover:underline">Use recovery code</button>
+          <p className="text-center text-[11px] text-muted-foreground font-medium uppercase tracking-widest pt-2">
+            Having trouble? <button type="button" className="text-primary font-black hover:underline underline-offset-4">Use recovery code</button>
           </p>
         </div>
 
@@ -166,14 +166,17 @@ function MfaContent() {
             type="submit"
             variant="soft"
             disabled={isLoading}
-            className="w-full py-7 text-base group"
+            className="w-full py-7 text-sm font-black uppercase tracking-[0.2em] group shadow-2xl shadow-primary/20"
           >
             {isLoading ? (
-              <Loader2 className="animate-spin" size={20} />
+              <div className="flex items-center gap-2">
+                <Loader2 className="animate-spin" size={20} />
+                <span>Verifying...</span>
+              </div>
             ) : (
               <>
-                Verify & Continue
-                <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+                Verify Identity
+                <ArrowRight size={20} className="ml-2 transition-transform group-hover:translate-x-1" />
               </>
             )}
           </Button>
@@ -185,7 +188,7 @@ function MfaContent() {
               clearMfaChallenge();
               router.push("/login");
             }}
-            className="w-full py-6 rounded-2xl font-bold text-muted-foreground hover:text-foreground"
+            className="w-full h-12 rounded-2xl gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
           >
             Cancel and Return
           </Button>

@@ -91,32 +91,32 @@ export function RegisterForm() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full max-w-md space-y-8 p-10 bg-card/95 rounded-[2.5rem] border border-border/50 shadow-xl"
+      transition={{ duration: 0.6 }}
+      className="w-full space-y-4"
     >
-      <div className="space-y-3 text-center">
-        <h1 className="text-4xl font-bold tracking-tight font-sans">Join SamStore</h1>
-        <p className="text-muted-foreground text-sm font-medium leading-relaxed">
-          Create an account to explore the <br /> best local Indonesian snacks
+      <div className="space-y-1 text-center">
+        <h1 className="text-3xl font-black tracking-tight text-foreground">Create Account</h1>
+        <p className="text-muted-foreground text-[11px] font-medium">
+          Start your premium snack journey today
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" aria-label="Registration form">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3" aria-label="Registration form">
         {error && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-4 bg-destructive/5 border border-destructive/10 rounded-2xl flex items-center gap-3 text-destructive text-sm font-medium"
+            className="p-2.5 bg-destructive/5 border border-destructive/10 rounded-xl flex items-center gap-2.5 text-destructive text-[10px] font-black"
             role="alert"
           >
-            <AlertCircle size={18} />
+            <AlertCircle size={14} />
             <p>{error}</p>
           </motion.div>
         )}
 
-        <div className="space-y-5">
+        <div className="space-y-3">
           <SoftInput
             {...register("fullName")}
             id="fullName"
@@ -124,7 +124,7 @@ export function RegisterForm() {
             placeholder="John Doe"
             icon={User}
             error={errors.fullName?.message}
-            aria-invalid={!!errors.fullName}
+            className="py-2.5"
           />
 
           <SoftInput
@@ -135,56 +135,61 @@ export function RegisterForm() {
             placeholder="name@example.com"
             icon={Mail}
             error={errors.email?.message}
-            aria-invalid={!!errors.email}
+            className="py-2.5"
           />
 
-          <SoftInput
-            {...register("password")}
-            id="password"
-            type="password"
-            label="Password"
-            placeholder="••••••••"
-            icon={Lock}
-            error={errors.password?.message}
-            aria-invalid={!!errors.password}
-          />
+          <div className="grid grid-cols-2 gap-3">
+            <SoftInput
+              {...register("password")}
+              id="password"
+              type="password"
+              label="Password"
+              placeholder="••••••••"
+              icon={Lock}
+              error={errors.password?.message}
+              className="py-2.5"
+            />
 
-          <SoftInput
-            {...register("confirmPassword")}
-            id="confirmPassword"
-            type="password"
-            label="Confirm Password"
-            placeholder="••••••••"
-            icon={Lock}
-            error={errors.confirmPassword?.message}
-            aria-invalid={!!errors.confirmPassword}
-          />
+            <SoftInput
+              {...register("confirmPassword")}
+              id="confirmPassword"
+              type="password"
+              label="Confirm"
+              placeholder="••••••••"
+              icon={Lock}
+              error={errors.confirmPassword?.message}
+              className="py-2.5"
+            />
+          </div>
         </div>
 
         <Button
           type="submit"
           variant="soft"
           disabled={isLoading}
-          className="w-full py-7 text-base group"
+          className="w-full h-12 text-[10px] font-black uppercase tracking-[0.3em] group shadow-xl shadow-primary/10"
         >
           {isLoading ? (
-            <Loader2 className="animate-spin" size={20} />
+            <div className="flex items-center gap-2">
+              <Loader2 className="animate-spin" size={14} />
+              <span>Creating...</span>
+            </div>
           ) : (
             <>
-              Create Account
-              <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+              Register Account
+              <ArrowRight size={14} className="ml-2 transition-transform group-hover:translate-x-1" />
             </>
           )}
         </Button>
       </form>
 
-      <div className="text-center text-sm text-muted-foreground font-medium pt-2">
-        Already have an account?{" "}
+      <div className="text-center text-[9px] text-muted-foreground/50 font-black pt-1">
+        ALREADY HAVE AN ACCOUNT?{" "}
         <Link 
           href="/login" 
-          className="text-primary font-bold hover:underline underline-offset-4"
+          className="text-primary hover:underline underline-offset-2 transition-all"
         >
-          Sign in
+          SIGN IN HERE
         </Link>
       </div>
     </motion.div>

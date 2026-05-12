@@ -26,6 +26,9 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
 
+import { SoftInput } from "@/components/ui/SoftInput";
+import { Button } from "@/components/ui/button";
+
 export function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,15 +86,15 @@ export function ResetPasswordForm() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md p-8 bg-card/95 rounded-3xl border border-border shadow-xl text-center space-y-6"
+        className="w-full text-center space-y-8"
       >
-        <div className="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto">
+        <div className="w-20 h-20 bg-primary/10 text-primary rounded-[2rem] border border-primary/20 flex items-center justify-center mx-auto shadow-xl shadow-primary/5">
           <CheckCircle2 size={40} />
         </div>
         <div className="space-y-3">
-          <h1 className="text-3xl font-bold tracking-tight font-heading">Password Reset Successful!</h1>
-          <p className="text-muted-foreground text-sm">
-            Your password has been securely updated. Redirecting you to the login page...
+          <h1 className="text-3xl font-black tracking-tight font-sans">Password Updated!</h1>
+          <p className="text-muted-foreground text-sm font-medium leading-relaxed">
+            Your password has been securely updated. <br /> Redirecting you to login...
           </p>
         </div>
       </motion.div>
@@ -102,12 +105,12 @@ export function ResetPasswordForm() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="w-full max-w-md space-y-8 p-8 bg-card/95 rounded-3xl border border-border shadow-xl"
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="w-full space-y-8"
     >
-      <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight font-heading">Create New Password</h1>
-        <p className="text-muted-foreground">Please enter your new strong password below.</p>
+      <div className="space-y-3 text-center">
+        <h1 className="text-4xl font-black tracking-tight font-sans text-foreground">New Password</h1>
+        <p className="text-muted-foreground text-sm font-medium leading-relaxed">Please enter your new strong password below</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -115,73 +118,65 @@ export function ResetPasswordForm() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-4 bg-destructive/10 border border-destructive/20 rounded-2xl flex items-center gap-3 text-destructive text-sm"
+            className="p-4 bg-destructive/5 border border-destructive/10 rounded-2xl flex items-center gap-3 text-destructive text-sm font-medium"
           >
             <AlertCircle size={18} className="flex-shrink-0" />
             <p>{error}</p>
           </motion.div>
         )}
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium pl-1" htmlFor="newPassword">New Password</label>
-            <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
-              <input
-                {...register("newPassword")}
-                id="newPassword"
-                type="password"
-                placeholder="••••••••"
-                className={cn(
-                  "w-full bg-muted/50 border border-transparent focus:border-primary/20 rounded-2xl py-3 pl-12 pr-4 text-sm transition-all outline-none ring-primary/10 focus:ring-4",
-                  errors.newPassword && "border-destructive/50 ring-destructive/10 focus:ring-destructive/10"
-                )}
-              />
-            </div>
-            {errors.newPassword && <p className="text-xs text-destructive pl-1">{errors.newPassword.message}</p>}
-          </div>
+        <div className="space-y-5">
+          <SoftInput
+            {...register("newPassword")}
+            id="newPassword"
+            type="password"
+            label="New Password"
+            placeholder="••••••••"
+            icon={Lock}
+            error={errors.newPassword?.message}
+          />
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium pl-1" htmlFor="confirmPassword">Confirm Password</label>
-            <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
-              <input
-                {...register("confirmPassword")}
-                id="confirmPassword"
-                type="password"
-                placeholder="••••••••"
-                className={cn(
-                  "w-full bg-muted/50 border border-transparent focus:border-primary/20 rounded-2xl py-3 pl-12 pr-4 text-sm transition-all outline-none ring-primary/10 focus:ring-4",
-                  errors.confirmPassword && "border-destructive/50 ring-destructive/10 focus:ring-destructive/10"
-                )}
-              />
-            </div>
-            {errors.confirmPassword && <p className="text-xs text-destructive pl-1">{errors.confirmPassword.message}</p>}
-          </div>
+          <SoftInput
+            {...register("confirmPassword")}
+            id="confirmPassword"
+            type="password"
+            label="Confirm Password"
+            placeholder="••••••••"
+            icon={Lock}
+            error={errors.confirmPassword?.message}
+          />
         </div>
 
-        <button
-          type="submit"
-          disabled={isLoading || !token}
-          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
-        >
-          {isLoading ? (
-            <Loader2 className="animate-spin" size={20} />
-          ) : (
-            <>
-              Reset Password
-              <ArrowRight size={18} />
-            </>
-          )}
-        </button>
+        <div className="space-y-4">
+          <Button
+            type="submit"
+            variant="soft"
+            disabled={isLoading || !token}
+            className="w-full py-7 text-sm font-black uppercase tracking-[0.2em] group shadow-2xl shadow-primary/20"
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="animate-spin" size={20} />
+                <span>Updating...</span>
+              </div>
+            ) : (
+              <>
+                Update Password
+                <ArrowRight size={20} className="ml-2 transition-transform group-hover:translate-x-1" />
+              </>
+            )}
+          </Button>
 
-        <Link
-          href="/login"
-          className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-2 mt-4"
-        >
-          <ArrowLeft size={16} />
-          Back to Login
-        </Link>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => router.push("/login")}
+            className="w-full h-12 rounded-2xl gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft size={16} />
+            Back to Login
+          </Button>
+        </div>
       </form>
     </motion.div>
   );
