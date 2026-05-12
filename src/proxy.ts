@@ -3,12 +3,12 @@ import type { NextRequest } from "next/server";
 import { AUTH_COOKIE_NAMES } from "@/lib/constants";
 
 /**
- * Next.js Middleware - Edge-level Route Protection
+ * Next.js Proxy - Edge-level Route Protection
  * 
  * Provides an instant first layer of security (Defense in Depth) 
  * by checking for session cookies at the edge.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   // Define protected routes
@@ -38,7 +38,7 @@ export function middleware(request: NextRequest) {
 }
 
 /**
- * Optimization: Only run middleware on specific paths to minimize overhead.
+ * Optimization: Only run proxy on specific paths to minimize overhead.
  */
 export const config = {
   matcher: [

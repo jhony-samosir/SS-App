@@ -41,8 +41,8 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
           {/* Background Typography - More Subtle & Layered */}
           <div className="absolute inset-0 flex flex-wrap content-center justify-center gap-x-8 gap-y-4 opacity-[0.07] pointer-events-none blur-[0.5px]">
             {["KERUPUK", "KERIPIK", "SAMSTORE", "SNACK", "JAJANAN", "PREMIUM", "LOCAL", "TRADITIONAL", "AUTHENTIC", "DELICIOUS", "CRUNCHY", "SWEET", "SPICY", "INDONESIA", "MARKET"].map((word, i) => (
-              <span 
-                key={i} 
+              <span
+                key={i}
                 className={cn(
                   "font-black tracking-tighter leading-none transition-all duration-1000",
                   i % 2 === 0 ? "text-white" : "text-primary-foreground",
@@ -67,7 +67,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
                 Simplify store <br /> management.
               </h1>
             </div>
-            
+
             <div className="flex items-center justify-center gap-4">
               <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-white/40" />
               <div className="w-1.5 h-1.5 rounded-full bg-white/60" />

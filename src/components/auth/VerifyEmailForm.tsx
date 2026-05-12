@@ -57,19 +57,25 @@ export function VerifyEmailForm() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className="w-full space-y-8 text-center"
     >
       {verificationState === "loading" && (
-        <div className="space-y-6">
-          <div className="w-20 h-20 bg-primary/10 text-primary rounded-[2rem] border border-primary/20 flex items-center justify-center mx-auto shadow-xl shadow-primary/5">
-            <Loader2 size={40} className="animate-spin" />
+        <div className="space-y-6 py-12">
+          <div className="relative mx-auto w-24 h-24">
+            <div className="absolute inset-0 bg-primary/20 rounded-[2.5rem] animate-pulse blur-xl" />
+            <div className="relative w-full h-full bg-primary/5 text-primary rounded-[2.5rem] border border-primary/20 flex items-center justify-center shadow-2xl shadow-primary/10">
+              <Loader2 size={40} className="animate-spin" />
+            </div>
           </div>
-          <div className="space-y-3">
-            <h1 className="text-3xl font-black tracking-tight font-sans">Verifying Email</h1>
-            <p className="text-muted-foreground text-sm font-medium">Please wait while we verify your email address...</p>
+          <div className="space-y-2">
+            <span className="text-[9px] font-black uppercase tracking-[0.6em] text-primary mb-1 block">
+              Security Check
+            </span>
+            <h1 className="text-4xl font-medium tracking-tight text-foreground font-heading italic">Verifying Email</h1>
+            <p className="text-muted-foreground/60 text-[10px] font-bold uppercase tracking-[0.2em]">Please wait while we secure your account</p>
           </div>
         </div>
       )}
@@ -78,23 +84,31 @@ export function VerifyEmailForm() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="space-y-8"
+          className="space-y-8 py-8"
         >
-          <div className="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-[2rem] border border-emerald-500/20 flex items-center justify-center mx-auto shadow-xl shadow-emerald-500/5">
-            <CheckCircle2 size={40} />
+          <div className="relative mx-auto w-24 h-24">
+            <div className="absolute inset-0 bg-emerald-500/20 rounded-[2.5rem] blur-xl" />
+            <div className="relative w-full h-full bg-emerald-500/5 text-emerald-500 rounded-[2.5rem] border border-emerald-500/20 flex items-center justify-center shadow-2xl shadow-emerald-500/10">
+              <CheckCircle2 size={40} />
+            </div>
           </div>
-          <div className="space-y-3">
-            <h1 className="text-3xl font-black tracking-tight font-sans">Email Verified!</h1>
-            <p className="text-muted-foreground text-sm font-medium leading-relaxed">
-              Your email has been successfully verified. <br /> Redirecting to login...
+          <div className="space-y-2">
+            <span className="text-[9px] font-black uppercase tracking-[0.6em] text-emerald-500 mb-1 block">
+              Activation Success
+            </span>
+            <h1 className="text-4xl font-medium tracking-tight text-foreground font-heading italic">Verified!</h1>
+            <p className="text-muted-foreground/60 text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed max-w-[240px] mx-auto">
+              Your account is now fully active. <br /> Redirecting to your portal...
             </p>
           </div>
           <Button
             asChild
             variant="soft"
-            className="w-full py-7 text-sm font-black uppercase tracking-[0.2em] shadow-2xl shadow-primary/20"
+            className="w-full h-14 text-[10px] font-black uppercase tracking-[0.4em] group shadow-2xl shadow-primary/10 rounded-2xl relative overflow-hidden"
           >
-            <Link href="/login">Go to Login Now</Link>
+            <Link href="/login" className="relative z-10 flex items-center justify-center">
+              Enter Portal
+            </Link>
           </Button>
         </motion.div>
       )}
@@ -103,14 +117,20 @@ export function VerifyEmailForm() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="space-y-8"
+          className="space-y-8 py-8"
         >
-          <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-[2rem] border border-destructive/20 flex items-center justify-center mx-auto shadow-xl shadow-destructive/5">
-            <XCircle size={40} />
+          <div className="relative mx-auto w-24 h-24">
+            <div className="absolute inset-0 bg-destructive/20 rounded-[2.5rem] blur-xl" />
+            <div className="relative w-full h-full bg-destructive/5 text-destructive rounded-[2.5rem] border border-destructive/20 flex items-center justify-center shadow-2xl shadow-destructive/10">
+              <XCircle size={40} />
+            </div>
           </div>
-          <div className="space-y-3">
-            <h1 className="text-3xl font-black tracking-tight font-sans text-destructive">Verification Failed</h1>
-            <p className="text-muted-foreground text-sm font-medium leading-relaxed">
+          <div className="space-y-2">
+            <span className="text-[9px] font-black uppercase tracking-[0.6em] text-destructive mb-1 block">
+              Access Interrupted
+            </span>
+            <h1 className="text-4xl font-medium tracking-tight text-foreground font-heading italic">Verification Failed</h1>
+            <p className="text-muted-foreground/60 text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed max-w-[240px] mx-auto">
               {errorMessage || "The verification link is invalid or has expired."}
             </p>
           </div>
@@ -120,19 +140,19 @@ export function VerifyEmailForm() {
               type="button"
               variant="outline"
               onClick={() => alert("Resend Verification - API Integration Pending")}
-              className="w-full h-14 rounded-2xl gap-3 font-bold text-[11px] uppercase tracking-widest border-border/60"
+              className="w-full h-14 rounded-2xl gap-3 font-black text-[9px] uppercase tracking-[0.3em] border-border/40 hover:bg-muted/30 transition-all duration-500 shadow-xl shadow-black/5"
             >
-              <RefreshCw size={18} />
-              Resend Verification Email
+              <RefreshCw size={14} />
+              Resend Email
             </Button>
             <Button
               asChild
               variant="ghost"
-              className="w-full h-12 rounded-2xl gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
+              className="w-full h-12 rounded-2xl gap-2 text-[8px] font-black uppercase tracking-[0.4em] text-muted-foreground/50 hover:text-foreground transition-all duration-500"
             >
-              <Link href="/login">
-                <ArrowLeft size={16} />
-                Back to Login
+              <Link href="/login" className="flex items-center justify-center">
+                <ArrowLeft size={12} className="mr-2" />
+                Return to Login
               </Link>
             </Button>
           </div>
