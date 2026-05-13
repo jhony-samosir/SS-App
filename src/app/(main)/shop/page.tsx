@@ -12,10 +12,26 @@ export default function ShopPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
 
+  // Fetch Categories
+  const { data: categoriesData } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => catalogService.getCategories(),
+  });
+
+  const categories = categoriesData?.data || [];
+
+  // Fetch Products with Filters
   const { data, isLoading } = useQuery({
-    queryKey: ["faceted-search", searchQuery],
-    queryFn: () => catalogService.getProducts({ q: searchQuery }),
+    queryKey: ["faceted-search", searchQuery, selectedCategory, priceRange],
+    queryFn: () => catalogService.getProducts({ 
+      q: searchQuery,
+      category_slug: selectedCategory || undefined,
+      min_price: priceRange[0],
+      max_price: priceRange[1]
+    }),
   });
 
   const products = data?.data || [];
@@ -92,11 +108,35 @@ export default function ShopPage() {
                 <div>
                   <h4 className="font-bold text-xs uppercase tracking-widest text-muted-foreground mb-6">Categories</h4>
                   <div className="space-y-3">
-                    {["All Snacks", "Keripik", "Kue Kering", "Traditional", "Sweet", "Savory"].map((cat) => (
-                      <label key={cat} className="flex items-center gap-3 group cursor-pointer">
-                        <div className="w-5 h-5 rounded-md border-2 border-border group-hover:border-primary/50 transition-colors" />
-                        <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">{cat}</span>
-                      </label>
+                    <button 
+                      onClick={() => setSelectedCategory(null)}
+                      className="flex items-center gap-3 group cursor-pointer w-full text-left"
+                    >
+                      <div className={cn(
+                        "w-5 h-5 rounded-md border-2 transition-all",
+                        selectedCategory === null ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"
+                      )} />
+                      <span className={cn(
+                        "text-sm font-medium transition-colors",
+                        selectedCategory === null ? "text-foreground font-bold" : "text-muted-foreground group-hover:text-foreground"
+                      )}>All Snacks</span>
+                    </button>
+                    
+                    {categories.map((cat) => (
+                      <button 
+                        key={cat.id} 
+                        onClick={() => setSelectedCategory(cat.slug)}
+                        className="flex items-center gap-3 group cursor-pointer w-full text-left"
+                      >
+                        <div className={cn(
+                          "w-5 h-5 rounded-md border-2 transition-all",
+                          selectedCategory === cat.slug ? "bg-primary border-primary" : "border-border group-hover:border-primary/50"
+                        )} />
+                        <span className={cn(
+                          "text-sm font-medium transition-colors",
+                          selectedCategory === cat.slug ? "text-foreground font-bold" : "text-muted-foreground group-hover:text-foreground"
+                        )}>{cat.name}</span>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -104,20 +144,38 @@ export default function ShopPage() {
                 <div>
                   <h4 className="font-bold text-xs uppercase tracking-widest text-muted-foreground mb-6">Price Range</h4>
                   <div className="space-y-6">
-                     <div className="h-1.5 w-full bg-muted rounded-full relative">
-                        <div className="absolute left-[10%] right-[40%] top-0 bottom-0 bg-primary rounded-full" />
-                        <div className="absolute left-[10%] top-1/2 -translate-y-1/2 w-4 h-4 bg-background border-2 border-primary rounded-full shadow-lg" />
-                        <div className="absolute right-[40%] top-1/2 -translate-y-1/2 w-4 h-4 bg-background border-2 border-primary rounded-full shadow-lg" />
-                     </div>
-                     <div className="flex items-center justify-between text-xs font-bold">
-                        <span>Rp 10.000</span>
-                        <span>Rp 250.000</span>
-                     </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase text-muted-foreground">Min</label>
+                        <input 
+                          type="number" 
+                          value={priceRange[0]}
+                          onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                          className="w-full bg-muted/50 border-none rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-primary/20 outline-none"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase text-muted-foreground">Max</label>
+                        <input 
+                          type="number" 
+                          value={priceRange[1]}
+                          onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                          className="w-full bg-muted/50 border-none rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-primary/20 outline-none"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 <div className="pt-8 border-t border-border/50">
-                  <button className="w-full py-4 bg-muted hover:bg-muted/80 font-bold rounded-2xl transition-all">
+                  <button 
+                    onClick={() => {
+                      setSelectedCategory(null);
+                      setPriceRange([0, 1000000]);
+                      setSearchQuery("");
+                    }}
+                    className="w-full py-4 bg-muted hover:bg-muted/80 font-bold rounded-2xl transition-all"
+                  >
                     Reset All Filters
                   </button>
                 </div>
