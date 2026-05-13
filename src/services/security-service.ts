@@ -18,7 +18,7 @@ export const securityService = {
   ): Promise<LoginAttemptListResponse> => {
     const response = await apiClient.get("/api/security/login-attempts", {
       params: { 
-        page, 
+        pageNumber: page, 
         pageSize, 
         ...filters 
       }

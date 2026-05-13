@@ -42,4 +42,21 @@ export const catalogService = {
     const response = await apiClient.get<{ data: Category[] }>("/api/catalog/v1/categories");
     return response.data;
   },
+
+  getReviews: async (productId: string, params: { limit?: number; offset?: number } = {}) => {
+    const response = await apiClient.get<{ data: any[] }>(`/api/catalog/v1/reviews/product/${productId}`, {
+      params,
+    });
+    return response.data;
+  },
+
+  getRatingSummary: async (productId: string) => {
+    const response = await apiClient.get<{ average_rating: number; total_reviews: number }>(`/api/catalog/v1/reviews/product/${productId}/summary`);
+    return response.data;
+  },
+
+  submitReview: async (payload: { product_id: string; rating: number; comment: string; user_name: string }) => {
+    const response = await apiClient.post("/api/catalog/v1/reviews", payload);
+    return response.data;
+  },
 };

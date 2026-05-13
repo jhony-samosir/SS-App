@@ -1,9 +1,9 @@
 export const STORE_NAVIGATION = [
   { name: "Home", href: "/" },
   { name: "Shop", href: "/shop" },
-  { name: "Deals", href: "/offers" },
-  { name: "Best Sellers", href: "/best-sellers" },
-  { name: "Categories", href: "#categories" },
+  { name: "Deals", href: "/shop?is_featured=true" },
+  { name: "Best Sellers", href: "/shop?sort=best_sellers" },
+  { name: "Categories", href: "/shop" },
 ];
 
 export const FOOTER_NAVIGATION = {

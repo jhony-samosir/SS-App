@@ -97,6 +97,8 @@ export function AdminSidebar({ className }: { className?: string }) {
 
   const topNav = [
     { name: "Dashboard", href: "/admin", icon: LayoutGrid, permission: "Admin" },
+    { name: "Products", href: "/admin/catalog/products", icon: AppWindow, permission: "Products" },
+    { name: "Categories", href: "/admin/catalog/categories", icon: LayoutGrid, permission: "Categories" },
     { name: "Users", href: "/admin/users", icon: Users, permission: "Users Read" },
     { name: "Security", href: "/admin/roles", icon: ShieldCheck, permission: "Roles" },
     { name: "Access", href: "/admin/permissions", icon: Lock, permission: "Permissions" },
