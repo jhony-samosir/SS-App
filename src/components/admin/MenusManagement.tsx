@@ -328,8 +328,9 @@ export function MenusManagement() {
                             />
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-sm font-bold ml-1">Parent Menu</label>
                             <SoftSelect 
+                              id="parent-menu"
+                              label="Parent Menu"
                               value={watch("parentId") || ""}
                               onChange={(val) => setValue("parentId", val === "" ? null : val)}
                               options={[

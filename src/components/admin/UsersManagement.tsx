@@ -238,6 +238,8 @@ export function UsersManagement() {
           
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             <SoftSelect 
+              id="role-filter"
+              label="Role"
               icon={<Filter size={16} />}
               value={roleFilter}
               onChange={setRoleFilter}
@@ -250,6 +252,8 @@ export function UsersManagement() {
             />
 
             <SoftSelect 
+              id="status-filter"
+              label="Status"
               icon={<UserCheck size={16} />}
               value={statusFilter}
               onChange={setStatusFilter}
@@ -262,6 +266,8 @@ export function UsersManagement() {
             />
 
             <SoftSelect 
+              id="sort-filter"
+              label="Sort By"
               icon={<ArrowUpDown size={16} />}
               value={sortConfig.key}
               onChange={handleSort}

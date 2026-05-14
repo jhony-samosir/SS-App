@@ -21,7 +21,7 @@ export default function ShopPage() {
     queryFn: () => catalogService.getCategories(),
   });
 
-  const categories = categoriesData?.data || [];
+  const categories = categoriesData?.data?.items || [];
 
   // Fetch Products with Filters
   const { data, isLoading } = useQuery({
