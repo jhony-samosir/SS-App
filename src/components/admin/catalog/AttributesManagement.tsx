@@ -20,16 +20,25 @@ import { DataTable } from "@/components/ui/DataTable";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { AttributeFormModal } from "./AttributeFormModal";
+import { TagFormModal } from "./TagFormModal";
 
 export function AttributesManagement() {
   const queryClient = useQueryClient();
   
   // State
   const [activeTab, setActiveTab] = useState<"attributes" | "tags">("attributes");
+  
+  // Attribute State
   const [attrPage, setAttrPage] = useState(1);
   const [attrLimit] = useState(10);
   const [isAttrModalOpen, setIsAttrModalOpen] = useState(false);
   const [selectedAttr, setSelectedAttr] = useState<ProductAttribute | null>(null);
+
+  // Tag State
+  const [tagPage, setTagPage] = useState(1);
+  const [tagLimit] = useState(10);
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
 
   // Queries
   const { data: attrData, isLoading: isLoadingAttrs } = useQuery({
@@ -38,13 +47,12 @@ export function AttributesManagement() {
     enabled: activeTab === "attributes"
   });
 
-  const { data: tags, isLoading: isLoadingTags } = useQuery({
-    queryKey: ["admin-tags"],
-    queryFn: () => catalogService.getTags(),
+  const { data: tagData, isLoading: isLoadingTags } = useQuery({
+    queryKey: ["admin-tags", tagPage, tagLimit],
+    queryFn: () => catalogService.getTags({ page: tagPage, limit: tagLimit }),
     enabled: activeTab === "tags"
   });
 
-  // Mutations
   const createAttrMutation = useMutation({
     mutationFn: (newAttr: Partial<ProductAttribute>) => catalogService.createAttribute(newAttr),
     onSuccess: () => {
@@ -120,9 +128,77 @@ export function AttributesManagement() {
     }
   });
 
+  // --- Tag Mutations ---
+  const createTagMutation = useMutation({
+    mutationFn: (newTag: Partial<Tag>) => catalogService.createTag(newTag),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-tags"] });
+      toast.success("Tag created successfully");
+      setIsTagModalOpen(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to create tag");
+    }
+  });
+
+  const updateTagMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: Partial<Tag> }) => 
+      catalogService.updateTag(id, data),
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ["admin-tags"] });
+      const previousData = queryClient.getQueryData(["admin-tags", tagPage, tagLimit]);
+      
+      queryClient.setQueryData(["admin-tags", tagPage, tagLimit], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            items: old.data.items.map((item: Tag) => 
+              item.id === id ? { ...item, ...data } : item
+            )
+          }
+        };
+      });
+
+      return { previousData };
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(["admin-tags", tagPage, tagLimit], context?.previousData);
+      toast.error("Failed to update tag");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-tags"] });
+      toast.success("Tag updated successfully");
+      setIsTagModalOpen(false);
+    }
+  });
+
   const deleteTagMutation = useMutation({
     mutationFn: (id: string) => catalogService.deleteTag(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["admin-tags"] });
+      const previousData = queryClient.getQueryData(["admin-tags", tagPage, tagLimit]);
+
+      queryClient.setQueryData(["admin-tags", tagPage, tagLimit], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            items: old.data.items.filter((item: Tag) => item.id !== id),
+            total_count: old.data.total_count - 1
+          }
+        };
+      });
+
+      return { previousData };
+    },
+    onError: (err, id, context) => {
+      queryClient.setQueryData(["admin-tags", tagPage, tagLimit], context?.previousData);
+      toast.error("Failed to delete tag");
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-tags"] });
       toast.success("Tag deleted successfully");
     }
@@ -133,6 +209,14 @@ export function AttributesManagement() {
       updateAttrMutation.mutate({ id: selectedAttr.id, data: values });
     } else {
       createAttrMutation.mutate(values);
+    }
+  };
+
+  const handleTagSubmit = (values: any) => {
+    if (selectedTag) {
+      updateTagMutation.mutate({ id: selectedTag.id, data: values });
+    } else {
+      createTagMutation.mutate(values);
     }
   };
 
@@ -231,16 +315,28 @@ export function AttributesManagement() {
       header: "Actions",
       className: "text-right",
       render: (tag: Tag) => (
-        <button 
-          onClick={() => {
-            if (confirm("Delete this tag?")) {
-              deleteTagMutation.mutate(tag.id);
-            }
-          }}
-          className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-all"
-        >
-          <Trash2 size={16} />
-        </button>
+        <div className="flex justify-end gap-2">
+          <button 
+            onClick={() => {
+              setSelectedTag(tag);
+              setIsTagModalOpen(true);
+            }}
+            className="p-2 hover:bg-primary/10 hover:text-primary rounded-lg transition-all"
+            title="Edit Tag"
+          >
+            <Edit3 size={16} />
+          </button>
+          <button 
+            onClick={() => {
+              if (confirm("Delete this tag?")) {
+                deleteTagMutation.mutate(tag.id);
+              }
+            }}
+            className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-all"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
       ),
     },
   ];
@@ -248,76 +344,66 @@ export function AttributesManagement() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight font-heading">Attributes & Tags</h1>
-          <p className="text-muted-foreground">Define global product characteristics and discovery labels</p>
-        </div>
-
-        <div className="flex bg-muted p-1 rounded-2xl">
-          <button 
+        <div className="flex items-center gap-4 bg-muted/30 p-1 rounded-2xl border border-border/50">
+          <button
             onClick={() => setActiveTab("attributes")}
             className={cn(
-              "px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
-              activeTab === "attributes" ? "bg-background shadow-md text-primary" : "text-muted-foreground hover:text-foreground"
+              "px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all",
+              activeTab === "attributes" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:bg-muted"
             )}
           >
             <Settings2 size={18} />
             Attributes
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab("tags")}
             className={cn(
-              "px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
-              activeTab === "tags" ? "bg-background shadow-md text-primary" : "text-muted-foreground hover:text-foreground"
+              "px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all",
+              activeTab === "tags" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:bg-muted"
             )}
           >
             <Tags size={18} />
             Tags
           </button>
         </div>
+
+        <button
+          onClick={() => {
+            if (activeTab === "attributes") {
+              setSelectedAttr(null);
+              setIsAttrModalOpen(true);
+            } else {
+              setSelectedTag(null);
+              setIsTagModalOpen(true);
+            }
+          }}
+          className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
+        >
+          <Plus size={20} />
+          {activeTab === "attributes" ? "New Attribute" : "New Tag"}
+        </button>
       </div>
 
       <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden">
-        <div className="p-6 border-b border-border flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-lg">
-            {activeTab === "attributes" ? <Filter size={20} /> : <Hash size={20} />}
-            {activeTab === "attributes" ? "Global Attributes" : "Discovery Tags"}
-          </div>
-
-          <button 
-            onClick={() => {
-              if (activeTab === "attributes") {
-                setSelectedAttr(null);
-                setIsAttrModalOpen(true);
-              }
-            }}
-            className="bg-primary/10 text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all"
-          >
-            <Plus size={16} />
-            {activeTab === "attributes" ? "New Attribute" : "Create Tag"}
-          </button>
-        </div>
-
         {activeTab === "attributes" ? (
-          <DataTable 
-            columns={attributeColumns} 
-            data={attributes} 
-            isLoading={isLoadingAttrs} 
-            emptyMessage="No attributes defined"
+          <DataTable
+            columns={attributeColumns}
+            data={attributes}
+            isLoading={isLoadingAttrs}
             page={attrPage}
             onPageChange={setAttrPage}
-            totalCount={totalAttrCount}
             pageSize={attrLimit}
+            totalCount={totalAttrCount}
           />
         ) : (
-          <DataTable 
-            columns={tagColumns} 
-            data={tags?.data} 
-            isLoading={isLoadingTags} 
-            emptyMessage="No tags found"
-            page={1}
-            onPageChange={() => {}}
-            totalCount={tags?.data?.length || 0}
+          <DataTable
+            columns={tagColumns}
+            data={tagData?.data?.items || []}
+            isLoading={isLoadingTags}
+            page={tagPage}
+            onPageChange={setTagPage}
+            pageSize={tagLimit}
+            totalCount={tagData?.data?.total_count || 0}
           />
         )}
       </div>
@@ -327,7 +413,15 @@ export function AttributesManagement() {
         onClose={() => setIsAttrModalOpen(false)}
         onSubmit={handleAttrSubmit}
         initialData={selectedAttr}
-        isLoading={createAttrMutation.isPending}
+        isLoading={createAttrMutation.isPending || updateAttrMutation.isPending}
+      />
+
+      <TagFormModal
+        isOpen={isTagModalOpen}
+        onClose={() => setIsTagModalOpen(false)}
+        onSubmit={handleTagSubmit}
+        initialData={selectedTag}
+        isLoading={createTagMutation.isPending || updateTagMutation.isPending}
       />
     </div>
   );

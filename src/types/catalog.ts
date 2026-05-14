@@ -61,6 +61,38 @@ export interface Warehouse extends BaseEntity {
   address?: string;
   is_active: boolean;
 }
+
+export interface BundleItem {
+  product_id?: number;
+  variant_id?: number;
+  quantity: number;
+  is_optional: boolean;
+}
+
+export interface ProductBundle extends BaseEntity {
+  public_id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  price_override?: number;
+  is_active: boolean;
+  items: BundleItem[];
+}
+
+export interface ImportJob {
+  ID: number;
+  PublicID: string;
+  JobType: string;
+  Status: "pending" | "processing" | "completed" | "failed";
+  FileURL: string;
+  ErrorLog?: string;
+  TotalRows: number;
+  Processed: number;
+  CreatedBy: string;
+  CreatedAt: string;
+  CompletedAt?: string;
+}
+
 export interface PaginatedResponse<T> {
   status: number;
   message: string;

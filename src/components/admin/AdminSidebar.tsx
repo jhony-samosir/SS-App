@@ -19,6 +19,12 @@ import {
   Menu as MenuIcon,
   Tag,
   Warehouse,
+  Package,
+  Database,
+  MessageSquare,
+  Layers,
+  FileUp,
+  FileText,
   LucideIcon
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -75,8 +81,9 @@ const navigation: NavSection[] = [
   {
     title: "System (Dev)",
     items: [
-      { name: "System Logs", href: "/admin/logs", icon: Activity, permission: "SecurityAudit" },
-      { name: "Settings", href: "/admin/settings", icon: Settings, permission: "*" },
+      { name: "Audit Logs", href: "/admin/logs", icon: FileText, permission: "AuditLogs" },
+      { name: "Imports", href: "/admin/catalog/imports", icon: FileUp, permission: "Imports" },
+      { name: "Settings", href: "/admin/settings", icon: Settings, permission: "Settings" },
     ]
   }
 ];
@@ -99,10 +106,14 @@ export function AdminSidebar({ className }: { className?: string }) {
 
   const topNav = [
     { name: "Dashboard", href: "/admin", icon: LayoutGrid, permission: "Admin" },
+    { name: "Products", href: "/admin/catalog/products", icon: Package, permission: "Products" },
+    { name: "Bundles", href: "/admin/catalog/bundles", icon: Layers, permission: "Bundles" },
     { name: "Categories", href: "/admin/catalog/categories", icon: LayoutGrid, permission: "Categories" },
     { name: "Brands", href: "/admin/catalog/brands", icon: Tag, permission: "Brands" },
     { name: "Attributes", href: "/admin/catalog/attributes", icon: Settings, permission: "Attributes" },
     { name: "Warehouses", href: "/admin/catalog/warehouses", icon: Warehouse, permission: "Warehouses" },
+    { name: "Inventory", href: "/admin/catalog/inventory", icon: Database, permission: "Inventory" },
+    { name: "Reviews", href: "/admin/catalog/reviews", icon: MessageSquare, permission: "Reviews" },
     { name: "Users", href: "/admin/users", icon: Users, permission: "Users Read" },
     { name: "Security", href: "/admin/roles", icon: ShieldCheck, permission: "Roles" },
     { name: "Access", href: "/admin/permissions", icon: Lock, permission: "Permissions" },
