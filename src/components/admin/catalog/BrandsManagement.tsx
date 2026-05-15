@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { BrandFormModal } from "./BrandFormModal";
+import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 
 export function BrandsManagement() {
   const { hasPermission } = useAuth();
@@ -31,6 +32,8 @@ export function BrandsManagement() {
   const [limit] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
 
   // Queries
   const { data, isLoading } = useQuery({
@@ -78,10 +81,12 @@ export function BrandsManagement() {
       queryClient.setQueryData(["admin-brands", page, limit], context?.previousData);
       toast.error("Failed to update brand");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-brands"] });
+    onSuccess: () => {
       toast.success("Brand updated successfully");
       setIsModalOpen(false);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-brands"] });
     }
   });
 
@@ -109,9 +114,12 @@ export function BrandsManagement() {
       queryClient.setQueryData(["admin-brands", page, limit], context?.previousData);
       toast.error("Failed to delete brand");
     },
+    onSuccess: () => {
+      toast.success("Brand deleted successfully");
+      setIsDeleteModalOpen(false);
+    },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-brands"] });
-      toast.success("Brand deleted successfully");
     }
   });
 
@@ -199,9 +207,8 @@ export function BrandsManagement() {
           </button>
           <button 
             onClick={() => {
-              if (confirm("Are you sure you want to delete this brand?")) {
-                deleteMutation.mutate(brand.id);
-              }
+              setBrandToDelete(brand);
+              setIsDeleteModalOpen(true);
             }}
             className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-all"
             title="Delete Brand"
@@ -269,6 +276,16 @@ export function BrandsManagement() {
         onSubmit={handleFormSubmit}
         initialData={selectedBrand}
         isLoading={createMutation.isPending || updateMutation.isPending}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => brandToDelete && deleteMutation.mutate(brandToDelete.id)}
+        title="Delete Brand"
+        description="Are you sure you want to delete this brand? All products associated with this brand will lose their brand reference."
+        itemName={brandToDelete?.name}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

@@ -13,10 +13,14 @@ export const userService = {
   ): Promise<UserListResponse> => {
     const response = await apiClient.get("/api/user", {
       params: { 
-        page, 
+        pageNumber: page, 
         pageSize, 
-        ...filters,
-        ...sort
+        searchTerm: filters.search,
+        roleName: filters.role,
+        isActive: filters.isActive,
+        isLocked: filters.isLocked,
+        sortBy: sort.sortBy,
+        sortDirection: sort.isDescending ? "desc" : "asc"
       }
     });
     return response.data;
@@ -30,13 +34,6 @@ export const userService = {
     return response.data;
   },
 
-  /**
-   * Create a new user
-   */
-  createUser: async (data: UserCreateRequest): Promise<UserProfile> => {
-    const response = await apiClient.post("/api/user", data);
-    return response.data;
-  },
 
   /**
    * Update an existing user

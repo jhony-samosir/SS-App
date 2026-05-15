@@ -21,6 +21,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { ProductFormModal } from "./ProductFormModal";
+import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 import Image from "next/image";
 
 export function ProductsManagement() {
@@ -31,6 +32,8 @@ export function ProductsManagement() {
   const [limit] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   // Queries
   const { data: prodData, isLoading } = useQuery({
@@ -77,10 +80,12 @@ export function ProductsManagement() {
       queryClient.setQueryData(["admin-products", page, limit], context?.previousData);
       toast.error("Failed to update product");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+    onSuccess: () => {
       toast.success("Product updated successfully");
       setIsModalOpen(false);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
     }
   });
 
@@ -104,13 +109,12 @@ export function ProductsManagement() {
 
       return { previousData };
     },
-    onError: (err, id, context) => {
-      queryClient.setQueryData(["admin-products", page, limit], context?.previousData);
-      toast.error("Failed to delete product");
+    onSuccess: () => {
+      toast.success("Product deleted successfully");
+      setIsDeleteModalOpen(false);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-      toast.success("Product deleted successfully");
     }
   });
 
@@ -174,7 +178,7 @@ export function ProductsManagement() {
       header: "Price",
       render: (prod: Product) => (
         <span className="font-bold text-sm">
-          ${prod.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          ${(prod.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
         </span>
       ),
     },
@@ -195,9 +199,8 @@ export function ProductsManagement() {
           </button>
           <button 
             onClick={() => {
-              if (confirm("Are you sure you want to delete this product?")) {
-                deleteMutation.mutate(prod.id);
-              }
+              setProductToDelete(prod);
+              setIsDeleteModalOpen(true);
             }}
             className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-all"
             title="Delete Product"
@@ -278,6 +281,16 @@ export function ProductsManagement() {
         onSubmit={handleSubmit}
         initialData={selectedProduct}
         isLoading={createMutation.isPending || updateMutation.isPending}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => productToDelete && deleteMutation.mutate(productToDelete.id)}
+        title="Delete Product"
+        description="Are you sure you want to delete this product? This will remove the product and all its variants from the catalog."
+        itemName={productToDelete?.name}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

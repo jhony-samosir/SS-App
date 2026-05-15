@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { ProductBundle } from "@/types/catalog";
+import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 
 export function BundlesManagement() {
   const queryClient = useQueryClient();
@@ -35,6 +36,8 @@ export function BundlesManagement() {
   // State
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [bundleToDelete, setBundleToDelete] = useState<ProductBundle | null>(null);
 
   // Queries
   const { data: bundleData, isLoading } = useQuery({
@@ -46,11 +49,11 @@ export function BundlesManagement() {
   const deleteMutation = useMutation({
     mutationFn: (id: number) => catalogService.deleteBundle(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-bundles"] });
       toast.success("Bundle deleted successfully");
+      setIsDeleteModalOpen(false);
     },
-    onError: (error: any) => {
-      toast.error(error.message || "Failed to delete bundle");
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-bundles"] });
     }
   });
 
@@ -128,9 +131,8 @@ export function BundlesManagement() {
             <DropdownMenuItem 
               className="gap-2 cursor-pointer text-destructive focus:text-destructive"
               onClick={() => {
-                if (confirm("Are you sure you want to delete this bundle?")) {
-                  deleteMutation.mutate(parseInt(bundle.id));
-                }
+                setBundleToDelete(bundle);
+                setIsDeleteModalOpen(true);
               }}
             >
               <Trash2 size={14} /> Delete
@@ -213,6 +215,16 @@ export function BundlesManagement() {
           <p className="opacity-80">Product bundles increase your Average Order Value (AOV) by encouraging customers to buy complementary items at a slight discount.</p>
         </div>
       </div>
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => bundleToDelete && deleteMutation.mutate(parseInt(bundleToDelete.id))}
+        title="Delete Bundle"
+        description="Are you sure you want to delete this product bundle? This will not delete the individual products."
+        itemName={bundleToDelete?.name}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

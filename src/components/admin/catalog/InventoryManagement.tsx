@@ -84,9 +84,17 @@ export function InventoryManagement() {
       header: "Product / Variant",
       render: (inv: ProductInventory) => (
         <div className="flex flex-col">
-          <span className="font-bold text-foreground">Variant ID: {inv.variant_id}</span>
-          <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-tighter">SKU REFERENCE</span>
+          <span className="font-bold text-foreground leading-none">{inv.product_name}</span>
+          <span className="text-xs text-muted-foreground mt-1">{inv.variant_name}</span>
         </div>
+      ),
+    },
+    {
+      header: "SKU",
+      render: (inv: ProductInventory) => (
+        <span className="text-xs font-mono font-bold bg-muted px-2 py-1 rounded-md border border-border/50">
+          {inv.sku || "N/A"}
+        </span>
       ),
     },
     {
@@ -259,7 +267,9 @@ export function InventoryManagement() {
                   <Database size={20} className="text-primary" />
                   Adjust Stock Level
                 </h2>
-                <p className="text-xs text-muted-foreground mt-0.5">Manual inventory correction for Warehouse</p>
+                <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-[300px]">
+                  Manual correction for: <span className="font-bold text-foreground">{selectedInv?.product_name} ({selectedInv?.variant_name})</span>
+                </p>
               </div>
               <button onClick={() => setIsAdjustModalOpen(false)} className="p-2 hover:bg-muted rounded-full transition-colors">
                 <Plus size={20} className="rotate-45" />

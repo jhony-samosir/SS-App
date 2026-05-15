@@ -19,6 +19,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { CategoryFormModal } from "./CategoryFormModal";
+import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 
 export function CategoriesManagement() {
   const queryClient = useQueryClient();
@@ -29,6 +30,8 @@ export function CategoriesManagement() {
   const [limit] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
 
   // Queries
   const { data, isLoading } = useQuery({
@@ -75,10 +78,12 @@ export function CategoriesManagement() {
       queryClient.setQueryData(["admin-categories", page, limit], context?.previousData);
       toast.error("Failed to update category");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
+    onSuccess: () => {
       toast.success("Category updated successfully");
       setIsModalOpen(false);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
     }
   });
 
@@ -102,13 +107,12 @@ export function CategoriesManagement() {
 
       return { previousData };
     },
-    onError: (err, id, context) => {
-      queryClient.setQueryData(["admin-categories", page, limit], context?.previousData);
-      toast.error("Failed to delete category");
+    onSuccess: () => {
+      toast.success("Category deleted successfully");
+      setIsDeleteModalOpen(false);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
-      toast.success("Category deleted successfully");
     }
   });
 
@@ -189,9 +193,8 @@ export function CategoriesManagement() {
           </button>
           <button 
             onClick={() => {
-              if (confirm("Are you sure you want to delete this category?")) {
-                deleteMutation.mutate(cat.id);
-              }
+              setCategoryToDelete(cat);
+              setIsDeleteModalOpen(true);
             }}
             className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-all"
             title="Delete Category"
@@ -286,6 +289,16 @@ export function CategoriesManagement() {
         onSubmit={handleFormSubmit}
         initialData={selectedCategory}
         isLoading={createMutation.isPending || updateMutation.isPending}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => categoryToDelete && deleteMutation.mutate(categoryToDelete.id)}
+        title="Delete Category"
+        description="Are you sure you want to delete this category? Sub-categories and product associations might be affected."
+        itemName={categoryToDelete?.name}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

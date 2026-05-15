@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { AttributeFormModal } from "./AttributeFormModal";
 import { TagFormModal } from "./TagFormModal";
+import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 
 export function AttributesManagement() {
   const queryClient = useQueryClient();
@@ -39,6 +40,10 @@ export function AttributesManagement() {
   const [tagLimit] = useState(10);
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
+
+  // Delete State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ id: string, name: string, type: "attribute" | "tag" } | null>(null);
 
   // Queries
   const { data: attrData, isLoading: isLoadingAttrs } = useQuery({
@@ -91,10 +96,12 @@ export function AttributesManagement() {
       queryClient.setQueryData(["admin-attributes", attrPage, attrLimit], context?.previousData);
       toast.error("Failed to update attribute");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-attributes"] });
+    onSuccess: () => {
       toast.success("Attribute updated successfully");
       setIsAttrModalOpen(false);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-attributes"] });
     }
   });
 
@@ -118,13 +125,12 @@ export function AttributesManagement() {
 
       return { previousData };
     },
-    onError: (err, id, context) => {
-      queryClient.setQueryData(["admin-attributes", attrPage, attrLimit], context?.previousData);
-      toast.error("Failed to delete attribute");
+    onSuccess: () => {
+      toast.success("Attribute deleted successfully");
+      setIsDeleteModalOpen(false);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-attributes"] });
-      toast.success("Attribute deleted successfully");
     }
   });
 
@@ -167,10 +173,12 @@ export function AttributesManagement() {
       queryClient.setQueryData(["admin-tags", tagPage, tagLimit], context?.previousData);
       toast.error("Failed to update tag");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-tags"] });
+    onSuccess: () => {
       toast.success("Tag updated successfully");
       setIsTagModalOpen(false);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-tags"] });
     }
   });
 
@@ -194,13 +202,12 @@ export function AttributesManagement() {
 
       return { previousData };
     },
-    onError: (err, id, context) => {
-      queryClient.setQueryData(["admin-tags", tagPage, tagLimit], context?.previousData);
-      toast.error("Failed to delete tag");
+    onSuccess: () => {
+      toast.success("Tag deleted successfully");
+      setIsDeleteModalOpen(false);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-tags"] });
-      toast.success("Tag deleted successfully");
     }
   });
 
@@ -282,9 +289,8 @@ export function AttributesManagement() {
           </button>
           <button 
             onClick={() => {
-              if (confirm("Are you sure you want to delete this attribute?")) {
-                deleteAttrMutation.mutate(attr.id);
-              }
+              setItemToDelete({ id: attr.id, name: attr.name, type: "attribute" });
+              setIsDeleteModalOpen(true);
             }}
             className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-all"
           >
@@ -328,9 +334,8 @@ export function AttributesManagement() {
           </button>
           <button 
             onClick={() => {
-              if (confirm("Delete this tag?")) {
-                deleteTagMutation.mutate(tag.id);
-              }
+              setItemToDelete({ id: tag.id, name: tag.name, type: "tag" });
+              setIsDeleteModalOpen(true);
             }}
             className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-all"
           >
@@ -422,6 +427,27 @@ export function AttributesManagement() {
         onSubmit={handleTagSubmit}
         initialData={selectedTag}
         isLoading={createTagMutation.isPending || updateTagMutation.isPending}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          if (!itemToDelete) return;
+          if (itemToDelete.type === "attribute") {
+            deleteAttrMutation.mutate(itemToDelete.id);
+          } else {
+            deleteTagMutation.mutate(itemToDelete.id);
+          }
+        }}
+        title={itemToDelete?.type === "attribute" ? "Delete Attribute" : "Delete Tag"}
+        description={
+          itemToDelete?.type === "attribute" 
+            ? "Are you sure? This will remove this attribute from all products and variants." 
+            : "Are you sure you want to remove this tag?"
+        }
+        itemName={itemToDelete?.name}
+        isLoading={deleteAttrMutation.isPending || deleteTagMutation.isPending}
       />
     </div>
   );

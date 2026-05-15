@@ -16,11 +16,10 @@ import {
   ArrowUpDown,
   AlertCircle,
   ShieldAlert,
-  Loader2,
-  Plus
+  Loader2
 } from "lucide-react";
 import { userService } from "@/services/user-service";
-import { UserListItem, UserCreateRequest } from "@/types/user";
+import { UserListItem } from "@/types/user";
 import { useDebounce } from "@/hooks/use-debounce";
 import { DataTable } from "@/components/ui/DataTable";
 import Link from "next/link";
@@ -29,7 +28,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { UserFormModal } from "./UserFormModal";
 import { SoftSelect } from "@/components/ui/SoftSelect";
 import { toast } from "sonner";
 
@@ -46,25 +44,9 @@ export function UsersManagement() {
   const [sortConfig, setSortConfig] = useState<{ key: string, desc: boolean }>({ key: "createdAt", desc: true });
   
   const [forbiddenError, setForbiddenError] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
 
-  const createMutation = useMutation({
-    mutationFn: (data: UserCreateRequest) => userService.createUser(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      setIsFormOpen(false);
-      setSubmitError(null);
-      toast.success("User created successfully");
-    },
-    onError: (err: unknown) => {
-      if (axios.isAxiosError(err)) {
-        setSubmitError(err.response?.data?.message || "Failed to create user");
-      }
-    }
-  });
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["users", page, debouncedSearch, roleFilter, statusFilter, sortConfig],
@@ -208,18 +190,6 @@ export function UsersManagement() {
           <p className="text-muted-foreground">Monitor and manage all system users and their access levels</p>
         </div>
 
-        {hasPermission("Users Create") && (
-          <button
-            onClick={() => {
-              setSubmitError(null);
-              setIsFormOpen(true);
-            }}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-primary/20"
-          >
-            <Plus size={20} />
-            Create User
-          </button>
-        )}
       </div>
 
       <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden">
@@ -294,13 +264,6 @@ export function UsersManagement() {
         />
       </div>
 
-      <UserFormModal 
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        onSubmit={(values) => createMutation.mutate(values)}
-        isPending={createMutation.isPending}
-        error={submitError}
-      />
     </div>
   );
 }

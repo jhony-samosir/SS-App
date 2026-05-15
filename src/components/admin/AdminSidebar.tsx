@@ -170,13 +170,13 @@ export function AdminSidebar({ className }: { className?: string }) {
             <Link
               key={item.name}
               href={item.href}
-            className={cn(
-              "group relative flex items-center rounded-2xl transition-all duration-500",
-              isCollapsed ? "h-12 w-12 justify-center mx-auto" : cn("w-full px-4 py-3 gap-3", isSubItem ? "py-2" : "py-3.5"),
-              isActive
-                ? "bg-primary/10 text-primary shadow-[0_0_20px_rgba(var(--primary),0.1)] border border-primary/20"
-                : "text-muted-foreground/70 hover:bg-muted/30 hover:text-foreground"
-            )}
+              className={cn(
+                "group relative flex items-center rounded-2xl transition-all duration-500",
+                isCollapsed ? "h-12 w-12 justify-center mx-auto" : cn("w-full px-4 py-3 gap-3", isSubItem ? "py-2" : "py-3.5"),
+                isActive
+                  ? "bg-primary/10 text-primary shadow-[0_0_20px_rgba(var(--primary),0.1)] border border-primary/20"
+                  : "text-muted-foreground/70 hover:bg-muted/30 hover:text-foreground"
+              )}
             >
               {isActive && isSubItem && (
                 <motion.div
@@ -238,8 +238,8 @@ export function AdminSidebar({ className }: { className?: string }) {
       <div className={cn("h-28 flex items-center relative overflow-hidden", isCollapsed ? "justify-center px-0" : "px-6")}>
         <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-transparent opacity-40" />
         <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-3xl" />
-        
-        <Link href="/" className={cn("flex items-center gap-4 group min-w-0 relative z-10", isCollapsed ? "justify-center w-full" : "")}>
+
+        <Link href="/admin" className={cn("flex items-center gap-4 group min-w-0 relative z-10", isCollapsed ? "justify-center w-full" : "")}>
           <div className={cn(
             "bg-gradient-to-tr from-primary to-primary/40 text-white flex-shrink-0 flex items-center justify-center shadow-[0_8px_30px_rgb(var(--primary)/0.3)] border border-white/10 transition-all duration-700 group-hover:rotate-[15deg] group-hover:scale-110",
             isCollapsed ? "w-11 h-11 rounded-[16px]" : "w-14 h-14 rounded-[22px]"
@@ -347,15 +347,15 @@ export function AdminSidebar({ className }: { className?: string }) {
 
         {!isCollapsed && (
           <div className="mt-5 grid grid-cols-2 gap-3">
-            <button 
-              onClick={toggleAdminSidebar} 
+            <button
+              onClick={toggleAdminSidebar}
               className="flex items-center justify-center gap-2 py-3 text-[11px] text-muted-foreground/80 hover:text-primary bg-background/30 hover:bg-primary/10 rounded-2xl transition-all duration-300 font-black border border-border/10 hover:border-primary/20 uppercase tracking-widest"
             >
               {isLocked ? <Unlock size={14} /> : <Lock size={14} />}
               <span>{isLocked ? "UNLOCK" : "LOCK"}</span>
             </button>
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="flex items-center justify-center gap-2 py-3 text-[11px] text-destructive/80 hover:text-destructive hover:bg-destructive/10 bg-background/30 rounded-2xl transition-all duration-300 font-black border border-border/10 hover:border-destructive/20 uppercase tracking-widest"
             >
               <LogOut size={14} />

@@ -20,6 +20,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { WarehouseFormModal } from "./WarehouseFormModal";
+import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 
 export function WarehousesManagement() {
   const queryClient = useQueryClient();
@@ -30,6 +31,8 @@ export function WarehousesManagement() {
   const [limit] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [warehouseToDelete, setWarehouseToDelete] = useState<Warehouse | null>(null);
 
   // Queries
   const { data, isLoading } = useQuery({
@@ -76,10 +79,12 @@ export function WarehousesManagement() {
       queryClient.setQueryData(["admin-warehouses", page, limit], context?.previousData);
       toast.error("Failed to update warehouse");
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-warehouses"] });
+    onSuccess: () => {
       toast.success("Warehouse updated successfully");
       setIsModalOpen(false);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-warehouses"] });
     }
   });
 
@@ -103,13 +108,12 @@ export function WarehousesManagement() {
 
       return { previousData };
     },
-    onError: (err, id, context) => {
-      queryClient.setQueryData(["admin-warehouses", page, limit], context?.previousData);
-      toast.error("Failed to delete warehouse");
+    onSuccess: () => {
+      toast.success("Warehouse deleted successfully");
+      setIsDeleteModalOpen(false);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-warehouses"] });
-      toast.success("Warehouse deleted successfully");
     }
   });
 
@@ -190,9 +194,8 @@ export function WarehousesManagement() {
           </button>
           <button 
             onClick={() => {
-              if (confirm("Are you sure you want to delete this warehouse?")) {
-                deleteMutation.mutate(wh.id);
-              }
+              setWarehouseToDelete(wh);
+              setIsDeleteModalOpen(true);
             }}
             className="p-2 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-all"
           >
@@ -291,6 +294,16 @@ export function WarehousesManagement() {
         onSubmit={handleFormSubmit}
         initialData={selectedWarehouse}
         isLoading={createMutation.isPending || updateMutation.isPending}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => warehouseToDelete && deleteMutation.mutate(warehouseToDelete.id)}
+        title="Delete Warehouse"
+        description="Are you sure you want to delete this warehouse? This will remove all associated stock levels and logistics records."
+        itemName={`${warehouseToDelete?.name} (${warehouseToDelete?.code})`}
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

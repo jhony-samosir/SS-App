@@ -7,7 +7,11 @@ export const roleService = {
    */
   getRoles: async (page = 1, pageSize = 10, search = ""): Promise<RoleListResponse> => {
     const response = await apiClient.get("/api/roles", {
-      params: { page, pageSize, search }
+      params: { 
+        pageNumber: page, 
+        pageSize, 
+        searchTerm: search 
+      }
     });
     return response.data;
   },

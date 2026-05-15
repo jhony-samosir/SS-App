@@ -37,6 +37,9 @@ export interface VariantAttributeValue {
 export interface ProductInventory {
   id: string;
   variant_id: string;
+  product_name?: string;
+  variant_name?: string;
+  sku?: string;
   warehouse_id: string;
   warehouse_name?: string;
   quantity_on_hand: number;
