@@ -140,9 +140,9 @@ export function CategoriesManagement() {
           <div className="w-10 h-10 bg-indigo-500/10 text-indigo-600 rounded-xl flex items-center justify-center border border-indigo-500/20">
             <Layers size={20} />
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-foreground">{cat.name}</span>
-            <div className="flex items-center gap-1 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-foreground truncate-max" title={cat.name}>{cat.name}</span>
+            <div className="flex items-center gap-1 text-[10px] text-dimmed uppercase tracking-widest font-bold truncate-max" title={cat.slug}>
               {cat.slug}
             </div>
           </div>
@@ -229,8 +229,8 @@ export function CategoriesManagement() {
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         <div className="xl:col-span-3">
           <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden">
-            <div className="p-6 border-b border-border flex flex-col lg:flex-row gap-4 items-center">
-              <div className="relative w-full lg:w-96">
+            <div className="filter-bar">
+              <div className="search-container">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                 <input
                   type="text"

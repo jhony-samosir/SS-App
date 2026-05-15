@@ -142,14 +142,14 @@ export function RolesManagement() {
           <div className="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
             <Shield size={16} />
           </div>
-          <span className="font-bold">{role.name}</span>
+          <span className="font-bold truncate-max" title={role.name}>{role.name}</span>
         </div>
       ),
     },
     {
       header: "Description",
       render: (role: Role) => (
-        <p className="text-sm text-muted-foreground max-w-xs truncate">{role.description}</p>
+        <p className="text-sm text-dimmed truncate-max" title={role.description}>{role.description}</p>
       ),
     },
     {
@@ -208,15 +208,15 @@ export function RolesManagement() {
       </div>
 
       <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden">
-        <div className="p-6 border-b border-border flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full md:w-96">
+        <div className="filter-bar">
+          <div className="search-container">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input
               type="text"
               placeholder="Search roles..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl pl-10 pr-4 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+              className="w-full bg-background border border-border rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
             />
           </div>
           

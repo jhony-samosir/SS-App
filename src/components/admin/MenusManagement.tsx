@@ -170,7 +170,9 @@ export function MenusManagement() {
           <div className="w-8 h-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
             <DynamicIcon name={m.icon || "Link"} size={16} />
           </div>
-          <span className="font-bold">{m.name}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold truncate-max" title={m.name}>{m.name}</span>
+          </div>
         </div>
       ),
     },
@@ -234,6 +236,20 @@ export function MenusManagement() {
       )}
 
       <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden">
+        {!isTreeMode && (
+          <div className="filter-bar">
+            <div className="search-container">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+              <input
+                type="text"
+                placeholder="Search menus..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-background border border-border rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
+              />
+            </div>
+          </div>
+        )}
         {isTreeMode ? (
            <div className="p-6">
               {isTreeLoading ? (

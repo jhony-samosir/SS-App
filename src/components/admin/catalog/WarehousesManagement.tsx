@@ -142,9 +142,9 @@ export function WarehousesManagement() {
           <div className="w-10 h-10 bg-amber-500/10 text-amber-600 rounded-xl flex items-center justify-center border border-amber-500/20">
             <WarehouseIcon size={20} />
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-foreground">{wh.name}</span>
-            <span className="text-xs text-muted-foreground font-mono">{wh.code}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-foreground truncate-max" title={wh.name}>{wh.name}</span>
+            <span className="text-xs text-dimmed font-mono truncate-max" title={wh.code}>{wh.code}</span>
           </div>
         </div>
       ),
@@ -229,16 +229,19 @@ export function WarehousesManagement() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden">
-            <div className="p-6 border-b border-border flex items-center justify-between">
-              <input
-                type="text"
-                placeholder="Search warehouses by name, code or city..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full max-w-md bg-background border border-border rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
-              />
+            <div className="filter-bar">
+              <div className="search-container">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search warehouses by name, code or city..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full bg-background border border-border rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
+                />
+              </div>
               {(isLoading || updateMutation.isPending || deleteMutation.isPending) && (
-                <Loader2 className="animate-spin text-primary" size={20} />
+                <Loader2 className="animate-spin text-primary ml-auto" size={20} />
               )}
             </div>
 

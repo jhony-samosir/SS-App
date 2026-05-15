@@ -106,7 +106,7 @@ export function ProductFormModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
-      
+
       <div className="relative w-full max-w-2xl bg-card rounded-3xl border border-border shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
         <div className="p-6 border-b border-border flex items-center justify-between bg-card sticky top-0 z-10">
           <div>
@@ -187,10 +187,9 @@ export function ProductFormModal({
                 onChange={(val) => setValue("brand_id", val === "" ? null : val)}
                 error={errors.brand_id?.message}
               />
-              
+
               {/* Note: Multi-category selection is simplified here for standard SoftSelect */}
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground pl-1">Primary Category</label>
                 <SoftSelect
                   id="prod-category"
                   label="Category"

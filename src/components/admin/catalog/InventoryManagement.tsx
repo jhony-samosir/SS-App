@@ -83,9 +83,9 @@ export function InventoryManagement() {
     {
       header: "Product / Variant",
       render: (inv: ProductInventory) => (
-        <div className="flex flex-col">
-          <span className="font-bold text-foreground leading-none">{inv.product_name}</span>
-          <span className="text-xs text-muted-foreground mt-1">{inv.variant_name}</span>
+        <div className="flex flex-col min-w-0">
+          <span className="font-bold text-foreground leading-none truncate-max" title={inv.product_name}>{inv.product_name}</span>
+          <span className="text-xs text-dimmed mt-1 truncate-max" title={inv.variant_name}>{inv.variant_name}</span>
         </div>
       ),
     },
@@ -228,13 +228,13 @@ export function InventoryManagement() {
       </div>
 
       <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden">
-        <div className="p-6 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="relative flex-grow max-w-md">
+        <div className="filter-bar">
+          <div className="search-container">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input 
               type="text"
               placeholder="Search by Variant SKU or ID..."
-              className="w-full bg-muted/50 border border-border/50 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 transition-all"
+              className="w-full bg-background border border-border rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
             />
           </div>
           

@@ -78,9 +78,9 @@ export function LoginAttemptsAudit() {
           )}>
             <Mail size={18} />
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-foreground">{attempt.email}</span>
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">Identity</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-foreground truncate-max" title={attempt.email}>{attempt.email}</span>
+            <span className="text-[10px] text-dimmed uppercase tracking-widest font-medium">Identity</span>
           </div>
         </div>
       ),
@@ -165,9 +165,9 @@ export function LoginAttemptsAudit() {
       </div>
 
       <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden">
-        <div className="p-6 border-b border-border grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="filter-bar grid grid-cols-1 md:grid-cols-3 w-full">
           {/* Email Search */}
-          <div className="relative">
+          <div className="search-container !max-w-none">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input
               type="text"
@@ -179,7 +179,7 @@ export function LoginAttemptsAudit() {
           </div>
 
           {/* IP Search */}
-          <div className="relative">
+          <div className="search-container !max-w-none">
             <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input
               type="text"

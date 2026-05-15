@@ -151,9 +151,9 @@ export function BrandsManagement() {
               <Tag size={20} />
             )}
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-foreground">{brand.name}</span>
-            <span className="text-xs text-muted-foreground">{brand.slug}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-foreground truncate-max" title={brand.name}>{brand.name}</span>
+            <span className="text-xs text-dimmed truncate-max" title={brand.slug}>{brand.slug}</span>
           </div>
         </div>
       ),
@@ -241,8 +241,8 @@ export function BrandsManagement() {
       </div>
 
       <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden">
-        <div className="p-6 border-b border-border flex flex-col lg:flex-row gap-4 items-center">
-          <div className="relative w-full lg:w-96">
+        <div className="filter-bar">
+          <div className="search-container">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input
               type="text"

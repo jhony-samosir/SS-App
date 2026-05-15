@@ -68,9 +68,9 @@ export function BundlesManagement() {
           <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600">
             <Layers size={20} />
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-sm">{bundle.name}</span>
-            <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider">{bundle.slug}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-sm truncate-max" title={bundle.name}>{bundle.name}</span>
+            <span className="text-[10px] text-dimmed font-mono uppercase tracking-wider truncate-max" title={bundle.slug}>{bundle.slug}</span>
           </div>
         </div>
       ),
@@ -179,13 +179,13 @@ export function BundlesManagement() {
       </div>
 
       <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden">
-        <div className="p-6 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="relative flex-grow max-w-md">
+        <div className="filter-bar">
+          <div className="search-container">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input 
               type="text"
               placeholder="Search bundles..."
-              className="w-full bg-muted/50 border border-border/50 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 transition-all"
+              className="w-full bg-background border border-border rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none text-sm"
             />
           </div>
           

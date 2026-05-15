@@ -118,4 +118,20 @@
   html {
     @apply font-sans;
   }
-}
+}
+.text-dimmed {
+  @apply text-muted-foreground/70;
+}
+
+.truncate-max {
+  @apply truncate inline-block;
+  max-width: 200px;
+}
+
+.filter-bar {
+  @apply flex flex-wrap items-center gap-4 p-6 border-b border-border;
+}
+
+.search-container {
+  @apply relative w-full sm:min-w-[240px] sm:max-w-[400px];
+}

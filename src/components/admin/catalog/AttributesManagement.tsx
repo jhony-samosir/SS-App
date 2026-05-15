@@ -234,10 +234,10 @@ export function AttributesManagement() {
     {
       header: "Attribute",
       render: (attr: ProductAttribute) => (
-        <div className="flex flex-col">
-          <span className="font-bold text-foreground">{attr.name}</span>
-          <span className="text-xs text-muted-foreground font-mono">{attr.code}</span>
-        </div>
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-foreground truncate-max" title={attr.name}>{attr.name}</span>
+            <span className="text-xs text-dimmed font-mono truncate-max" title={attr.code}>{attr.code}</span>
+          </div>
       ),
     },
     {
@@ -305,16 +305,16 @@ export function AttributesManagement() {
     {
       header: "Tag Name",
       render: (tag: Tag) => (
-        <div className="flex items-center gap-2">
-          <Hash size={16} className="text-muted-foreground" />
-          <span className="font-bold">{tag.name}</span>
+        <div className="flex items-center gap-2 min-w-0">
+          <Hash size={16} className="text-muted-foreground shrink-0" />
+          <span className="font-bold truncate-max" title={tag.name}>{tag.name}</span>
         </div>
       ),
     },
     {
       header: "Slug",
       render: (tag: Tag) => (
-        <span className="text-sm font-mono text-muted-foreground">{tag.slug}</span>
+        <span className="text-sm font-mono text-dimmed truncate-max" title={tag.slug}>{tag.slug}</span>
       ),
     },
     {

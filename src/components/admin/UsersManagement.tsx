@@ -114,10 +114,12 @@ export function UsersManagement() {
           <div className="w-10 h-10 bg-primary/10 text-primary rounded-full flex items-center justify-center border border-primary/20">
             <User size={20} />
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-foreground">{user.fullName}</span>
-            <span className="text-xs text-muted-foreground flex items-center gap-1">
-              <Mail size={12} />
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-foreground truncate-max" title={user.fullName}>
+              {user.fullName}
+            </span>
+            <span className="text-xs text-dimmed flex items-center gap-1 truncate-max" title={user.email}>
+              <Mail size={12} className="shrink-0" />
               {user.email}
             </span>
           </div>
@@ -193,9 +195,9 @@ export function UsersManagement() {
       </div>
 
       <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden">
-        <div className="p-6 border-b border-border flex flex-col lg:flex-row gap-4 items-center">
+        <div className="filter-bar">
           {/* Search */}
-          <div className="relative w-full lg:w-96">
+          <div className="search-container">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
             <input
               type="text"
@@ -206,7 +208,7 @@ export function UsersManagement() {
             />
           </div>
           
-          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+          <div className="flex flex-wrap items-center gap-3 flex-grow lg:flex-grow-0">
             <SoftSelect 
               id="role-filter"
               label="Role"

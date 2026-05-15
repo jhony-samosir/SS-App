@@ -34,7 +34,7 @@ export function DataTable<T>({
   return (
     <div className="w-full">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-left border-collapse min-w-[800px]">
           <thead>
             <tr className="bg-muted/30 text-muted-foreground text-xs uppercase tracking-widest font-bold">
               {columns.map((col, idx) => (
