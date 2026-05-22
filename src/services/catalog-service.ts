@@ -170,9 +170,8 @@ export const catalogService = {
     await apiClient.delete(`/api/catalog/v1/warehouses/${id}`);
   },
 
-  // --- Reviews ---
   getReviews: async (productId: string, params: { limit?: number; offset?: number } = {}) => {
-    const response = await apiClient.get<{ data: any[] }>(`/api/catalog/v1/reviews/product/${productId}`, {
+    const response = await apiClient.get<{ data: { items: any[]; total_count: number; page: number; limit: number } }>(`/api/catalog/v1/reviews/product/${productId}`, {
       params,
     });
     return response.data;

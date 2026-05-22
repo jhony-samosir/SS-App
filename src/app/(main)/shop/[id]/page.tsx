@@ -167,7 +167,7 @@ export default function ProductDetailPage() {
         <div className="mb-32 pt-32 border-t border-border/50">
           <ReviewList 
             productId={id}
-            reviews={reviewsData?.data || []}
+            reviews={reviewsData?.data?.items || []}
             summary={{
               averageRating: ratingSummary?.average_rating || 0,
               totalReviews: ratingSummary?.total_reviews || 0,
