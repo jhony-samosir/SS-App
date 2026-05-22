@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { mapBackendUserToFrontend } from "@/services/auth-service";
 import axios from "axios";
+import logger from "@/lib/logger";
 
 /**
  * Server-side session utility.
@@ -27,7 +28,42 @@ export async function getServerSession() {
     });
 
     return mapBackendUserToFrontend(response.data);
-  } catch (error) {
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      // 401 is expected when user is not logged in or session expired. Only log other statuses (e.g. 500, network errors).
+      if (status !== 401) {
+        logger.error(
+          {
+            err: {
+              message: error.message,
+              stack: error.stack,
+              status: status,
+              code: error.code,
+            },
+            path: "/api/user/me",
+          },
+          "Server-side session check failed with HTTP error"
+        );
+      }
+    } else {
+      const isDynamicError = 
+        error instanceof Error && 
+        (error.name === "DynamicServerError" || error.message.includes("Dynamic server usage"));
+
+      if (!isDynamicError) {
+        logger.error(
+          {
+            err: {
+              message: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+            },
+            path: "/api/user/me",
+          },
+          "Server-side session check failed with unexpected error"
+        );
+      }
+    }
     // Session not found or expired
     return null;
   }

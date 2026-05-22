@@ -12,7 +12,8 @@ import {
   Edit3,
   CheckCircle2,
   XCircle,
-  Truck
+  Truck,
+  Search
 } from "lucide-react";
 import { catalogService } from "@/services/catalog-service";
 import { Warehouse } from "@/types/catalog";
