@@ -5,6 +5,8 @@ import { Star, ShoppingCart, Heart, Package } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Product } from "@/types/product";
+import { useCartStore } from "@/store/use-cart-store";
+import { toast } from "sonner"; // Assuming sonner is available or will handle silently
 
 interface ProductCardProps {
   product: Product;
@@ -15,6 +17,25 @@ interface ProductCardProps {
 export function ProductCard({ product, index = 0, viewMode = "grid" }: ProductCardProps) {
   const price = product.price || 25000; // Fallback if price missing
   const rating = 4.8; // Placeholder as backend rating might be separate
+  const { addItem } = useCartStore();
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await addItem({
+        productId: 0, // Should be actual product ID but we use public ID
+        productPublicId: product.id,
+        productName: product.name,
+        unitPrice: price,
+        quantity: 1,
+        imageUrl: product.image_url,
+      });
+      // toast.success("Added to cart");
+    } catch (error) {
+      // toast.error("Failed to add to cart");
+    }
+  };
 
   if (viewMode === "list") {
     return (
@@ -48,7 +69,7 @@ export function ProductCard({ product, index = 0, viewMode = "grid" }: ProductCa
             <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{product.description}</p>
             <div className="flex items-center justify-between">
                <span className="text-2xl font-black text-foreground">Rp {price.toLocaleString('id-ID')}</span>
-               <button className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+               <button onClick={handleAddToCart} className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
                  <ShoppingCart size={16} />
                  Add to Cart
                </button>
@@ -81,10 +102,10 @@ export function ProductCard({ product, index = 0, viewMode = "grid" }: ProductCa
           </button>
 
           <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-6">
-             <div className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-2xl shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center gap-2">
+             <button onClick={handleAddToCart} className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-2xl shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center gap-2">
                 <ShoppingCart size={18} />
                 Quick Add
-             </div>
+             </button>
           </div>
         </div>
 
@@ -108,9 +129,9 @@ export function ProductCard({ product, index = 0, viewMode = "grid" }: ProductCa
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none mb-1">Price</span>
               <span className="text-xl font-black text-foreground">Rp {price.toLocaleString('id-ID')}</span>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+            <button onClick={handleAddToCart} className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-all">
               <ShoppingCart size={20} />
-            </div>
+            </button>
           </div>
         </div>
       </motion.div>

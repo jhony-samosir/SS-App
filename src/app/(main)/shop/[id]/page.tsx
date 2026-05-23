@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ReviewList } from "@/components/catalog/ReviewList";
 import { BundleCard } from "@/components/catalog/BundleCard";
+import { useCartStore } from "@/store/use-cart-store";
+import { useState } from "react";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -29,6 +31,28 @@ export default function ProductDetailPage() {
     queryFn: () => catalogService.getRatingSummary(id),
     enabled: !!id,
   });
+
+  const { addItem } = useCartStore();
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    setIsAdding(true);
+    try {
+      await addItem({
+        productId: 0,
+        productPublicId: product.id,
+        productName: product.name,
+        unitPrice: product.price || 25000,
+        quantity: 1,
+        imageUrl: product.image_url,
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   if (productLoading) {
     return (
@@ -116,9 +140,19 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="flex items-center gap-4">
-              <button className="flex-[3] py-5 bg-primary text-primary-foreground font-bold rounded-2xl shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                <ShoppingCart size={22} />
-                Add to Cart
+              <button 
+                onClick={handleAddToCart}
+                disabled={isAdding}
+                className="flex-[3] py-5 bg-primary text-primary-foreground font-bold rounded-2xl shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {isAdding ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <ShoppingCart size={22} />
+                    Add to Cart
+                  </>
+                )}
               </button>
               <button className="flex-1 py-5 bg-card border border-border/50 text-muted-foreground hover:text-rose-500 rounded-2xl flex items-center justify-center transition-all group">
                 <Heart size={22} className="group-hover:fill-rose-500" />

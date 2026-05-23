@@ -18,11 +18,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCartStore } from "@/store/use-cart-store";
+import { CartDrawer } from "@/components/ui/cart-drawer";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { user, isAuthenticated, logout, isHydrated, hasRole } = useAuth();
+  const { itemCount, openDrawer, fetchCart } = useCartStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -32,6 +35,12 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCart();
+    }
+  }, [isAuthenticated, fetchCart]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -123,12 +132,14 @@ export function Navbar() {
         <div className="flex items-center gap-2 text-foreground">
           <ThemeToggle />
           
-          <Link href="/cart" className="relative p-2.5 hover:bg-muted rounded-xl transition-all" aria-label="Cart">
+          <button onClick={openDrawer} className="relative p-2.5 hover:bg-muted rounded-xl transition-all" aria-label="Cart">
             <ShoppingCart size={20} strokeWidth={2} />
-            <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-background shadow-sm">
-              0
-            </span>
-          </Link>
+            {itemCount > 0 && (
+              <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-background shadow-sm">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
+          </button>
           
           <div className="h-6 w-px bg-border/50 mx-1" />
 
@@ -242,6 +253,7 @@ export function Navbar() {
           </button>
         </div>
       </div>
+      <CartDrawer />
     </nav>
   );
 }
