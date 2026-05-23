@@ -28,6 +28,14 @@ export function Navbar() {
   const { itemCount, openDrawer, fetchCart } = useCartStore();
   const router = useRouter();
 
+  const handleCartClick = () => {
+    if (!isAuthenticated) {
+      router.push("/login?redirect=/shop");
+      return;
+    }
+    openDrawer();
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -132,7 +140,7 @@ export function Navbar() {
         <div className="flex items-center gap-2 text-foreground">
           <ThemeToggle />
           
-          <button onClick={openDrawer} className="relative p-2.5 hover:bg-muted rounded-xl transition-all" aria-label="Cart">
+          <button onClick={handleCartClick} className="relative p-2.5 hover:bg-muted rounded-xl transition-all" aria-label="Cart">
             <ShoppingCart size={20} strokeWidth={2} />
             {itemCount > 0 && (
               <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-background shadow-sm">

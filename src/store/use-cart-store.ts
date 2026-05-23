@@ -1,5 +1,14 @@
 import { create } from "zustand";
 import { cartService, CartItem, AddCartItemPayload } from "@/services/cart-service";
+import { useAuthStore } from "@/store/use-auth-store";
+
+// Custom error type so components can react to auth failures specifically
+export class AuthRequiredError extends Error {
+  constructor() {
+    super("AUTH_REQUIRED");
+    this.name = "AuthRequiredError";
+  }
+}
 
 interface CartState {
   items: CartItem[];
@@ -47,14 +56,25 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   addItem: async (payload: AddCartItemPayload) => {
+    // Guard: must be authenticated before touching the cart API
+    const { accessToken } = useAuthStore.getState();
+    if (!accessToken) {
+      throw new AuthRequiredError();
+    }
+
     set({ isLoading: true, error: null });
     try {
-      await cartService.addItem(payload);
+      // Normalize empty imageUrl to undefined so backend validation stays clean
+      const normalizedPayload = {
+        ...payload,
+        imageUrl: payload.imageUrl || undefined,
+      };
+      await cartService.addItem(normalizedPayload);
       await get().fetchCart();
       set({ isDrawerOpen: true });
-    } catch (err: any) {
-      set({ error: err.message || "Failed to add item to cart", isLoading: false });
-      // We might throw it further so components can show toasts
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to add item to cart";
+      set({ error: message, isLoading: false });
       throw err;
     }
   },

@@ -8,8 +8,11 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ReviewList } from "@/components/catalog/ReviewList";
 import { BundleCard } from "@/components/catalog/BundleCard";
-import { useCartStore } from "@/store/use-cart-store";
+import { useCartStore, AuthRequiredError } from "@/store/use-cart-store";
+import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -33,9 +36,22 @@ export default function ProductDetailPage() {
   });
 
   const { addItem } = useCartStore();
+  const { isAuthenticated, isHydrated } = useAuth();
   const [isAdding, setIsAdding] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleAddToCart = async () => {
+    if (!isHydrated || !isAuthenticated) {
+      toast.info("Please log in to add items to your cart.", {
+        action: {
+          label: "Log In",
+          onClick: () => router.push(`/login?redirect=${encodeURIComponent(pathname)}`),
+        },
+      });
+      return;
+    }
+
     if (!product) return;
     setIsAdding(true);
     try {
@@ -45,10 +61,15 @@ export default function ProductDetailPage() {
         productName: product.name,
         unitPrice: product.price || 25000,
         quantity: 1,
-        imageUrl: product.image_url,
+        imageUrl: product.image_url || undefined,
       });
-    } catch (error) {
-      console.error(error);
+      toast.success(`${product.name} added to cart!`);
+    } catch (err) {
+      if (err instanceof AuthRequiredError) {
+        router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      } else {
+        toast.error("Failed to add to cart. Please try again.");
+      }
     } finally {
       setIsAdding(false);
     }

@@ -5,8 +5,10 @@ import { Star, ShoppingCart, Heart, Package } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Product } from "@/types/product";
-import { useCartStore } from "@/store/use-cart-store";
-import { toast } from "sonner"; // Assuming sonner is available or will handle silently
+import { useCartStore, AuthRequiredError } from "@/store/use-cart-store";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter, usePathname } from "next/navigation";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
@@ -15,25 +17,44 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, index = 0, viewMode = "grid" }: ProductCardProps) {
-  const price = product.price || 25000; // Fallback if price missing
-  const rating = 4.8; // Placeholder as backend rating might be separate
+  const price = product.price || 25000;
+  const rating = 4.8;
   const { addItem } = useCartStore();
+  const { isAuthenticated, isHydrated } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Guard: redirect to login if not authenticated
+    if (!isHydrated || !isAuthenticated) {
+      toast.info("Please log in to add items to your cart.", {
+        action: {
+          label: "Log In",
+          onClick: () => router.push(`/login?redirect=${encodeURIComponent(pathname)}`),
+        },
+      });
+      return;
+    }
+
     try {
       await addItem({
-        productId: 0, // Should be actual product ID but we use public ID
+        productId: 0,
         productPublicId: product.id,
         productName: product.name,
         unitPrice: price,
         quantity: 1,
-        imageUrl: product.image_url,
+        imageUrl: product.image_url || undefined,
       });
-      // toast.success("Added to cart");
-    } catch (error) {
-      // toast.error("Failed to add to cart");
+      toast.success(`${product.name} added to cart!`);
+    } catch (err) {
+      if (err instanceof AuthRequiredError) {
+        router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      } else {
+        toast.error("Failed to add to cart. Please try again.");
+      }
     }
   };
 

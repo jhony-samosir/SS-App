@@ -4,21 +4,23 @@ import { useEffect } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { useCartStore } from "@/store/use-cart-store";
 import { Button } from "@/components/ui/button";
-import { MinusIcon, PlusIcon, TrashIcon, ShoppingCartIcon } from "lucide-react";
+import { MinusIcon, PlusIcon, TrashIcon, ShoppingCartIcon, LogInIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 export function CartDrawer() {
   const { items, total, isDrawerOpen, closeDrawer, fetchCart, updateItemQuantity, removeItem } = useCartStore();
   const router = useRouter();
+  const { isAuthenticated, isHydrated } = useAuth();
 
   useEffect(() => {
-    // Only fetch if open and empty maybe, or just always fetch when opened
-    if (isDrawerOpen) {
+    // Only fetch cart if drawer opens AND user is authenticated
+    if (isDrawerOpen && isAuthenticated) {
       fetchCart();
     }
-  }, [isDrawerOpen, fetchCart]);
+  }, [isDrawerOpen, isAuthenticated, fetchCart]);
 
   const handleCheckout = () => {
     closeDrawer();
@@ -36,7 +38,33 @@ export function CartDrawer() {
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {items.length === 0 ? (
+          {/* Show login prompt for unauthenticated users */}
+          {!isHydrated || !isAuthenticated ? (
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-6 py-12">
+              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                <LogInIcon className="w-10 h-10 text-primary" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-bold text-lg">Login Required</h3>
+                <p className="text-sm text-muted-foreground max-w-[220px]">
+                  Please log in to view your shopping cart and start adding items.
+                </p>
+              </div>
+              <Button
+                className="w-full max-w-[220px]"
+                onClick={() => {
+                  closeDrawer();
+                  router.push("/login?redirect=/shop");
+                }}
+              >
+                <LogInIcon className="w-4 h-4 mr-2" />
+                Log In
+              </Button>
+              <Button variant="outline" className="w-full max-w-[220px]" onClick={closeDrawer}>
+                Continue Browsing
+              </Button>
+            </div>
+          ) : items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground space-y-4">
               <ShoppingCartIcon className="w-16 h-16 opacity-20" />
               <p>Your cart is empty.</p>
