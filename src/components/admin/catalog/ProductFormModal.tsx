@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Product } from "@/types/product";
 import { Brand, Category } from "@/types/catalog";
-import { Loader2, X, Image as ImageIcon, Tag, Hash, DollarSign } from "lucide-react";
+import { Loader2, X, Image as ImageIcon, Tag, Hash } from "lucide-react";
 import { SoftInput } from "@/components/ui/SoftInput";
 import { SoftSelect } from "@/components/ui/SoftSelect";
 import { useEffect } from "react";
@@ -32,6 +32,15 @@ interface ProductFormModalProps {
   initialData?: Product | null;
   isLoading?: boolean;
 }
+
+const RpIcon = (props: any) => (
+  <span 
+    className={props.className} 
+    style={{ fontSize: "11px", fontWeight: "900", userSelect: "none" }}
+  >
+    Rp
+  </span>
+);
 
 export function ProductFormModal({
   isOpen,
@@ -145,8 +154,8 @@ export function ProductFormModal({
                 id="prod-price"
                 label="Price"
                 type="number"
-                icon={DollarSign}
-                placeholder="0.00"
+                icon={RpIcon as any}
+                placeholder="0"
                 {...register("price", { valueAsNumber: true })}
                 error={errors.price?.message}
               />

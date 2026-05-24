@@ -1,4 +1,4 @@
-import { Category } from "./catalog";
+import { Category, Brand } from "./catalog";
 
 export interface Product {
   id: string;
@@ -10,6 +10,7 @@ export interface Product {
   rating: number;
   description?: string;
   brand_id?: number;
+  brand?: Brand;
   categories?: Category[];
   variants?: ProductVariant[];
 }

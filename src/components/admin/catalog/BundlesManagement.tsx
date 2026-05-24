@@ -92,7 +92,7 @@ export function BundlesManagement() {
           {bundle.price_override ? (
             <>
               <Tag size={12} className="text-emerald-500" />
-              <span className="font-bold text-emerald-600">${bundle.price_override.toFixed(2)}</span>
+              <span className="font-bold text-emerald-600">Rp {bundle.price_override.toLocaleString('id-ID')}</span>
             </>
           ) : (
             <span className="text-muted-foreground text-xs italic">Default Pricing</span>

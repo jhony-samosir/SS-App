@@ -156,11 +156,72 @@ export function ProductsManagement() {
       ),
     },
     {
+      header: "Brand",
+      render: (prod: Product) => (
+        prod.brand ? (
+          <div className="flex items-center gap-2">
+            {prod.brand.logo_url && (
+              <div className="relative w-5 h-5 rounded-md overflow-hidden bg-muted border border-border/50 shrink-0">
+                <Image src={prod.brand.logo_url} alt={prod.brand.name} fill className="object-cover" />
+              </div>
+            )}
+            <span className="font-semibold text-xs text-foreground/85 bg-muted border border-border/50 px-2.5 py-0.5 rounded-md">
+              {prod.brand.name}
+            </span>
+          </div>
+        ) : (
+          <span className="text-muted-foreground text-xs">—</span>
+        )
+      )
+    },
+    {
+      header: "Categories",
+      render: (prod: Product) => (
+        prod.categories && prod.categories.length > 0 ? (
+          <div className="flex flex-wrap gap-1 max-w-[180px]">
+            {prod.categories.map((c) => (
+              <span key={c.id} className="text-[10px] font-semibold bg-primary/5 text-primary border border-primary/10 px-1.5 py-0.5 rounded-md">
+                {c.name}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <span className="text-muted-foreground text-xs">—</span>
+        )
+      )
+    },
+    {
+      header: "Variants",
+      render: (prod: Product) => (
+        prod.variants && prod.variants.length > 0 ? (
+          <div className="flex flex-col gap-1 min-w-[120px]">
+            <span className="text-xs font-semibold text-foreground/70">
+              {prod.variants.length} Variant{prod.variants.length > 1 ? 's' : ''}
+            </span>
+            <div className="flex flex-wrap gap-1">
+              {prod.variants.slice(0, 2).map((v) => (
+                <span key={v.id} className="text-[9px] font-mono bg-muted text-muted-foreground px-1 py-0.5 rounded border border-border/40" title={v.name}>
+                  {v.sku}
+                </span>
+              ))}
+              {prod.variants.length > 2 && (
+                <span className="text-[9px] font-mono bg-muted text-muted-foreground px-1 py-0.5 rounded border border-border/40">
+                  +{prod.variants.length - 2} more
+                </span>
+              )}
+            </div>
+          </div>
+        ) : (
+          <span className="text-muted-foreground text-xs">No variants</span>
+        )
+      )
+    },
+    {
       header: "Status",
       render: (prod: Product) => (
         <span className={cn(
           "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
-          prod.status === "published" 
+          prod.status === "published" || prod.status === "active"
             ? "bg-emerald-50 text-emerald-600 border-emerald-200" 
             : prod.status === "draft"
               ? "bg-amber-50 text-amber-600 border-amber-200"
@@ -168,7 +229,7 @@ export function ProductsManagement() {
         )}>
           <span className={cn(
             "w-1.5 h-1.5 rounded-full animate-pulse",
-            prod.status === "published" ? "bg-emerald-500" : prod.status === "draft" ? "bg-amber-500" : "bg-rose-500"
+            prod.status === "published" || prod.status === "active" ? "bg-emerald-500" : prod.status === "draft" ? "bg-amber-500" : "bg-rose-500"
           )} />
           {prod.status.replace("_", " ")}
         </span>
@@ -178,7 +239,7 @@ export function ProductsManagement() {
       header: "Price",
       render: (prod: Product) => (
         <span className="font-bold text-sm">
-          ${(prod.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          Rp {(prod.price ?? 0).toLocaleString('id-ID')}
         </span>
       ),
     },

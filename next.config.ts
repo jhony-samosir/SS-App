@@ -10,6 +10,15 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "placehold.co",
+      },
+    ],
+  },
+
   async rewrites() {
     const gatewayUrl = process.env.API_BASE_URL || "http://localhost:8080";
     return [
@@ -25,7 +34,7 @@ const nextConfig: NextConfig = {
       default-src 'self';
       script-src 'self' 'unsafe-eval' 'unsafe-inline';
       style-src 'self' 'unsafe-inline';
-      img-src 'self' blob: data:;
+      img-src 'self' blob: data: https://placehold.co;
       font-src 'self';
       object-src 'none';
       base-uri 'self';

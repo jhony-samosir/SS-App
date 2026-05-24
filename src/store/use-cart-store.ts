@@ -57,8 +57,8 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   addItem: async (payload: AddCartItemPayload) => {
     // Guard: must be authenticated before touching the cart API
-    const { accessToken } = useAuthStore.getState();
-    if (!accessToken) {
+    const { isAuthenticated } = useAuthStore.getState();
+    if (!isAuthenticated) {
       throw new AuthRequiredError();
     }
 
