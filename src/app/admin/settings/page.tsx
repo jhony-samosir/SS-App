@@ -14,7 +14,7 @@ export default function SettingsPage() {
         <p className="text-muted-foreground">Configure system-wide application parameters and preferences</p>
       </div>
 
-      <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl p-12 flex flex-col items-center justify-center text-center min-h-[400px]">
+      <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl p-12 flex flex-col items-center justify-center text-center min-h-100">
         <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-6">
           <Settings size={32} />
         </div>

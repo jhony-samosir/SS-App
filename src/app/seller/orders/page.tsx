@@ -1,6 +1,6 @@
 "use client";
 
-import { ShoppingCart, PackageCheck } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 
 export default function SellerOrdersPage() {
   return (
@@ -10,7 +10,7 @@ export default function SellerOrdersPage() {
         <p className="text-muted-foreground text-lg">Track and process your customer orders.</p>
       </div>
 
-      <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden min-h-[400px] flex flex-col items-center justify-center text-center p-12">
+      <div className="bg-card/50 backdrop-blur-xl rounded-3xl border border-border shadow-xl overflow-hidden min-h-100 flex flex-col items-center justify-center text-center p-12">
         <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-6">
           <ShoppingCart size={40} className="text-muted-foreground opacity-20" />
         </div>
