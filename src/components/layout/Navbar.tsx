@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { ShoppingCart, User, Search, Menu, LogOut, Loader2, ChevronDown, UserCircle, Settings, Package, Heart, ShieldCheck, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "./ThemeToggle";
 import { authService } from "@/services/auth-service";
@@ -64,12 +64,12 @@ export function Navbar() {
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
+    const formData = new FormData(e.currentTarget);
     const query = formData.get("q");
-    if (query) {
-      router.push(`/shop?search=${encodeURIComponent(query.toString())}`);
+    if (typeof query === "string" && query.trim()) {
+      router.push(`/shop?search=${encodeURIComponent(query.trim())}`);
     }
   };
 
@@ -82,7 +82,7 @@ export function Navbar() {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group flex-shrink-0" aria-label="SamStore Home">
+        <Link href="/" className="flex items-center gap-2 group shrink-0" aria-label="SamStore Home">
           <div className="relative">
             <motion.div 
               whileHover={{ scale: 1.1, rotate: 5 }}
@@ -122,7 +122,7 @@ export function Navbar() {
         {/* Search Bar */}
         <form 
           onSubmit={handleSearch}
-          className="hidden md:flex flex-grow max-w-md relative group"
+          className="hidden md:flex grow max-w-md relative group"
         >
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors pointer-events-none">
             <Search size={18} />
@@ -151,17 +151,18 @@ export function Navbar() {
           
           <div className="h-6 w-px bg-border/50 mx-1" />
 
-          {!isHydrated ? (
-            <div className="w-24 h-9 bg-muted/50 animate-pulse rounded-2xl" />
-          ) : isAuthenticated ? (
-            <div className="flex items-center gap-2">
+          {(() => {
+            if (!isHydrated) return <div className="w-24 h-9 bg-muted/50 animate-pulse rounded-2xl" />;
+            if (isAuthenticated)
+              return (
+                <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group outline-none">
                     <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all overflow-hidden border border-primary/20">
                       <User size={20} strokeWidth={2} />
                     </div>
-                    <div className="flex flex-col items-start hidden sm:flex">
+                    <div className="hidden sm:flex flex-col items-start">
                       <span className="text-xs font-bold leading-none">{user?.name?.split(' ')[0]}</span>
                       <span className="text-[10px] text-muted-foreground">Account</span>
                     </div>
@@ -246,15 +247,18 @@ export function Navbar() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
-          ) : (
-            <Link href="/login" className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group">
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all border border-primary/20">
-                <User size={20} strokeWidth={2} />
-              </div>
-              <span className="text-sm font-medium hidden sm:inline-block">Sign In</span>
-            </Link>
-          )}
+                </div>
+              );
+
+            return (
+              <Link href="/login" className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group">
+                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all border border-primary/20">
+                  <User size={20} strokeWidth={2} />
+                </div>
+                <span className="text-sm font-medium hidden sm:inline-block">Sign In</span>
+              </Link>
+            );
+          })()}
 
           <button className="md:hidden p-2 hover:bg-muted rounded-xl">
             <Menu size={24} />

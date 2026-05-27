@@ -1,10 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { orderService, Order, OrderItem } from "@/services/order-service";
+import { orderService, Order } from "@/services/order-service";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { 
@@ -27,6 +28,7 @@ import { format } from "date-fns";
 export default function OrdersPage() {
   const { user, isHydrated } = useAuth();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const router = useRouter();
 
   const { data: orders = [], isLoading, error } = useQuery<Order[]>({
     queryKey: ["orders"],
@@ -110,7 +112,7 @@ export default function OrdersPage() {
         <XCircle className="mx-auto text-destructive" size={48} />
         <h2 className="text-3xl font-bold">Failed to load orders</h2>
         <p className="text-muted-foreground">There was an error communicating with the order service.</p>
-        <Button onClick={() => window.location.reload()}>Retry</Button>
+        <Button onClick={() => globalThis.location.reload()}>Retry</Button>
       </div>
     );
   }
@@ -118,7 +120,7 @@ export default function OrdersPage() {
   return (
     <div className="container max-w-5xl mx-auto px-6 py-24 min-h-screen">
       <AnimatePresence mode="wait">
-        {!selectedOrder ? (
+        {selectedOrder === null ? (
           <motion.div
             key="list"
             initial="hidden"
@@ -145,7 +147,7 @@ export default function OrdersPage() {
                     Once you make your first purchase at the shop, your order details will appear here.
                   </p>
                 </div>
-                <Button size="lg" className="rounded-xl px-8" onClick={() => window.location.href = "/shop"}>
+                <Button size="lg" className="rounded-xl px-8" onClick={() => router.push("/shop")}>
                   Browse Snacks
                 </Button>
               </div>
@@ -178,8 +180,8 @@ export default function OrdersPage() {
 
                         <div className="flex items-center gap-6">
                           <div className="flex -space-x-4 overflow-hidden py-1">
-                            {order.items.slice(0, 3).map((item, idx) => (
-                              <div key={idx} className="relative w-12 h-12 rounded-xl border-2 border-background bg-muted overflow-hidden flex-shrink-0">
+                            {order.items.slice(0, 3).map((item) => (
+                              <div key={`${item.productPublicId}-${item.variantPublicId || "default"}`} className="relative w-12 h-12 rounded-xl border-2 border-background bg-muted overflow-hidden shrink-0">
                                 <Image
                                   src={item.imageUrl || "https://placehold.co/150x150"}
                                   alt={item.productName}
@@ -189,7 +191,7 @@ export default function OrdersPage() {
                               </div>
                             ))}
                             {order.items.length > 3 && (
-                              <div className="w-12 h-12 rounded-xl border-2 border-background bg-primary/10 text-primary text-xs font-black flex items-center justify-center flex-shrink-0">
+                              <div className="w-12 h-12 rounded-xl border-2 border-background bg-primary/10 text-primary text-xs font-black flex items-center justify-center shrink-0">
                                 +{order.items.length - 3}
                               </div>
                             )}
@@ -272,9 +274,9 @@ export default function OrdersPage() {
                     Purchased Items
                   </h3>
                   <div className="divide-y divide-border/50">
-                    {selectedOrder.items.map((item, idx) => (
-                      <div key={idx} className="flex gap-6 py-6 first:pt-0 last:pb-0 items-center">
-                        <div className="w-20 h-20 bg-muted rounded-2xl relative overflow-hidden flex-shrink-0">
+                    {selectedOrder.items.map((item) => (
+                      <div key={`${item.productPublicId}-${item.variantPublicId || "default"}`} className="flex gap-6 py-6 first:pt-0 last:pb-0 items-center">
+                        <div className="w-20 h-20 bg-muted rounded-2xl relative overflow-hidden shrink-0">
                           <Image
                             src={item.imageUrl || "https://placehold.co/150x150"}
                             alt={item.productName}
@@ -291,7 +293,7 @@ export default function OrdersPage() {
                             {formatCurrency(item.unitPrice, selectedOrder.currencyCode)} x {item.quantity}
                           </p>
                         </div>
-                        <div className="font-black text-lg flex-shrink-0">
+                        <div className="font-black text-lg shrink-0">
                           {formatCurrency(item.unitPrice * item.quantity, selectedOrder.currencyCode)}
                         </div>
                       </div>

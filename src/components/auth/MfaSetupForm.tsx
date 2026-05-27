@@ -192,7 +192,6 @@ export function MfaSetupForm() {
                   value={setupData.provisioningUri} 
                   size={180}
                   level="H"
-                  includeMargin={false}
                 />
               )}
             </div>
@@ -209,7 +208,7 @@ export function MfaSetupForm() {
             </div>
             <div className="flex items-center gap-2 bg-muted/50 p-3 rounded-2xl group border border-transparent hover:border-primary/20 transition-all">
               <Key size={16} className="text-muted-foreground" />
-              <code className="flex-grow text-xs font-mono truncate">{setupData?.secret}</code>
+              <code className="grow text-xs font-mono truncate">{setupData?.secret}</code>
               <button 
                 onClick={handleCopySecret}
                 className="p-2 hover:bg-background rounded-xl transition-all"
@@ -236,7 +235,7 @@ export function MfaSetupForm() {
             Enter the 6-digit code displayed in your app to confirm the setup.
           </p>
 
-          <form onSubmit={handleSubmit(handleEnableMfa)} className="flex-grow flex flex-col justify-center space-y-8">
+          <form onSubmit={handleSubmit(handleEnableMfa)} className="grow flex flex-col justify-center space-y-8">
             <div className="flex flex-col items-center space-y-6">
               <AnimatePresence mode="wait">
                 {error && (

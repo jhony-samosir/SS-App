@@ -1,17 +1,15 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter, usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalog-service";
 import { Star, ShoppingCart, Heart, ShieldCheck, Truck, RefreshCcw, Package, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { ReviewList } from "@/components/catalog/ReviewList";
 import { BundleCard } from "@/components/catalog/BundleCard";
 import { useCartStore, AuthRequiredError } from "@/store/use-cart-store";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
 
 export default function ProductDetailPage() {
@@ -164,7 +162,7 @@ export default function ProductDetailPage() {
               <button 
                 onClick={handleAddToCart}
                 disabled={isAdding}
-                className="flex-[3] py-5 bg-primary text-primary-foreground font-bold rounded-2xl shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none"
+                className="flex-3 py-5 bg-primary text-primary-foreground font-bold rounded-2xl shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isAdding ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

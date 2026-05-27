@@ -12,32 +12,33 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface SoftSelectProps {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: { value: string; label: string }[];
-  placeholder?: string;
-  icon?: React.ReactNode;
-  className?: string;
-  error?: string;
+  readonly id: string;
+  readonly label: string;
+  readonly value: string;
+  readonly onChange: (value: string) => void;
+  readonly options: ReadonlyArray<{ readonly value: string; readonly label: string }>;
+  readonly placeholder?: string;
+  readonly icon?: React.ReactNode;
+  readonly className?: string;
+  readonly error?: string;
 }
 
 /**
  * SoftSelect - A high-end custom select component
  * Styled like a premium desktop application with custom animations and layout.
  */
-export function SoftSelect({
-  id,
-  label,
-  value,
-  onChange,
-  options,
-  placeholder = "Select option...",
-  icon,
-  className,
-  error,
-}: SoftSelectProps) {
+export function SoftSelect(props: Readonly<SoftSelectProps>) {
+  const {
+    id,
+    label,
+    value,
+    onChange,
+    options,
+    placeholder = "Select option...",
+    icon,
+    className,
+    error,
+  } = props;
   const selectedLabel = options.find((opt) => opt.value === value)?.label || placeholder;
   const errorId = `${id}-error`;
 
@@ -61,7 +62,7 @@ export function SoftSelect({
             )}
           >
             {icon && <div className="text-muted-foreground shrink-0 transition-colors group-hover:text-primary">{icon}</div>}
-            <span className="flex-grow text-[13px] font-medium truncate">{selectedLabel}</span>
+            <span className="grow text-[13px] font-medium truncate">{selectedLabel}</span>
             <ChevronDown size={14} className="text-muted-foreground/60 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
           </button>
         </DropdownMenuTrigger>
@@ -69,7 +70,7 @@ export function SoftSelect({
         <DropdownMenuContent 
           align="start" 
           sideOffset={8}
-          className="w-[220px] p-2 bg-background/80 backdrop-blur-xl border border-border/40 rounded-[14px] shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+          className="w-55 p-2 bg-background/80 backdrop-blur-xl border border-border/40 rounded-[14px] shadow-2xl animate-in fade-in zoom-in-95 duration-200"
         >
           <DropdownMenuRadioGroup value={value} onValueChange={onChange}>
             {options.map((opt) => {
@@ -81,7 +82,7 @@ export function SoftSelect({
                   className={cn(
                     "relative flex items-center h-10 px-3 py-2 rounded-lg text-[13px] font-medium outline-none cursor-pointer transition-all mb-1 last:mb-0",
                     isSelected 
-                      ? "bg-primary/[0.08] text-primary" 
+                      ? "bg-primary/8 text-primary" 
                       : "hover:bg-muted/60 text-muted-foreground hover:text-foreground"
                   )}
                 >
