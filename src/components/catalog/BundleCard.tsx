@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { Package, Plus, ArrowRight, ShoppingCart, Percent } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface BundleItem {
   id: number;
@@ -20,7 +19,7 @@ interface BundleProps {
   bundlePrice: number;
 }
 
-export function BundleCard({ name, description, items, originalPrice, bundlePrice }: BundleProps) {
+export function BundleCard({ name, description, items, originalPrice, bundlePrice }: Readonly<BundleProps>) {
   const savings = originalPrice - bundlePrice;
   const savingsPercent = Math.round((savings / originalPrice) * 100);
 

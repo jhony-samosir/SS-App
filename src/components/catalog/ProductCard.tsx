@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Star, ShoppingCart, Heart, Package } from "lucide-react";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { Product } from "@/types/product";
 import { useCartStore, AuthRequiredError } from "@/store/use-cart-store";
 import { useAuth } from "@/hooks/use-auth";
@@ -16,7 +15,7 @@ interface ProductCardProps {
   viewMode?: "grid" | "list";
 }
 
-export function ProductCard({ product, index = 0, viewMode = "grid" }: ProductCardProps) {
+export function ProductCard({ product, index = 0, viewMode = "grid" }: Readonly<ProductCardProps>) {
   const price = product.price || 25000;
   const rating = 4.8;
   const { addItem } = useCartStore();
@@ -67,7 +66,7 @@ export function ProductCard({ product, index = 0, viewMode = "grid" }: ProductCa
           transition={{ delay: index * 0.05 }}
           className="group bg-card rounded-[2rem] p-6 border border-border/40 hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all flex gap-8 items-center"
         >
-          <div className="w-40 h-40 rounded-2xl bg-muted/30 overflow-hidden relative flex-shrink-0">
+          <div className="w-40 h-40 rounded-2xl bg-muted/30 overflow-hidden relative shrink-0">
              {product.image_url ? (
                <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
              ) : (
@@ -76,7 +75,7 @@ export function ProductCard({ product, index = 0, viewMode = "grid" }: ProductCa
                </div>
              )}
           </div>
-          <div className="flex-grow">
+          <div className="grow">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
                 Snack

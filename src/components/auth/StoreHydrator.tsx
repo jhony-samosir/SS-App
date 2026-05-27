@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useAuthStore } from "@/store/use-auth-store";
+import type { User } from "@/store/use-auth-store";
 
 interface StoreHydratorProps {
-  user: any;
+  user: User | null;
 }
 
 /**
@@ -14,14 +15,11 @@ interface StoreHydratorProps {
  * This runs before any other client-side logic, ensuring a flicker-free UI.
  */
 export function StoreHydrator({ user }: StoreHydratorProps) {
-  const setAuth = useAuthStore((state) => state.setAuth);
-  const setInitialized = useAuthStore((state) => state.setInitialized);
-  const setHydrated = useAuthStore((state) => state.setHydrated);
   
   // We use a ref to ensure hydration only happens once
-  const isHydrated = useRef(false);
+  const isHydrated = useRef<boolean | null>(null);
 
-  if (!isHydrated.current) {
+  if (isHydrated.current == null) {
     if (user) {
       // In-memory update before render
       useAuthStore.setState({ 

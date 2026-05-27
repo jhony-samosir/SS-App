@@ -97,7 +97,7 @@ export function VerifyEmailForm() {
               Activation Success
             </span>
             <h1 className="text-4xl font-medium tracking-tight text-foreground font-heading italic">Verified!</h1>
-            <p className="text-muted-foreground/60 text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed max-w-[240px] mx-auto">
+            <p className="text-muted-foreground/60 text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed max-w-60 mx-auto">
               Your account is now fully active. <br /> Redirecting to your portal...
             </p>
           </div>
@@ -130,7 +130,7 @@ export function VerifyEmailForm() {
               Access Interrupted
             </span>
             <h1 className="text-4xl font-medium tracking-tight text-foreground font-heading italic">Verification Failed</h1>
-            <p className="text-muted-foreground/60 text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed max-w-[240px] mx-auto">
+            <p className="text-muted-foreground/60 text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed max-w-60 mx-auto">
               {errorMessage || "The verification link is invalid or has expired."}
             </p>
           </div>
