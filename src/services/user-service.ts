@@ -1,5 +1,5 @@
 import apiClient from "@/lib/api-client";
-import { UserListResponse, UserProfile, UserCreateRequest, UserUpdateRequest, UserSession } from "@/types/user";
+import { UserListResponse, UserProfile, UserUpdateRequest, UserSession } from "@/types/user";
 
 export const userService = {
   /**
