@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { Star, ShoppingCart, Heart, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { catalogService } from "@/services/catalog-service";
 import { cn } from "@/lib/utils";
 
 import { ProductCard } from "@/components/catalog/ProductCard";
+
+const FEATURED_SKELETON_IDS = ["one", "two", "three", "four", "five"];
 
 export function FeaturedProducts() {
   const { data, isLoading } = useQuery({
@@ -57,19 +56,17 @@ export function FeaturedProducts() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {isLoading ? (
-            [...Array(5)].map((_, i) => (
-              <div key={i} className="aspect-[4/5] bg-muted/30 rounded-[2.5rem] animate-pulse" />
-            ))
-          ) : filteredProducts.length === 0 ? (
+          {isLoading && FEATURED_SKELETON_IDS.map((id) => (
+            <div key={`featured-skeleton-${id}`} className="aspect-4/5 bg-muted/30 rounded-[2.5rem] animate-pulse" />
+          ))}
+          {!isLoading && filteredProducts.length === 0 && (
             <div className="col-span-full py-20 text-center">
               <p className="text-muted-foreground">No featured snacks found in this category.</p>
             </div>
-          ) : (
-            filteredProducts.map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
-            ))
           )}
+          {!isLoading && filteredProducts.map((product, index) => (
+            <ProductCard key={product.id} product={product} index={index} />
+          ))}
         </div>
       </div>
     </section>

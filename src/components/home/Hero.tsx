@@ -43,7 +43,7 @@ export function Hero() {
           <div className="mt-12 flex items-center gap-8">
             <div className="flex -space-x-3">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-10 h-10 rounded-full border-2 border-card bg-muted flex items-center justify-center text-[10px] font-bold">
+                <div key={`hero-avatar-${i}`} className="w-10 h-10 rounded-full border-2 border-card bg-muted flex items-center justify-center text-[10px] font-bold">
                   JS
                 </div>
               ))}
@@ -58,7 +58,7 @@ export function Hero() {
         </SlideIn>
 
         <FadeIn
-          className="relative lg:h-[600px] h-[400px]"
+          className="relative lg:h-[600px] h-100"
         >
           <div className="relative h-full w-full rounded-[3rem] overflow-hidden shadow-2xl shadow-primary/5 border-8 border-card">
             <Image

@@ -1,20 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
-import { catalogService } from "@/services/catalog-service";
 
 
 export function Categories() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => catalogService.getCategories(),
-  });
-
-  const categories = data?.data || [];
-
   const premiumCategories = [
     { name: "Keripik", label: "Chips", image: "/images/cat-keripik.png" },
     { name: "Kerupuk", label: "Crackers", image: "/images/cat-kerupuk.png" },
@@ -50,7 +40,7 @@ export function Categories() {
               whileHover={{ y: -8 }}
               className="group cursor-pointer"
             >
-              <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden mb-6 shadow-xl shadow-black/5 border-4 border-card transition-all group-hover:shadow-2xl group-hover:shadow-primary/10">
+              <div className="relative aspect-4/5 rounded-[3rem] overflow-hidden mb-6 shadow-xl shadow-black/5 border-4 border-card transition-all group-hover:shadow-2xl group-hover:shadow-primary/10">
                 <Image
                   src={cat.image}
                   alt={cat.name}
@@ -58,7 +48,7 @@ export function Categories() {
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
               <div className="text-center">
                 <h3 className="text-foreground font-bold tracking-tight text-2xl mb-1 group-hover:text-primary transition-colors font-sans">

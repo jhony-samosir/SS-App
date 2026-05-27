@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Star, Send, Loader2, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -11,14 +11,14 @@ interface ReviewFormProps {
   onClose: () => void;
 }
 
-export function ReviewForm({ productId, onSubmit, onClose }: ReviewFormProps) {
+export function ReviewForm({ productId, onSubmit, onClose }: Readonly<ReviewFormProps>) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (rating === 0) {
       setError("Please select a rating");
@@ -35,7 +35,8 @@ export function ReviewForm({ productId, onSubmit, onClose }: ReviewFormProps) {
       await onSubmit({ rating, comment });
       onClose();
     } catch (err) {
-      setError("Failed to submit review. Please try again.");
+      const message = err instanceof Error ? err.message : "Failed to submit review. Please try again.";
+      setError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -84,13 +85,15 @@ export function ReviewForm({ productId, onSubmit, onClose }: ReviewFormProps) {
 
         {/* Comment Input */}
         <div className="space-y-2">
-          <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground ml-2">Your Experience</label>
+          <label htmlFor="review-comment" className="text-sm font-bold uppercase tracking-wider text-muted-foreground ml-2">Your Experience</label>
           <div className="relative">
             <textarea
+              id="review-comment"
+              aria-label="Your experience"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="What did you like or dislike? How was the taste?"
-              className="w-full bg-muted/50 border border-border/50 focus:border-primary/20 rounded-[1.5rem] p-6 text-sm focus:ring-8 focus:ring-primary/5 transition-all outline-none min-h-[160px] resize-none"
+              className="w-full bg-muted/50 border border-border/50 focus:border-primary/20 rounded-[1.5rem] p-6 text-sm focus:ring-8 focus:ring-primary/5 transition-all outline-none min-h-40 resize-none"
               disabled={isSubmitting}
             />
             <div className="absolute bottom-4 right-6 text-[10px] font-bold text-muted-foreground uppercase">
@@ -124,7 +127,7 @@ export function ReviewForm({ productId, onSubmit, onClose }: ReviewFormProps) {
           </button>
           <button
             type="submit"
-            className="flex-[2] py-4 bg-primary text-primary-foreground font-bold rounded-2xl shadow-xl shadow-primary/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+            className="flex-2 py-4 bg-primary text-primary-foreground font-bold rounded-2xl shadow-xl shadow-primary/20 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
             disabled={isSubmitting}
           >
             {isSubmitting ? (

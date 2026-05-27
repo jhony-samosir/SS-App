@@ -1,27 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Star, ThumbsUp, ThumbsDown, CheckCircle2, MoreVertical, MessageSquare } from "lucide-react";
+import { Star, ThumbsUp, ThumbsDown, CheckCircle2, MoreVertical, MessageSquare, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ReviewForm } from "./ReviewForm";
 import { catalogService } from "@/services/catalog-service";
 import { toast } from "sonner";
-import { X } from "lucide-react";
-
-interface Review {
-  id: number;
-  userName: string;
-  rating: number;
-  comment: string;
-  isVerifiedPurchase: boolean;
-  createdAt: string;
-  helpfulCount: number;
-}
+import { ProductReview } from "@/types/product";
 
 interface ReviewListProps {
   productId: string;
-  reviews: Review[];
+  reviews: ProductReview[];
   summary: {
     averageRating: number;
     totalReviews: number;
@@ -29,7 +19,7 @@ interface ReviewListProps {
   };
 }
 
-export function ReviewList({ productId, reviews, summary }: ReviewListProps) {
+export function ReviewList({ productId, reviews, summary }: Readonly<ReviewListProps>) {
   const [filter, setFilter] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
 
@@ -50,7 +40,7 @@ export function ReviewList({ productId, reviews, summary }: ReviewListProps) {
   };
 
   const filteredReviews = filter 
-    ? reviews.filter(r => r.rating === filter)
+    ? reviews.filter(r => r.Rating === filter)
     : reviews;
 
   return (
@@ -100,7 +90,7 @@ export function ReviewList({ productId, reviews, summary }: ReviewListProps) {
                   )}
                 >
                   <span className="text-xs font-bold w-4">{star}</span>
-                  <div className="flex-grow h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="grow h-2 bg-muted rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${percentage}%` }}
@@ -136,7 +126,7 @@ export function ReviewList({ productId, reviews, summary }: ReviewListProps) {
       {/* Review Form Modal */}
       <AnimatePresence>
         {showForm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -192,7 +182,7 @@ export function ReviewList({ productId, reviews, summary }: ReviewListProps) {
         ) : (
           filteredReviews.map((review, index) => (
             <motion.div
-              key={review.id}
+              key={review.ID}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
@@ -201,10 +191,10 @@ export function ReviewList({ productId, reviews, summary }: ReviewListProps) {
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg border border-primary/20">
-                    {review.userName.charAt(0)}
+                    {review.UserName.charAt(0)}
                   </div>
                   <div>
-                    <h4 className="font-bold text-foreground leading-none mb-1.5">{review.userName}</h4>
+                    <h4 className="font-bold text-foreground leading-none mb-1.5">{review.UserName}</h4>
                     <div className="flex items-center gap-2">
                       <div className="flex gap-0.5">
                         {[1, 2, 3, 4, 5].map((s) => (
@@ -212,28 +202,28 @@ export function ReviewList({ productId, reviews, summary }: ReviewListProps) {
                             key={s}
                             size={12}
                             className={cn(
-                              s <= review.rating ? "fill-primary text-primary" : "text-muted-foreground/20"
+                              s <= review.Rating ? "fill-primary text-primary" : "text-muted-foreground/20"
                             )}
                           />
                         ))}
                       </div>
                       <span className="text-[10px] text-muted-foreground">•</span>
                       <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                        {new Date(review.createdAt).toLocaleDateString()}
+                        {new Date(review.CreatedAt).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
                 </div>
-                {review.isVerifiedPurchase && (
+                {review.Status === "approved" && (
                   <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full uppercase tracking-widest">
                     <CheckCircle2 size={10} />
-                    Verified Purchase
+                    Verified Review
                   </div>
                 )}
               </div>
 
               <p className="text-muted-foreground leading-relaxed mb-8">
-                {review.comment}
+                {review.Comment}
               </p>
 
               <div className="flex items-center justify-between pt-6 border-t border-border/50">
@@ -242,7 +232,7 @@ export function ReviewList({ productId, reviews, summary }: ReviewListProps) {
                   <div className="flex items-center gap-2">
                     <button className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-muted transition-colors border border-transparent hover:border-border">
                       <ThumbsUp size={14} className="text-muted-foreground" />
-                      {review.helpfulCount || 0}
+                      0
                     </button>
                     <button className="p-1.5 rounded-xl hover:bg-muted transition-colors border border-transparent hover:border-border">
                       <ThumbsDown size={14} className="text-muted-foreground" />
@@ -258,13 +248,5 @@ export function ReviewList({ productId, reviews, summary }: ReviewListProps) {
         )}
       </div>
     </div>
-  );
-}
-
-function ChevronDown({ size }: { size: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m6 9 6 6 6-6"/>
-    </svg>
   );
 }
