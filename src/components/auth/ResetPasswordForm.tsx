@@ -5,18 +5,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { Loader2, Lock, ArrowRight, AlertCircle, CheckCircle2, ArrowLeft } from "lucide-react";
 import { authService } from "@/services/auth-service";
-import { cn } from "@/lib/utils";
 import axios from "axios";
 
 const resetPasswordSchema = z.object({
   newPassword: z.string()
     .min(8, "Password must be at least 8 characters")
     .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-    .regex(/[0-9]/, "Must contain at least one number")
+    .regex(/\d/, "Must contain at least one number")
     .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
   confirmPassword: z.string()
 }).refine((data) => data.newPassword === data.confirmPassword, {
@@ -39,7 +37,9 @@ export function ResetPasswordForm() {
 
   useEffect(() => {
     if (!token) {
-      setError("Invalid or missing reset token. Please request a new password reset.");
+      setTimeout(() => {
+        setError("Invalid or missing reset token. Please request a new password reset.");
+      }, 0);
     }
   }, [token]);
 
@@ -120,7 +120,7 @@ export function ResetPasswordForm() {
             animate={{ opacity: 1, scale: 1 }}
             className="p-4 bg-destructive/5 border border-destructive/10 rounded-2xl flex items-center gap-3 text-destructive text-sm font-medium"
           >
-            <AlertCircle size={18} className="flex-shrink-0" />
+            <AlertCircle size={18} className="shrink-0" />
             <p>{error}</p>
           </motion.div>
         )}

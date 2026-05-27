@@ -5,7 +5,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/use-auth-store";
 import { GuardFallback } from "./guards/GuardFallback";
 
-function SellerGuardContent({ children }: { children: React.ReactNode }) {
+function SellerGuardContent({ children }: Readonly<{ children: React.ReactNode }>) {
   const { isAuthenticated, isInitialized, isHydrated, hasRole } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -34,7 +34,7 @@ function SellerGuardContent({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-export function SellerGuard({ children }: { children: React.ReactNode }) {
+export function SellerGuard({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <Suspense fallback={<GuardFallback message="Verifying seller access..." />}>
       <SellerGuardContent>{children}</SellerGuardContent>

@@ -6,9 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Loader2, Mail, Lock, User, ArrowRight, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, Mail, Lock, User, ArrowRight, CheckCircle2 } from "lucide-react";
 import { authService } from "@/services/auth-service";
-import { cn } from "@/lib/utils";
 import axios from "axios";
 import Link from "next/link";
 
@@ -17,7 +16,7 @@ import { Button } from "@/components/ui/button";
 
 const registerSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
+  email: z.string().email(),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Confirm password must be at least 6 characters"),
   acceptTos: z.boolean().refine(val => val === true, "You must accept the Terms of Service"),
@@ -240,7 +239,7 @@ export function RegisterForm() {
           disabled={isLoading}
           className="w-full h-14 text-[10px] font-black uppercase tracking-[0.4em] group shadow-2xl shadow-primary/10 rounded-2xl overflow-hidden relative"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <div className="absolute inset-0 bg-linear-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
           {isLoading ? (
             <div className="flex items-center gap-2 relative z-10">
               <Loader2 className="animate-spin" size={14} />

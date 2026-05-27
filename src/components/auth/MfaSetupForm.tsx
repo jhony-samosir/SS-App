@@ -50,6 +50,7 @@ export function MfaSetupForm() {
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const verificationCode = watch("code");
 
   // Mutation for MFA Setup (Initiation)
@@ -113,7 +114,7 @@ export function MfaSetupForm() {
         <div className="space-y-4">
           <h1 className="text-3xl font-bold tracking-tight font-heading">Enable Two-Step Verification</h1>
           <p className="text-muted-foreground leading-relaxed">
-            Protect your account with an extra layer of security. After enabling, you'll need to enter a code from your authenticator app each time you sign in.
+            Protect your account with an extra layer of security. After enabling, you&apos;ll need to enter a code from your authenticator app each time you sign in.
           </p>
         </div>
         

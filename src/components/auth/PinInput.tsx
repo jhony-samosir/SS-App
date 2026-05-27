@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useImperativeHandle, forwardRef, useEffect } from "react";
+import { useRef, useImperativeHandle, forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
 export interface PinInputHandle {
@@ -37,7 +37,7 @@ export const PinInput = forwardRef<PinInputHandle, PinInputProps>(({
 
   // Ensure internal value array is consistent with prop value
   const values = value.split("").slice(0, length);
-  const displayValues = [...values, ...Array(length - values.length).fill("")];
+  const displayValues = [...values, ...Array.from<string>({ length: length - values.length }).fill("")];
 
   const handleChange = (index: number, char: string) => {
     if (disabled) return;
@@ -104,11 +104,14 @@ export const PinInput = forwardRef<PinInputHandle, PinInputProps>(({
     }
   };
 
+  // Generate static keys based on length
+  const inputKeys = Array.from({ length }).map((_, i) => `pin-input-${i}`);
+
   return (
     <div className={cn("flex justify-center gap-3", className)}>
       {Array.from({ length }).map((_, i) => (
         <input
-          key={i}
+          key={inputKeys[i]}
           ref={(el) => { inputRefs.current[i] = el; }}
           type="text"
           inputMode="numeric"
