@@ -58,6 +58,7 @@ export function AttributeFormModal({
     }
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const currentInputType = watch("input_type");
 
   useEffect(() => {
@@ -120,7 +121,7 @@ export function AttributeFormModal({
             label="Input Type"
             options={inputTypeOptions}
             value={currentInputType}
-            onChange={(val) => setValue("input_type", val as any)}
+            onChange={(val) => setValue("input_type", val as AttributeFormValues["input_type"])}
             error={errors.input_type?.message}
           />
 

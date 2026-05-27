@@ -114,6 +114,7 @@ export function RolesManagement() {
         setEditingRole(freshRole);
         reset({ name: freshRole.name, description: freshRole.description });
       } catch (err) {
+        console.error("Failed to fetch latest role data:", err);
         setError("Failed to fetch latest role data.");
         setIsFormOpen(false);
       } finally {
@@ -221,9 +222,9 @@ export function RolesManagement() {
           </div>
           
           {error && (
-            <div className="flex-grow max-w-md p-3 bg-destructive/10 border border-destructive/20 rounded-xl flex items-center gap-2 text-destructive text-sm">
+            <div className="grow max-w-md p-3 bg-destructive/10 border border-destructive/20 rounded-xl flex items-center gap-2 text-destructive text-sm">
               <AlertCircle size={16} />
-              <p className="flex-grow">{error}</p>
+              <p className="grow">{error}</p>
               <button onClick={() => setError(null)}><X size={14} /></button>
             </div>
           )}
@@ -273,8 +274,9 @@ export function RolesManagement() {
 
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-bold ml-1">Role Name</label>
+                      <label htmlFor="role-name" className="text-sm font-bold ml-1">Role Name</label>
                       <input
+                        id="role-name"
                         {...register("name")}
                         placeholder="e.g. Moderator"
                         className="w-full bg-background border border-border rounded-2xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
@@ -283,8 +285,9 @@ export function RolesManagement() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-bold ml-1">Description</label>
+                      <label htmlFor="role-description" className="text-sm font-bold ml-1">Description</label>
                       <textarea
+                        id="role-description"
                         {...register("description")}
                         placeholder="Describe the role's purpose..."
                         rows={4}
@@ -298,7 +301,7 @@ export function RolesManagement() {
                       disabled={createMutation.isPending || updateMutation.isPending}
                       className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
                     >
-                      {(createMutation.isPending || updateMutation.isPending) ? (
+                      {createMutation.isPending || updateMutation.isPending ? (
                         <Loader2 className="animate-spin" size={20} />
                       ) : (
                         editingRole ? "Update Role" : "Create Role"

@@ -6,7 +6,6 @@ import {
   X, 
   Loader2, 
   Check, 
-  AlertCircle, 
   Save,
   ShieldCheck,
   LayoutGrid,
@@ -31,7 +30,7 @@ interface RolePermissionsEditorProps {
 
 type PermissionAction = "canRead" | "canCreate" | "canUpdate" | "canDelete";
 
-export function RolePermissionsEditor({ roleId, roleName, isOpen, onClose }: RolePermissionsEditorProps) {
+export function RolePermissionsEditor({ roleId, roleName, isOpen, onClose }: Readonly<RolePermissionsEditorProps>) {
   const [localPermissions, setLocalPermissions] = useState<RolePermission[]>([]);
   const [isDiffVisible, setIsDiffVisible] = useState(false);
   const queryClient = useQueryClient();
@@ -73,7 +72,10 @@ export function RolePermissionsEditor({ roleId, roleName, isOpen, onClose }: Rol
   // Sync local state when data loads
   useEffect(() => {
     if (initialPermissions) {
-      setLocalPermissions(JSON.parse(JSON.stringify(initialPermissions)));
+      const timer = setTimeout(() => {
+        setLocalPermissions(structuredClone(initialPermissions));
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [initialPermissions]);
 
@@ -88,30 +90,28 @@ export function RolePermissionsEditor({ roleId, roleName, isOpen, onClose }: Rol
     });
   };
 
+  const applyBulkAction = (perms: RolePermission[], menu: MenuItem, action: PermissionAction, value: boolean): RolePermission[] => {
+    const existingIdx = perms.findIndex(p => p.menuId === menu.publicId);
+    if (existingIdx >= 0) {
+      const updated = [...perms];
+      updated[existingIdx] = { ...updated[existingIdx], [action]: value };
+      return updated;
+    }
+    return [...perms, {
+      menuId: menu.publicId,
+      menuName: menu.name,
+      canRead: false,
+      canCreate: false,
+      canUpdate: false,
+      canDelete: false,
+      [action]: value
+    }];
+  };
+
   const bulkToggleColumn = (action: PermissionAction, value: boolean) => {
     if (!menuTree) return;
     const allMenus = flattenMenus(menuTree);
-    
-    setLocalPermissions(prev => {
-      const newPerms = [...prev];
-      allMenus.forEach(menu => {
-        const existingIdx = newPerms.findIndex(p => p.menuId === menu.publicId);
-        if (existingIdx >= 0) {
-          newPerms[existingIdx] = { ...newPerms[existingIdx], [action]: value };
-        } else {
-          newPerms.push({
-            menuId: menu.publicId,
-            menuName: menu.name,
-            canRead: false,
-            canCreate: false,
-            canUpdate: false,
-            canDelete: false,
-            [action]: value
-          });
-        }
-      });
-      return newPerms;
-    });
+    setLocalPermissions(prev => allMenus.reduce((acc, menu) => applyBulkAction(acc, menu, action, value), prev));
   };
 
   const changes = useMemo(() => {
@@ -189,7 +189,7 @@ export function RolePermissionsEditor({ roleId, roleName, isOpen, onClose }: Rol
             </div>
 
             {/* Matrix Content */}
-            <div className="flex-grow overflow-auto p-8">
+            <div className="grow overflow-auto p-8">
               {isLoading ? (
                 <div className="h-full flex flex-col items-center justify-center gap-4">
                   <Loader2 className="animate-spin text-primary" size={48} />
@@ -252,7 +252,7 @@ export function RolePermissionsEditor({ roleId, roleName, isOpen, onClose }: Rol
             {/* Diff Summary Modal */}
             <AnimatePresence>
               {isDiffVisible && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsDiffVisible(false)} className="absolute inset-0 bg-background/90 backdrop-blur-md" />
                   <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="relative w-full max-w-lg bg-card border border-border rounded-3xl shadow-2xl p-8">
                      <h3 className="text-2xl font-bold mb-6 flex items-center gap-2"><LayoutGrid className="text-primary" /> Review Changes</h3>
@@ -290,7 +290,7 @@ export function RolePermissionsEditor({ roleId, roleName, isOpen, onClose }: Rol
   );
 }
 
-function PermissionRow({ menu, localPermissions, onToggle, depth }: { menu: MenuItem, localPermissions: RolePermission[], onToggle: (id: string, a: PermissionAction, name: string) => void, depth: number }) {
+function PermissionRow({ menu, localPermissions, onToggle, depth }: Readonly<{ menu: MenuItem, localPermissions: RolePermission[], onToggle: (id: string, a: PermissionAction, name: string) => void, depth: number }>) {
   const perm = localPermissions.find(p => p.menuId === menu.publicId) || { menuId: menu.publicId, canRead: false, canCreate: false, canUpdate: false, canDelete: false };
   const hasChildren = menu.children && menu.children.length > 0;
   const [isExpanded, setIsExpanded] = useState(true);
@@ -333,7 +333,7 @@ function PermissionRow({ menu, localPermissions, onToggle, depth }: { menu: Menu
   );
 }
 
-function Checkbox({ checked, onChange }: { checked: boolean, onChange: () => void }) {
+function Checkbox({ checked, onChange }: Readonly<{ checked: boolean, onChange: () => void }>) {
   return (
     <button 
       onClick={onChange}

@@ -13,7 +13,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UserProfile, UserCreateRequest, UserUpdateRequest } from "@/types/user";
+import { UserProfile } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { roleService } from "@/services/role-service";
 import { cn } from "@/lib/utils";
@@ -31,7 +31,7 @@ type UserFormValues = z.infer<typeof userSchema>;
 interface UserFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (values: any) => void;
+  onSubmit: (values: UserFormValues) => void;
   initialData?: UserProfile | null;
   isPending: boolean;
   error: string | null;

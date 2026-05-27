@@ -14,7 +14,6 @@ import {
   UserX,
   Filter,
   ArrowUpDown,
-  AlertCircle,
   ShieldAlert,
   Loader2
 } from "lucide-react";
@@ -27,9 +26,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { SoftSelect } from "@/components/ui/SoftSelect";
-import { toast } from "sonner";
 
 export function UsersManagement() {
   const { hasPermission, isHydrated } = useAuth();
@@ -45,8 +42,11 @@ export function UsersManagement() {
   
   const [forbiddenError, setForbiddenError] = useState(false);
 
-  const queryClient = useQueryClient();
-
+  const getIsActiveFilter = () => {
+    if (statusFilter === "active") return true;
+    if (statusFilter === "inactive") return false;
+    return undefined;
+  };
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["users", page, debouncedSearch, roleFilter, statusFilter, sortConfig],
@@ -58,7 +58,7 @@ export function UsersManagement() {
           { 
             search: debouncedSearch, 
             role: roleFilter || undefined,
-            isActive: statusFilter === "active" ? true : statusFilter === "inactive" ? false : undefined,
+            isActive: getIsActiveFilter(),
             isLocked: statusFilter === "locked" ? true : undefined
           },
           { sortBy: sortConfig.key, isDescending: sortConfig.desc }
@@ -76,7 +76,10 @@ export function UsersManagement() {
 
   useEffect(() => {
     if (isHydrated && !hasPermission("Users Read")) {
-      setForbiddenError(true);
+      const timer = setTimeout(() => {
+        setForbiddenError(true);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isHydrated, hasPermission]);
 
@@ -208,7 +211,7 @@ export function UsersManagement() {
             />
           </div>
           
-          <div className="flex flex-wrap items-center gap-3 flex-grow lg:flex-grow-0">
+          <div className="flex flex-wrap items-center gap-3 grow lg:grow-0">
             <SoftSelect 
               id="role-filter"
               label="Role"
