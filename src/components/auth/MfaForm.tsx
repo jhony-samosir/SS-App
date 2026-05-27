@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +13,6 @@ import { useAuthRedirect } from "@/hooks/use-auth-redirect";
 import { PinInput, type PinInputHandle } from "./PinInput";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { Suspense } from "react";
 
 const mfaSchema = z.object({
   code: z.string().length(6, "Verification code must be 6 digits"),
@@ -23,7 +22,7 @@ type MfaFormValues = z.infer<typeof mfaSchema>;
 
 export function MfaForm() {
   return (
-    <Suspense fallback={<div className="w-full max-w-md h-[400px] bg-card/40 animate-pulse rounded-[2.5rem]" />}>
+    <Suspense fallback={<div className="w-full max-w-md h-100 bg-card/40 animate-pulse rounded-[2.5rem]" />}>
       <MfaContent />
     </Suspense>
   );
@@ -42,7 +41,6 @@ function MfaContent() {
     control,
     handleSubmit,
     setValue,
-    formState: { errors },
   } = useForm<MfaFormValues>({
     resolver: zodResolver(mfaSchema),
     defaultValues: {
@@ -69,7 +67,7 @@ function MfaContent() {
       });
 
       // Capture token from response
-      const token = (response as any).access_token || (response as any).accessToken;
+      const token = response.access_token || response.accessToken;
 
       if (response.user) {
         setAuth(response.user, token);
@@ -123,6 +121,7 @@ function MfaContent() {
         </p>
       </div>
 
+      {/* eslint-disable-next-line react-hooks/refs */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-10" aria-label="MFA verification form">
         {error && (
           <motion.div
