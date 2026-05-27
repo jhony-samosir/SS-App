@@ -4,12 +4,10 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   Plus, 
-  Loader2, 
   Settings2,
   Tags,
   Trash2, 
   Hash,
-  Filter,
   CheckCircle2,
   Circle,
   Edit3
@@ -22,6 +20,27 @@ import { toast } from "sonner";
 import { AttributeFormModal } from "./AttributeFormModal";
 import { TagFormModal } from "./TagFormModal";
 import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
+
+type AttributeListCache = {
+  data?: {
+    items: ProductAttribute[];
+    total_count: number;
+  };
+};
+
+type TagListCache = {
+  data?: {
+    items: Tag[];
+    total_count: number;
+  };
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error === "object" && error !== null && "response" in error) {
+    return (error as { response?: { data?: { message?: string } } }).response?.data?.message || fallback;
+  }
+  return fallback;
+};
 
 export function AttributesManagement() {
   const queryClient = useQueryClient();
@@ -65,8 +84,8 @@ export function AttributesManagement() {
       toast.success("Attribute created successfully");
       setIsAttrModalOpen(false);
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create attribute");
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to create attribute"));
     }
   });
 
@@ -77,13 +96,13 @@ export function AttributesManagement() {
       await queryClient.cancelQueries({ queryKey: ["admin-attributes"] });
       const previousData = queryClient.getQueryData(["admin-attributes", attrPage, attrLimit]);
       
-      queryClient.setQueryData(["admin-attributes", attrPage, attrLimit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-attributes", attrPage, attrLimit], (old: AttributeListCache | undefined) => {
+        if (!old?.data) return old;
         return {
           ...old,
           data: {
             ...old.data,
-            items: old.data.items.map((item: ProductAttribute) => 
+            items: old.data.items.map((item) => 
               item.id === id ? { ...item, ...data } : item
             )
           }
@@ -111,13 +130,13 @@ export function AttributesManagement() {
       await queryClient.cancelQueries({ queryKey: ["admin-attributes"] });
       const previousData = queryClient.getQueryData(["admin-attributes", attrPage, attrLimit]);
 
-      queryClient.setQueryData(["admin-attributes", attrPage, attrLimit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-attributes", attrPage, attrLimit], (old: AttributeListCache | undefined) => {
+        if (!old?.data) return old;
         return {
           ...old,
           data: {
             ...old.data,
-            items: old.data.items.filter((item: ProductAttribute) => item.id !== id),
+            items: old.data.items.filter((item) => item.id !== id),
             total_count: old.data.total_count - 1
           }
         };
@@ -142,8 +161,8 @@ export function AttributesManagement() {
       toast.success("Tag created successfully");
       setIsTagModalOpen(false);
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create tag");
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to create tag"));
     }
   });
 
@@ -154,13 +173,13 @@ export function AttributesManagement() {
       await queryClient.cancelQueries({ queryKey: ["admin-tags"] });
       const previousData = queryClient.getQueryData(["admin-tags", tagPage, tagLimit]);
       
-      queryClient.setQueryData(["admin-tags", tagPage, tagLimit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-tags", tagPage, tagLimit], (old: TagListCache | undefined) => {
+        if (!old?.data) return old;
         return {
           ...old,
           data: {
             ...old.data,
-            items: old.data.items.map((item: Tag) => 
+            items: old.data.items.map((item) => 
               item.id === id ? { ...item, ...data } : item
             )
           }
@@ -188,13 +207,13 @@ export function AttributesManagement() {
       await queryClient.cancelQueries({ queryKey: ["admin-tags"] });
       const previousData = queryClient.getQueryData(["admin-tags", tagPage, tagLimit]);
 
-      queryClient.setQueryData(["admin-tags", tagPage, tagLimit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-tags", tagPage, tagLimit], (old: TagListCache | undefined) => {
+        if (!old?.data) return old;
         return {
           ...old,
           data: {
             ...old.data,
-            items: old.data.items.filter((item: Tag) => item.id !== id),
+            items: old.data.items.filter((item) => item.id !== id),
             total_count: old.data.total_count - 1
           }
         };
@@ -211,7 +230,7 @@ export function AttributesManagement() {
     }
   });
 
-  const handleAttrSubmit = (values: any) => {
+  const handleAttrSubmit = (values: Partial<ProductAttribute>) => {
     if (selectedAttr) {
       updateAttrMutation.mutate({ id: selectedAttr.id, data: values });
     } else {
@@ -219,7 +238,7 @@ export function AttributesManagement() {
     }
   };
 
-  const handleTagSubmit = (values: any) => {
+  const handleTagSubmit = (values: Partial<Tag>) => {
     if (selectedTag) {
       updateTagMutation.mutate({ id: selectedTag.id, data: values });
     } else {

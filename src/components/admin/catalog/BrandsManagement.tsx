@@ -18,12 +18,24 @@ import { Brand } from "@/types/catalog";
 import { DataTable } from "@/components/ui/DataTable";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/use-auth";
 import { BrandFormModal } from "./BrandFormModal";
 import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 
+type BrandListCache = {
+  data?: {
+    items: Brand[];
+    total_count: number;
+  };
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error === "object" && error !== null && "response" in error) {
+    return (error as { response?: { data?: { message?: string } } }).response?.data?.message || fallback;
+  }
+  return fallback;
+};
+
 export function BrandsManagement() {
-  const { hasPermission } = useAuth();
   const queryClient = useQueryClient();
   
   // State
@@ -49,8 +61,8 @@ export function BrandsManagement() {
       toast.success("Brand created successfully");
       setIsModalOpen(false);
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create brand");
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to create brand"));
     }
   });
 
@@ -62,13 +74,13 @@ export function BrandsManagement() {
       await queryClient.cancelQueries({ queryKey: ["admin-brands"] });
       const previousData = queryClient.getQueryData(["admin-brands", page, limit]);
       
-      queryClient.setQueryData(["admin-brands", page, limit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-brands", page, limit], (old: BrandListCache | undefined) => {
+        if (!old?.data) return old;
         return {
           ...old,
           data: {
             ...old.data,
-            items: old.data.items.map((item: Brand) => 
+            items: old.data.items.map((item) => 
               item.id === id ? { ...item, ...data } : item
             )
           }
@@ -96,13 +108,13 @@ export function BrandsManagement() {
       await queryClient.cancelQueries({ queryKey: ["admin-brands"] });
       const previousData = queryClient.getQueryData(["admin-brands", page, limit]);
 
-      queryClient.setQueryData(["admin-brands", page, limit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-brands", page, limit], (old: BrandListCache | undefined) => {
+        if (!old?.data) return old;
         return {
           ...old,
           data: {
             ...old.data,
-            items: old.data.items.filter((item: Brand) => item.id !== id),
+            items: old.data.items.filter((item) => item.id !== id),
             total_count: old.data.total_count - 1
           }
         };
@@ -123,7 +135,7 @@ export function BrandsManagement() {
     }
   });
 
-  const handleFormSubmit = (values: any) => {
+  const handleFormSubmit = (values: Partial<Brand>) => {
     if (selectedBrand) {
       updateMutation.mutate({ id: selectedBrand.id, data: values });
     } else {

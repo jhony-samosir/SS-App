@@ -26,6 +26,13 @@ import { format } from "date-fns";
 
 import { ImportJob } from "@/types/catalog";
 
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error === "object" && error !== null && "response" in error) {
+    return (error as { response?: { data?: { message?: string } } }).response?.data?.message || fallback;
+  }
+  return fallback;
+};
+
 export function ImportManagement() {
   const queryClient = useQueryClient();
   
@@ -59,8 +66,8 @@ export function ImportManagement() {
       setIsImportModalOpen(false);
       setFileUrl("");
     },
-    onError: (error: any) => {
-      toast.error(error.message || "Failed to trigger import");
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to trigger import"));
     }
   });
 

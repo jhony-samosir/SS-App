@@ -24,6 +24,13 @@ import { toast } from "sonner";
 import { SoftInput } from "@/components/ui/SoftInput";
 import { SoftSelect } from "@/components/ui/SoftSelect";
 
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error === "object" && error !== null && "response" in error) {
+    return (error as { response?: { data?: { message?: string } } }).response?.data?.message || fallback;
+  }
+  return fallback;
+};
+
 export function InventoryManagement() {
   const queryClient = useQueryClient();
   
@@ -49,7 +56,7 @@ export function InventoryManagement() {
 
   // Mutations
   const adjustStockMutation = useMutation({
-    mutationFn: (data: any) => catalogService.updateStock(data),
+    mutationFn: (data: { variant_id: string; warehouse_id: string; quantity: number; note?: string; reference_type?: string; reference_id?: string }) => catalogService.updateStock(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-inventory"] });
       toast.success("Stock adjusted successfully");
@@ -57,8 +64,8 @@ export function InventoryManagement() {
       setAdjustQty(0);
       setAdjustNote("");
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to adjust stock");
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to adjust stock"));
     }
   });
 

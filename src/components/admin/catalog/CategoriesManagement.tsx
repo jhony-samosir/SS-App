@@ -21,6 +21,20 @@ import { toast } from "sonner";
 import { CategoryFormModal } from "./CategoryFormModal";
 import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 
+type CategoryListCache = {
+  data?: {
+    items: Category[];
+    total_count: number;
+  };
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error === "object" && error !== null && "response" in error) {
+    return (error as { response?: { data?: { message?: string } } }).response?.data?.message || fallback;
+  }
+  return fallback;
+};
+
 export function CategoriesManagement() {
   const queryClient = useQueryClient();
   
@@ -47,8 +61,8 @@ export function CategoriesManagement() {
       toast.success("Category created successfully");
       setIsModalOpen(false);
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create category");
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to create category"));
     }
   });
 
@@ -59,13 +73,13 @@ export function CategoriesManagement() {
       await queryClient.cancelQueries({ queryKey: ["admin-categories"] });
       const previousData = queryClient.getQueryData(["admin-categories", page, limit]);
       
-      queryClient.setQueryData(["admin-categories", page, limit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-categories", page, limit], (old: CategoryListCache | undefined) => {
+        if (!old?.data) return old;
         return {
           ...old,
           data: {
             ...old.data,
-            items: old.data.items.map((item: Category) => 
+            items: old.data.items.map((item) => 
               item.id === id ? { ...item, ...data } : item
             )
           }
@@ -93,13 +107,13 @@ export function CategoriesManagement() {
       await queryClient.cancelQueries({ queryKey: ["admin-categories"] });
       const previousData = queryClient.getQueryData(["admin-categories", page, limit]);
 
-      queryClient.setQueryData(["admin-categories", page, limit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-categories", page, limit], (old: CategoryListCache | undefined) => {
+        if (!old?.data) return old;
         return {
           ...old,
           data: {
             ...old.data,
-            items: old.data.items.filter((item: Category) => item.id !== id),
+            items: old.data.items.filter((item) => item.id !== id),
             total_count: old.data.total_count - 1
           }
         };
@@ -116,7 +130,7 @@ export function CategoriesManagement() {
     }
   });
 
-  const handleFormSubmit = (values: any) => {
+  const handleFormSubmit = (values: Partial<Category>) => {
     if (selectedCategory) {
       updateMutation.mutate({ id: selectedCategory.id, data: values });
     } else {
