@@ -1,7 +1,6 @@
 "use client";
 
-import { Loader2, Trash2, X, AlertTriangle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Loader2, Trash2, AlertTriangle } from "lucide-react";
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -21,19 +20,21 @@ export function DeleteConfirmModal({
   description,
   isLoading,
   itemName
-}: DeleteConfirmModalProps) {
+}: Readonly<DeleteConfirmModalProps>) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div 
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+      <button
+        type="button"
+        aria-label="Close delete confirmation"
         className="absolute inset-0 bg-background/60 backdrop-blur-md animate-in fade-in duration-300" 
         onClick={onClose} 
       />
       
       <div className="relative w-full max-w-md bg-card rounded-[2rem] border border-border shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
         {/* Header Decor */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-destructive/50 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-destructive/50 to-transparent" />
         
         <div className="p-8">
           <div className="flex flex-col items-center text-center space-y-4">

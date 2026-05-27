@@ -30,38 +30,46 @@ export function DataTable<T>({
   onPageChange,
   pageSize = 10,
   emptyMessage = "No data found",
-}: DataTableProps<T>) {
+}: Readonly<DataTableProps<T>>) {
+  const showLoading = isLoading;
+  const showEmpty = !isLoading && data.length === 0;
+  const showData = !isLoading && data.length > 0;
+
   return (
     <div className="w-full">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[800px]">
+        <table className="w-full text-left border-collapse min-w-200">
           <thead>
             <tr className="bg-muted/30 text-muted-foreground text-xs uppercase tracking-widest font-bold">
               {columns.map((col, idx) => (
-                <th key={idx} className={cn("px-6 py-4", col.className)}>
+                <th key={`th-${idx}-${col.header}`} className={cn("px-6 py-4", col.className)}>
                   {col.header}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {isLoading ? (
+            {showLoading && (
               <tr>
                 <td colSpan={columns.length} className="px-6 py-12 text-center">
                   <Loader2 className="animate-spin mx-auto text-primary" size={32} />
                 </td>
               </tr>
-            ) : data.length === 0 ? (
+            )}
+            
+            {showEmpty && (
               <tr>
                 <td colSpan={columns.length} className="px-6 py-12 text-center text-muted-foreground">
                   {emptyMessage}
                 </td>
               </tr>
-            ) : (
+            )}
+            
+            {showData && (
               data.map((item, idx) => (
-                <tr key={idx} className="hover:bg-muted/20 transition-colors group">
+                <tr key={(item as { id?: string; publicId?: string })?.id || (item as { id?: string; publicId?: string })?.publicId || `row-${idx}`} className="hover:bg-muted/20 transition-colors group">
                   {columns.map((col, colIdx) => (
-                    <td key={colIdx} className={cn("px-6 py-4", col.className)}>
+                    <td key={`cell-${idx}-${colIdx}`} className={cn("px-6 py-4", col.className)}>
                       {col.render(item)}
                     </td>
                   ))}

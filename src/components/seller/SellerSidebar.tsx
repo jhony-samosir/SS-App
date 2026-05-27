@@ -9,16 +9,14 @@ import {
   ShoppingCart,
   Store,
   LayoutGrid,
-  ChevronRight,
   LogOut,
-  UserCircle,
-  LucideIcon
+  UserCircle
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useUIStore } from "@/store/use-ui-store";
 import { motion, AnimatePresence } from "framer-motion";
 
-export function SellerSidebar({ className }: { className?: string }) {
+export function SellerSidebar({ className }: Readonly<{ className?: string }>) {
   const pathname = usePathname();
   const { user, isHydrated } = useAuth();
   const { isSellerSidebarCollapsed: isLocked, toggleSellerSidebar } = useUIStore();
@@ -27,7 +25,7 @@ export function SellerSidebar({ className }: { className?: string }) {
   // Effective state: expanded if NOT locked OR if hovered
   const isCollapsed = isLocked && !isHovered;
 
-  if (!isHydrated) return <aside className={cn("w-[72px] border-r border-border/40 bg-background h-screen sticky top-0 lg:flex hidden", className)} />;
+  if (!isHydrated) return <aside className={cn("w-18 border-r border-border/40 bg-background h-screen sticky top-0 lg:flex hidden", className)} />;
 
   const topNav = [
     { name: "Dashboard", href: "/seller", icon: LayoutGrid },
@@ -54,7 +52,7 @@ export function SellerSidebar({ className }: { className?: string }) {
               "group relative flex items-center rounded-xl transition-all duration-200",
               isCollapsed ? "h-11 w-11 justify-center mx-auto" : "px-3 py-2 gap-3",
               isActive
-                ? "bg-primary/[0.06] text-primary"
+                ? "bg-primary/6 text-primary"
                 : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
             )}
           >
@@ -78,7 +76,7 @@ export function SellerSidebar({ className }: { className?: string }) {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
                   transition={{ duration: 0.15 }}
-                  className="font-medium text-[13px] tracking-tight truncate flex-grow"
+                  className="font-medium text-[13px] tracking-tight truncate grow"
                 >
                   {item.name}
                 </motion.span>
@@ -108,14 +106,14 @@ export function SellerSidebar({ className }: { className?: string }) {
       animate={{ width: isCollapsed ? 72 : 240 }}
       transition={{ type: "spring", stiffness: 400, damping: 35 }}
       className={cn(
-        "border-r border-border/40 bg-background h-screen sticky top-0 flex flex-col z-40 hidden lg:flex select-none",
+        "border-r border-border/40 bg-background h-screen sticky top-0 flex-col z-40 hidden lg:flex select-none",
         className
       )}
     >
       {/* Header */}
       <div className="h-14 flex items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-3 group min-w-0">
-          <div className="w-9 h-9 bg-primary/10 text-primary rounded-lg flex-shrink-0 flex items-center justify-center transition-all group-hover:scale-105">
+          <div className="w-9 h-9 bg-primary/10 text-primary rounded-lg shrink-0 flex items-center justify-center transition-all group-hover:scale-105">
             <Store size={20} />
           </div>
           {!isCollapsed && (
@@ -132,7 +130,7 @@ export function SellerSidebar({ className }: { className?: string }) {
       </div>
 
       {/* Main Navigation */}
-      <div className="flex-grow overflow-y-auto py-2 space-y-6 custom-scrollbar">
+      <div className="grow overflow-y-auto py-2 space-y-6 custom-scrollbar">
         <div className="space-y-1">
           {renderNavItems(topNav)}
         </div>
@@ -152,11 +150,11 @@ export function SellerSidebar({ className }: { className?: string }) {
           "flex items-center gap-3 p-2 transition-all mt-2",
           isCollapsed ? "justify-center" : "px-3"
         )}>
-          <div className="w-8 h-8 rounded-full bg-secondary/10 flex-shrink-0 flex items-center justify-center text-secondary border border-secondary/20">
+          <div className="w-8 h-8 rounded-full bg-secondary/10 shrink-0 flex items-center justify-center text-secondary border border-secondary/20">
             <UserCircle size={18} />
           </div>
           {!isCollapsed && (
-            <div className="flex-grow min-w-0">
+            <div className="grow min-w-0">
               <p className="text-[12px] font-bold truncate leading-none mb-1">{user?.name || "Seller"}</p>
               <button
                 onClick={toggleSellerSidebar}

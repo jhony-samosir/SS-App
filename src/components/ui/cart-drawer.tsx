@@ -14,6 +14,9 @@ export function CartDrawer() {
   const { items, total, isDrawerOpen, closeDrawer, fetchCart, updateItemQuantity, removeItem } = useCartStore();
   const router = useRouter();
   const { isAuthenticated, isHydrated } = useAuth();
+  const shouldShowLoginPrompt = !isHydrated || !isAuthenticated;
+  const shouldShowEmptyCart = !shouldShowLoginPrompt && items.length === 0;
+  const shouldShowCartItems = !shouldShowLoginPrompt && items.length > 0;
 
   useEffect(() => {
     // Only fetch cart if drawer opens AND user is authenticated
@@ -39,19 +42,19 @@ export function CartDrawer() {
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Show login prompt for unauthenticated users */}
-          {!isHydrated || !isAuthenticated ? (
+          {shouldShowLoginPrompt && (
             <div className="flex flex-col items-center justify-center h-full text-center space-y-6 py-12">
               <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
                 <LogInIcon className="w-10 h-10 text-primary" />
               </div>
               <div className="space-y-2">
                 <h3 className="font-bold text-lg">Login Required</h3>
-                <p className="text-sm text-muted-foreground max-w-[220px]">
+                <p className="text-sm text-muted-foreground max-w-55">
                   Please log in to view your shopping cart and start adding items.
                 </p>
               </div>
               <Button
-                className="w-full max-w-[220px]"
+                className="w-full max-w-55"
                 onClick={() => {
                   closeDrawer();
                   router.push("/login?redirect=/shop");
@@ -60,11 +63,13 @@ export function CartDrawer() {
                 <LogInIcon className="w-4 h-4 mr-2" />
                 Log In
               </Button>
-              <Button variant="outline" className="w-full max-w-[220px]" onClick={closeDrawer}>
+              <Button variant="outline" className="w-full max-w-55" onClick={closeDrawer}>
                 Continue Browsing
               </Button>
             </div>
-          ) : items.length === 0 ? (
+          )}
+
+          {shouldShowEmptyCart && (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground space-y-4">
               <ShoppingCartIcon className="w-16 h-16 opacity-20" />
               <p>Your cart is empty.</p>
@@ -72,11 +77,13 @@ export function CartDrawer() {
                 Continue Shopping
               </Button>
             </div>
-          ) : (
+          )}
+
+          {shouldShowCartItems && (
             <div className="space-y-4">
               {items.map((item) => (
                 <div key={item.publicId} className="flex gap-4 p-4 border rounded-lg bg-card shadow-sm">
-                  <div className="relative w-20 h-20 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                  <div className="relative w-20 h-20 rounded-md overflow-hidden bg-muted shrink-0">
                     <Image
                       src={item.imageUrl || "https://placehold.co/100x100"}
                       alt={item.productName}

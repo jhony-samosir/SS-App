@@ -6,6 +6,6 @@ interface DynamicIconProps extends LucideProps {
 }
 
 export function DynamicIcon({ name, ...props }: DynamicIconProps) {
-  const IconComponent = (Icons as any)[name] || Icons.Circle;
+  const IconComponent = (Icons as unknown as Record<string, React.ComponentType<LucideProps>>)[name] || Icons.Circle;
   return <IconComponent {...props} />;
 }
