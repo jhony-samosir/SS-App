@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useAuth } from "@/hooks/use-auth";
 import Link from "next/link";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, type Control, type UseFormHandleSubmit } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -119,8 +119,8 @@ function ReadOnlyView({ profile }: Readonly<ReadOnlyViewProps>) {
 
 // Sub-component: Editing Profile View Form
 interface EditFormViewProps {
-  control: any;
-  handleSubmit: any;
+  control: Control<ProfileUpdateValues>;
+  handleSubmit: UseFormHandleSubmit<ProfileUpdateValues>;
   onSubmit: (data: ProfileUpdateValues) => void;
   isUpdating: boolean;
   onCancel: () => void;
@@ -295,7 +295,7 @@ export default function ProfilePage() {
       if (err instanceof Error) {
         message = err.message;
       } else if (err && typeof err === "object" && "message" in err) {
-        message = String((err as any).message);
+        message = String((err as Record<string, unknown>).message);
       }
       toast.error(message);
     },

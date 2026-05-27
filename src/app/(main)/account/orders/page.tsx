@@ -99,7 +99,7 @@ export default function OrdersPage() {
         <div className="h-10 w-48 bg-muted animate-pulse rounded-2xl" />
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-44 w-full bg-muted/50 border border-border animate-pulse rounded-3xl" />
+            <div key={`order-skeleton-${i}`} className="h-44 w-full bg-muted/50 border border-border animate-pulse rounded-3xl" />
           ))}
         </div>
       </div>

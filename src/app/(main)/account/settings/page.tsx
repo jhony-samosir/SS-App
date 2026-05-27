@@ -5,13 +5,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion } from "framer-motion";
-import { User, Lock, Loader2, CheckCircle2, ShieldCheck, UserCircle } from "lucide-react";
+import { Lock, Loader2, ShieldCheck, UserCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { authService } from "@/services/auth-service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 // Schema for Profile Update
 const profileSchema = z.object({
@@ -64,8 +63,9 @@ export default function SettingsPage() {
       if (user) {
         setAuth({ ...user, name: values.fullName });
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to update profile");
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : (error && typeof error === "object" && "response" in error ? String(((error as Record<string, unknown>).response as Record<string, unknown>)?.data || "Failed to update profile") : "Failed to update profile");
+      toast.error(msg);
     } finally {
       setIsUpdatingProfile(false);
     }
@@ -80,8 +80,9 @@ export default function SettingsPage() {
       });
       toast.success(response.message);
       passwordForm.reset();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to change password");
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : (error && typeof error === "object" && "response" in error ? String(((error as Record<string, unknown>).response as Record<string, unknown>)?.data || "Failed to change password") : "Failed to change password");
+      toast.error(msg);
     } finally {
       setIsChangingPassword(false);
     }

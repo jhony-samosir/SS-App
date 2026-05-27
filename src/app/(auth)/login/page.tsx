@@ -1,5 +1,4 @@
 import { LoginForm } from "@/components/auth/LoginForm";
-import { AuthLayout } from "@/components/auth/AuthLayout";
 import { GuestGuard } from "@/components/auth/GuestGuard";
 import { Metadata } from "next";
 
