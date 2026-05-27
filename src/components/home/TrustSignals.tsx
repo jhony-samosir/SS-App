@@ -35,7 +35,7 @@ export function TrustSignals() {
               transition={{ delay: index * 0.1 }}
               className="flex items-start gap-6 group"
             >
-              <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+              <div className="shrink-0 w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                 {signal.icon}
               </div>
               <div>

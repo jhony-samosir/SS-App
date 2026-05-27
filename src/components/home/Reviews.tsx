@@ -1,6 +1,6 @@
 "use client";
 
-import { Star, Quote } from "lucide-react";
+import { Star } from "lucide-react";
 import { motion } from "framer-motion";
 
 const reviews = [
@@ -48,9 +48,9 @@ export function Reviews() {
               className="relative p-12 bg-white rounded-[3rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] border border-slate-50 flex flex-col items-center text-center"
             >
               <div className="flex items-center gap-1 mb-8">
-                {[...Array(5)].map((_, i) => (
+                {Array.from({ length: 5 }).map((_, i) => (
                   <Star
-                    key={i}
+                    key={`star-${review.name}-${i}`}
                     size={16}
                     className={i < review.rating ? "fill-primary text-primary" : "text-slate-200"}
                   />
@@ -89,7 +89,7 @@ export function Reviews() {
           <div className="space-y-6">
             <textarea 
               placeholder="How was your snack experience?"
-              className="w-full p-8 rounded-[2rem] bg-slate-50 border-none focus:outline-none focus:ring-4 focus:ring-primary/10 text-slate-900 min-h-[160px] transition-all text-lg"
+              className="w-full p-8 rounded-[2rem] bg-slate-50 border-none focus:outline-none focus:ring-4 focus:ring-primary/10 text-slate-900 min-h-40 transition-all text-lg"
             />
             <div className="flex justify-center">
               <button className="px-16 py-6 bg-primary hover:bg-primary/90 text-white font-bold rounded-full transition-all transform hover:scale-105 shadow-2xl shadow-primary/20">

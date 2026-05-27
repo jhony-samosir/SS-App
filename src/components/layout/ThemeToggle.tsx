@@ -12,7 +12,8 @@ export function ThemeToggle({ className }: { className?: string }) {
 
   // Avoid hydration mismatch
   React.useEffect(() => {
-    setMounted(true);
+    const id = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(id);
   }, []);
 
   if (!mounted) {

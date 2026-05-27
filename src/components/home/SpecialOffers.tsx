@@ -40,7 +40,7 @@ export function SpecialOffers() {
               </div>
             </div>
 
-            <div className="relative h-[300px] md:h-[400px]">
+            <div className="relative h-[300px] md:h-100">
               <div className="relative h-full w-full rounded-[2rem] overflow-hidden shadow-2xl border-4 border-card">
                 <Image
                   src="/images/special-offer.png"

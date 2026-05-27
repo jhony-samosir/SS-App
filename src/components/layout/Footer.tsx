@@ -34,9 +34,9 @@ export function Footer() {
               Bringing the authentic taste of local Indonesian snacks to your doorstep. Quality, tradition, and the perfect crunch.
             </p>
             <div className="flex items-center gap-4">
-              {socialIcons.map(({ name, label }, i) => (
+              {socialIcons.map(({ name, label }) => (
                 <Link 
-                  key={i} 
+                  key={name} 
                   href="#" 
                   aria-label={`Follow us on ${label}`}
                   className="w-10 h-10 rounded-xl bg-muted/50 border border-border/50 flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all group shadow-sm"
@@ -68,7 +68,7 @@ export function Footer() {
           {/* Support */}
           <div>
             <h4 className="text-foreground font-bold mb-8 text-sm uppercase tracking-widest flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-secondary/40" />
+              <span className="w-2 h-2 rounded-full bg-secondary/40"/>
               Support
             </h4>
             <ul className="space-y-4">
