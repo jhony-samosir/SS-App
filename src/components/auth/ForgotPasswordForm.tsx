@@ -8,18 +8,15 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Loader2, Mail, ArrowRight, AlertCircle, CheckCircle2, ArrowLeft } from "lucide-react";
 import { authService } from "@/services/auth-service";
-import { cn } from "@/lib/utils";
-import axios from "axios";
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z.email({ message: "Please enter a valid email address" }),
 });
 
 type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
 
 import { SoftInput } from "@/components/ui/SoftInput";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -85,7 +82,7 @@ export function ForgotPasswordForm() {
     >
       <div className="space-y-3 text-center">
         <h1 className="text-4xl font-black tracking-tight font-sans text-foreground">Reset Password</h1>
-        <p className="text-muted-foreground text-sm font-medium leading-relaxed">Enter your email and we'll send a link to reset your password</p>
+        <p className="text-muted-foreground text-sm font-medium leading-relaxed">Enter your email and we&apos;ll send a link to reset your password</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

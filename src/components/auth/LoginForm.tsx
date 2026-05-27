@@ -1,25 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Loader2, Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
+import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
 import { authService } from "@/services/auth-service";
 import { useAuth } from "@/hooks/use-auth";
 import { useAuthRedirect } from "@/hooks/use-auth-redirect";
-import { cn } from "@/lib/utils";
 import axios from "axios";
-import { Suspense } from "react";
 
 import { SoftInput } from "@/components/ui/SoftInput";
 import { Button } from "@/components/ui/button";
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z.email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -27,7 +25,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   return (
-    <Suspense fallback={<div className="w-full max-w-md h-[400px] bg-card/40 animate-pulse rounded-[2.5rem]" />}>
+    <Suspense fallback={<div className="w-full max-w-md h-100 bg-card/40 animate-pulse rounded-[2.5rem]" />}>
       <LoginContent />
     </Suspense>
   );
@@ -166,7 +164,7 @@ function LoginContent() {
           disabled={isLoading}
           className="w-full h-14 text-[10px] font-black uppercase tracking-[0.4em] group shadow-2xl shadow-primary/10 rounded-2xl overflow-hidden relative"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <div className="absolute inset-0 bg-linear-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
           {isLoading ? (
             <div className="flex items-center gap-2 relative z-10">
               <Loader2 className="animate-spin" size={14} />

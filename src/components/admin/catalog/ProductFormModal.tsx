@@ -15,7 +15,7 @@ const productSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   slug: z.string().min(2, "Slug must be at least 2 characters"),
   price: z.number().min(0, "Price must be positive"),
-  image_url: z.string().url({ message: "Invalid URL" }),
+  image_url: z.url({ message: "Invalid URL" }),
   description: z.string().optional(),
   brand_id: z.string().optional().nullable(),
   status: z.enum(["draft", "published", "out_of_stock"]),
@@ -218,7 +218,7 @@ export function ProductFormModal({
               <label htmlFor="prod-description" className="text-xs font-bold uppercase tracking-widest text-muted-foreground pl-1">Description</label>
               <textarea
                 {...register("description")}
-                className="w-full bg-muted/30 border border-border/50 rounded-2xl p-4 text-sm min-h-[120px] focus:outline-none focus:ring-8 focus:ring-primary/5 focus:border-primary/30 transition-all resize-none"
+                className="w-full bg-muted/30 border border-border/50 rounded-2xl p-4 text-sm min-h-30 focus:outline-none focus:ring-8 focus:ring-primary/5 focus:border-primary/30 transition-all resize-none"
                 placeholder="Describe your product features and specifications..."
               />
             </div>

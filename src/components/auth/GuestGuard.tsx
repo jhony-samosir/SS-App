@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/use-auth-store";
 
-export function GuestGuard({ children }: { children: React.ReactNode }) {
+export function GuestGuard({ children }: Readonly<{ children: React.ReactNode }>) {
   const { isAuthenticated, isInitialized } = useAuthStore();
   const router = useRouter();
 
