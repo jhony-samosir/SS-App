@@ -5,7 +5,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/use-auth-store";
 import { GuardFallback } from "./guards/GuardFallback";
 
-function AuthGuardContent({ children }: { children: React.ReactNode }) {
+function AuthGuardContent({ children }: Readonly<{ children: React.ReactNode }>) {
   const { isAuthenticated, isInitialized } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -33,7 +33,7 @@ function AuthGuardContent({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-export function AuthGuard({ children }: { children: React.ReactNode }) {
+export function AuthGuard({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <Suspense fallback={<GuardFallback message="Checking access..." />}>
       <AuthGuardContent>{children}</AuthGuardContent>

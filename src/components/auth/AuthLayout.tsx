@@ -1,9 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
-import loginIllustration from "@/assets/auth/login-illustration.png";
 
-export function AuthLayout({ children }: { children: React.ReactNode }) {
+export function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div className="h-screen w-full grid lg:grid-cols-2 bg-background selection:bg-primary/20 overflow-hidden">
       {/* Left Panel: Branding & Illustration */}
@@ -37,24 +35,35 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Middle: Typography Wall & Hero Text */}
-        <div className="relative z-10 flex flex-col items-center justify-center flex-grow overflow-hidden select-none">
+        <div className="relative z-10 flex flex-col items-center justify-center grow overflow-hidden select-none">
           {/* Background Typography - More Subtle & Layered */}
           <div className="absolute inset-0 flex flex-wrap content-center justify-center gap-x-8 gap-y-4 opacity-[0.07] pointer-events-none blur-[0.5px]">
-            {["KERUPUK", "KERIPIK", "SAMSTORE", "SNACK", "JAJANAN", "PREMIUM", "LOCAL", "TRADITIONAL", "AUTHENTIC", "DELICIOUS", "CRUNCHY", "SWEET", "SPICY", "INDONESIA", "MARKET"].map((word, i) => (
-              <span
-                key={i}
-                className={cn(
-                  "font-black tracking-tighter leading-none transition-all duration-1000",
-                  i % 2 === 0 ? "text-white" : "text-primary-foreground",
-                  i % 3 === 0 ? "text-7xl" : i % 2 === 0 ? "text-5xl" : "text-3xl"
-                )}
-                style={{
-                  transform: `rotate(${Math.sin(i) * 12}deg) translateY(${Math.cos(i) * 15}px)`,
-                }}
-              >
-                {word}
-              </span>
-            ))}
+            {["KERUPUK", "KERIPIK", "SAMSTORE", "SNACK", "JAJANAN", "PREMIUM", "LOCAL", "TRADITIONAL", "AUTHENTIC", "DELICIOUS", "CRUNCHY", "SWEET", "SPICY", "INDONESIA", "MARKET"].map((word, i) => {
+              const textSizeClasses = ["text-3xl", "text-5xl", "text-7xl"];
+              let index = 0;
+              if (i % 3 === 0) {
+                index = 2;
+              } else if (i % 2 === 0) {
+                index = 1;
+              }
+              const textSizeClass = textSizeClasses[index];
+
+              return (
+                <span
+                  key={word}
+                  className={cn(
+                    "font-black tracking-tighter leading-none transition-all duration-1000",
+                    i % 2 === 0 ? "text-white" : "text-primary-foreground",
+                    textSizeClass
+                  )}
+                  style={{
+                    transform: `rotate(${Math.sin(i) * 12}deg) translateY(${Math.cos(i) * 15}px)`,
+                  }}
+                >
+                  {word}
+                </span>
+              );
+            })}
           </div>
 
           {/* Centered Main Content - Premium Typography */}
@@ -69,9 +78,9 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="flex items-center justify-center gap-4">
-              <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-white/40" />
+              <div className="h-px w-12 bg-linear-to-r from-transparent to-white/40" />
               <div className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-white/40" />
+              <div className="h-px w-12 bg-linear-to-l from-transparent to-white/40" />
             </div>
 
             <p className="text-lg text-white/90 font-medium leading-relaxed drop-shadow-lg max-w-sm mx-auto">
@@ -88,7 +97,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
 
       {/* Right Panel: Form */}
       <div className="flex flex-col items-center justify-center p-6 lg:p-12 bg-white dark:bg-slate-950">
-        <div className="w-full max-w-[380px] flex flex-col items-center h-fit">
+        <div className="w-full max-w-95 flex flex-col items-center h-fit">
           {/* Mobile Logo / Brand Indicator */}
           <div className="mb-6 flex flex-col items-center gap-2 group cursor-pointer">
             <div className="text-primary bg-primary/5 p-3 rounded-2xl border border-primary/10 shadow-xl shadow-primary/5 group-hover:bg-primary group-hover:text-white transition-all duration-500">

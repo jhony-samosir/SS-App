@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/use-auth-store";
 import { ADMIN_PERMISSIONS } from "@/lib/constants";
 import { GuardFallback } from "./guards/GuardFallback";
 
-function AdminGuardContent({ children }: { children: React.ReactNode }) {
+function AdminGuardContent({ children }: Readonly<{ children: React.ReactNode }>) {
   const { isAuthenticated, isInitialized, isHydrated, hasAnyPermission } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -35,7 +35,7 @@ function AdminGuardContent({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-export function AdminGuard({ children }: { children: React.ReactNode }) {
+export function AdminGuard({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <Suspense fallback={<GuardFallback message="Verifying administrative access..." />}>
       <AdminGuardContent>{children}</AdminGuardContent>
