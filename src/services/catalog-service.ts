@@ -1,5 +1,5 @@
 import apiClient from "@/lib/api-client";
-import { Product, ProductVariant, ProductInventory } from "@/types/product";
+import { Product, ProductVariant, ProductInventory, ProductReview } from "@/types/product";
 import { Brand, Category, ProductAttribute, Tag, Warehouse, PaginatedResponse, ProductBundle, ImportJob } from "@/types/catalog";
 
 export interface SearchParams {
@@ -20,8 +20,17 @@ export interface SearchResponse {
 
 const API_BASE = "/api/catalog/v1";
 
-const handleApiError = (error: any, defaultMessage: string) => {
-  const message = error.response?.data?.error || error.message || defaultMessage;
+const handleApiError = (error: unknown, defaultMessage: string) => {
+  let message = defaultMessage;
+  if (error instanceof Error) {
+    message = error.message;
+  }
+  if (error && typeof error === "object" && "response" in error) {
+    const response = (error as { response?: { data?: { error?: string } } }).response;
+    if (response?.data?.error) {
+      message = response.data.error;
+    }
+  }
   throw new Error(message);
 };
 
@@ -171,7 +180,7 @@ export const catalogService = {
   },
 
   getReviews: async (productId: string, params: { limit?: number; offset?: number } = {}) => {
-    const response = await apiClient.get<{ data: { items: any[]; total_count: number; page: number; limit: number } }>(`/api/catalog/v1/reviews/product/${productId}`, {
+    const response = await apiClient.get<{ data: { items: ProductReview[]; total_count: number; page: number; limit: number } }>(`/api/catalog/v1/reviews/product/${productId}`, {
       params,
     });
     return response.data;
@@ -183,7 +192,7 @@ export const catalogService = {
   },
 
   getAllReviews: async (params: { page?: number; limit?: number } = {}) => {
-    const response = await apiClient.get<PaginatedResponse<any>>("/api/catalog/v1/reviews", {
+    const response = await apiClient.get<PaginatedResponse<ProductReview>>("/api/catalog/v1/reviews", {
       params,
     });
     return response.data;

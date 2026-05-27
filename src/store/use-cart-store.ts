@@ -50,8 +50,9 @@ export const useCartStore = create<CartState>((set, get) => ({
         itemCount: data.itemCount || 0,
         isLoading: false,
       });
-    } catch (err: any) {
-      set({ error: err.message || "Failed to load cart", isLoading: false });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to load cart";
+      set({ error: message, isLoading: false });
     }
   },
 
@@ -84,8 +85,9 @@ export const useCartStore = create<CartState>((set, get) => ({
     try {
       await cartService.updateItemQuantity(publicId, quantity);
       await get().fetchCart();
-    } catch (err: any) {
-      set({ error: err.message || "Failed to update quantity", isLoading: false });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to update quantity";
+      set({ error: message, isLoading: false });
       throw err;
     }
   },
@@ -95,8 +97,9 @@ export const useCartStore = create<CartState>((set, get) => ({
     try {
       await cartService.removeItem(publicId);
       await get().fetchCart();
-    } catch (err: any) {
-      set({ error: err.message || "Failed to remove item", isLoading: false });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to remove item";
+      set({ error: message, isLoading: false });
       throw err;
     }
   },
@@ -106,8 +109,9 @@ export const useCartStore = create<CartState>((set, get) => ({
     try {
       await cartService.clearCart();
       set({ items: [], total: 0, itemCount: 0, isLoading: false });
-    } catch (err: any) {
-      set({ error: err.message || "Failed to clear cart", isLoading: false });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to clear cart";
+      set({ error: message, isLoading: false });
     }
   },
 
@@ -120,8 +124,8 @@ export const useCartStore = create<CartState>((set, get) => ({
         return { success: true, orderId: res.orderId };
       }
       return { success: false, error: "Checkout failed" };
-    } catch (err: any) {
-      const errorMsg = err.message || "Checkout failed due to insufficient stock or invalid cart";
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Checkout failed due to insufficient stock or invalid cart";
       set({ error: errorMsg, isLoading: false });
       return { success: false, error: errorMsg };
     }

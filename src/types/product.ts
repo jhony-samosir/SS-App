@@ -9,8 +9,9 @@ export interface Product {
   image_url: string;
   rating: number;
   description?: string;
-  brand_id?: number;
+  brand_id?: number | string | null;
   brand?: Brand;
+  category_ids?: string[];
   categories?: Category[];
   variants?: ProductVariant[];
 }
