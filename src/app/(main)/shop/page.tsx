@@ -8,6 +8,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ProductCard } from "@/components/catalog/ProductCard";
 
+const SKELETON_IDS = ["one", "two", "three", "four", "five", "six", "seven", "eight"];
+
+function getGridColumns(viewMode: "grid" | "list", showFilters: boolean) {
+  if (viewMode !== "grid") return "grid-cols-1";
+  if (showFilters) return "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3";
+  return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+}
+
 export default function ShopPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
@@ -35,6 +43,41 @@ export default function ShopPage() {
   });
 
   const products = data?.data || [];
+  const gridColumns = getGridColumns(viewMode, showFilters);
+  const hasProducts = products.length > 0;
+
+  const loadingContent = (
+    <div className={cn("grid gap-6", gridColumns)}>
+      {SKELETON_IDS.map((id) => (
+        <div key={`shop-skeleton-${id}`} className="aspect-4/5 bg-muted/30 rounded-[2.5rem] animate-pulse" />
+      ))}
+    </div>
+  );
+
+  const emptyContent = (
+    <div className="flex flex-col items-center justify-center py-32 text-center bg-muted/10 rounded-[4rem] border border-dashed border-border">
+      <div className="w-20 h-20 bg-muted/50 rounded-full flex items-center justify-center mb-6 text-muted-foreground">
+        <Search size={32} />
+      </div>
+      <h3 className="text-2xl font-bold mb-2">No snacks found</h3>
+      <p className="text-muted-foreground max-w-xs mx-auto">Try adjusting your filters or search keywords to find what you&apos;re looking for.</p>
+    </div>
+  );
+
+  const productContent = (
+    <div className={cn("grid gap-6", gridColumns)}>
+       {products.map((p, i) => (
+         <ProductCard key={p.id} product={p} index={i} viewMode={viewMode} />
+       ))}
+    </div>
+  );
+
+  let productsContent = emptyContent;
+  if (isLoading) {
+    productsContent = loadingContent;
+  } else if (hasProducts) {
+    productsContent = productContent;
+  }
 
   return (
     <div className="pt-24 min-h-screen bg-background text-foreground">
@@ -146,8 +189,9 @@ export default function ShopPage() {
                   <div className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase text-muted-foreground">Min</label>
+                        <label htmlFor="price-min" className="text-[10px] font-bold uppercase text-muted-foreground">Min</label>
                         <input 
+                          id="price-min"
                           type="number" 
                           value={priceRange[0]}
                           onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
@@ -155,8 +199,9 @@ export default function ShopPage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase text-muted-foreground">Max</label>
+                        <label htmlFor="price-max" className="text-[10px] font-bold uppercase text-muted-foreground">Max</label>
                         <input 
+                          id="price-max"
                           type="number" 
                           value={priceRange[1]}
                           onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
@@ -185,37 +230,7 @@ export default function ShopPage() {
 
           {/* Product Grid */}
           <main className={cn("transition-all duration-500", showFilters ? "lg:col-span-9" : "lg:col-span-12")}>
-            {isLoading ? (
-              <div className={cn(
-                "grid gap-6",
-                viewMode === "grid" 
-                  ? (showFilters ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4") 
-                  : "grid-cols-1"
-              )}>
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="aspect-[4/5] bg-muted/30 rounded-[2.5rem] animate-pulse" />
-                ))}
-              </div>
-            ) : products.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-32 text-center bg-muted/10 rounded-[4rem] border border-dashed border-border">
-                <div className="w-20 h-20 bg-muted/50 rounded-full flex items-center justify-center mb-6 text-muted-foreground">
-                  <Search size={32} />
-                </div>
-                <h3 className="text-2xl font-bold mb-2">No snacks found</h3>
-                <p className="text-muted-foreground max-w-xs mx-auto">Try adjusting your filters or search keywords to find what you're looking for.</p>
-              </div>
-            ) : (
-              <div className={cn(
-                "grid gap-6",
-                viewMode === "grid" 
-                  ? (showFilters ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4") 
-                  : "grid-cols-1"
-              )}>
-                 {products.map((p, i) => (
-                   <ProductCard key={p.id} product={p} index={i} viewMode={viewMode} />
-                 ))}
-              </div>
-            )}
+            {productsContent}
           </main>
         </div>
       </div>

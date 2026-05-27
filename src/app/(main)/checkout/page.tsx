@@ -93,7 +93,7 @@ export default function CheckoutPage() {
               <div className="space-y-6">
                 {items.map((item) => (
                   <div key={item.publicId} className="flex gap-6 items-center">
-                    <div className="w-24 h-24 bg-muted rounded-2xl relative overflow-hidden flex-shrink-0">
+                    <div className="w-24 h-24 bg-muted rounded-2xl relative overflow-hidden shrink-0">
                       <Image
                         src={item.imageUrl || "https://placehold.co/150x150"}
                         alt={item.productName}

@@ -119,7 +119,7 @@ export default function ProductDetailPage() {
             </motion.div>
             <div className="grid grid-cols-4 gap-4">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-square rounded-2xl bg-muted/20 border border-border/20 cursor-pointer hover:border-primary/50 transition-all" />
+                <div key={`product-thumb-${i}`} className="aspect-square rounded-2xl bg-muted/20 border border-border/20 cursor-pointer hover:border-primary/50 transition-all" />
               ))}
             </div>
           </div>
