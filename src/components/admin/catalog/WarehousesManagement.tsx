@@ -23,6 +23,20 @@ import { toast } from "sonner";
 import { WarehouseFormModal } from "./WarehouseFormModal";
 import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 
+type WarehouseListCache = {
+  data?: {
+    items: Warehouse[];
+    total_count: number;
+  };
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error === "object" && error !== null && "response" in error) {
+    return (error as { response?: { data?: { message?: string } } }).response?.data?.message || fallback;
+  }
+  return fallback;
+};
+
 export function WarehousesManagement() {
   const queryClient = useQueryClient();
   
@@ -49,8 +63,8 @@ export function WarehousesManagement() {
       toast.success("Warehouse created successfully");
       setIsModalOpen(false);
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create warehouse");
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to create warehouse"));
     }
   });
 
@@ -61,13 +75,13 @@ export function WarehousesManagement() {
       await queryClient.cancelQueries({ queryKey: ["admin-warehouses"] });
       const previousData = queryClient.getQueryData(["admin-warehouses", page, limit]);
       
-      queryClient.setQueryData(["admin-warehouses", page, limit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-warehouses", page, limit], (old: WarehouseListCache | undefined) => {
+        if (!old?.data) return old;
         return {
           ...old,
           data: {
             ...old.data,
-            items: old.data.items.map((item: Warehouse) => 
+            items: old.data.items.map((item) => 
               item.id === id ? { ...item, ...data } : item
             )
           }
@@ -95,13 +109,13 @@ export function WarehousesManagement() {
       await queryClient.cancelQueries({ queryKey: ["admin-warehouses"] });
       const previousData = queryClient.getQueryData(["admin-warehouses", page, limit]);
 
-      queryClient.setQueryData(["admin-warehouses", page, limit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-warehouses", page, limit], (old: WarehouseListCache | undefined) => {
+        if (!old?.data) return old;
         return {
           ...old,
           data: {
             ...old.data,
-            items: old.data.items.filter((item: Warehouse) => item.id !== id),
+            items: old.data.items.filter((item) => item.id !== id),
             total_count: old.data.total_count - 1
           }
         };
@@ -118,7 +132,7 @@ export function WarehousesManagement() {
     }
   });
 
-  const handleFormSubmit = (values: any) => {
+  const handleFormSubmit = (values: Partial<Warehouse>) => {
     if (selectedWarehouse) {
       updateMutation.mutate({ id: selectedWarehouse.id, data: values });
     } else {

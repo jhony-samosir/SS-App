@@ -35,6 +35,13 @@ export function ReviewsManagement() {
   });
 
   // Mutations
+  const getErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error === "object" && error !== null && "response" in error) {
+    return (error as { response?: { data?: { message?: string } } }).response?.data?.message || fallback;
+  }
+  return fallback;
+};
+
   const updateStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string, status: ProductReview["Status"] }) => 
       catalogService.updateReviewStatus(id, status),
@@ -42,8 +49,8 @@ export function ReviewsManagement() {
       queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
       toast.success(`Review ${variables.status} successfully`);
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to update review status");
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to update review status"));
     }
   });
 
@@ -87,7 +94,7 @@ export function ReviewsManagement() {
       render: (rev: ProductReview) => (
         <div className="flex flex-col gap-1 py-1">
           {renderStars(rev.Rating)}
-          <p className="text-sm text-foreground line-clamp-2 italic">"{rev.Comment}"</p>
+          <p className="text-sm text-foreground line-clamp-2 italic">&quot;{rev.Comment}&quot;</p>
           <span className="text-[10px] text-muted-foreground">Product ID: {rev.ProductID}</span>
         </div>
       ),
@@ -167,7 +174,7 @@ export function ReviewsManagement() {
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Pending</p>
             <p className="text-2xl font-bold text-amber-600">
-              {reviews.filter((r: any) => r.Status === "pending").length}
+              {reviews.filter((r) => r.Status === "pending").length}
             </p>
           </div>
         </div>

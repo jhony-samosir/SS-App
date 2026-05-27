@@ -24,6 +24,20 @@ import { ProductFormModal } from "./ProductFormModal";
 import { DeleteConfirmModal } from "@/components/ui/DeleteConfirmModal";
 import Image from "next/image";
 
+type ProductListCache = {
+  data?: {
+    items: Product[];
+    total_count: number;
+  };
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error === "object" && error !== null && "response" in error) {
+    return (error as { response?: { data?: { message?: string } } }).response?.data?.message || fallback;
+  }
+  return fallback;
+};
+
 export function ProductsManagement() {
   const queryClient = useQueryClient();
   
@@ -43,26 +57,26 @@ export function ProductsManagement() {
 
   // Mutations
   const createMutation = useMutation({
-    mutationFn: (data: any) => catalogService.createProduct(data),
+    mutationFn: (data: Partial<Product>) => catalogService.createProduct(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       toast.success("Product created successfully");
       setIsModalOpen(false);
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create product");
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, "Failed to create product"));
     }
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: any }) => 
+    mutationFn: ({ id, data }: { id: string, data: Partial<Product> }) => 
       catalogService.updateProduct(id, data),
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: ["admin-products"] });
       const previousData = queryClient.getQueryData(["admin-products", page, limit]);
       
-      queryClient.setQueryData(["admin-products", page, limit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-products", page, limit], (old: ProductListCache | undefined) => {
+        if (!old || !old.data) return old;
         return {
           ...old,
           data: {
@@ -95,8 +109,8 @@ export function ProductsManagement() {
       await queryClient.cancelQueries({ queryKey: ["admin-products"] });
       const previousData = queryClient.getQueryData(["admin-products", page, limit]);
 
-      queryClient.setQueryData(["admin-products", page, limit], (old: any) => {
-        if (!old) return old;
+      queryClient.setQueryData(["admin-products", page, limit], (old: ProductListCache | undefined) => {
+        if (!old || !old.data) return old;
         return {
           ...old,
           data: {
@@ -118,7 +132,7 @@ export function ProductsManagement() {
     }
   });
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: Partial<Product>) => {
     if (selectedProduct) {
       updateMutation.mutate({ id: selectedProduct.id, data: values });
     } else {

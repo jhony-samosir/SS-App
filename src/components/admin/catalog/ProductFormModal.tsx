@@ -4,8 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Product } from "@/types/product";
-import { Brand, Category } from "@/types/catalog";
-import { Loader2, X, Image as ImageIcon, Tag, Hash } from "lucide-react";
+import { Loader2, X, Image as ImageIcon, Tag, Hash, type LucideIcon } from "lucide-react";
 import { SoftInput } from "@/components/ui/SoftInput";
 import { SoftSelect } from "@/components/ui/SoftSelect";
 import { useEffect } from "react";
@@ -16,7 +15,7 @@ const productSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   slug: z.string().min(2, "Slug must be at least 2 characters"),
   price: z.number().min(0, "Price must be positive"),
-  image_url: z.string().url("Invalid URL"),
+  image_url: z.string().url({ message: "Invalid URL" }),
   description: z.string().optional(),
   brand_id: z.string().optional().nullable(),
   status: z.enum(["draft", "published", "out_of_stock"]),
@@ -33,7 +32,7 @@ interface ProductFormModalProps {
   isLoading?: boolean;
 }
 
-const RpIcon = (props: any) => (
+const RpIcon = (props: React.ComponentPropsWithoutRef<"span">) => (
   <span 
     className={props.className} 
     style={{ fontSize: "11px", fontWeight: "900", userSelect: "none" }}
@@ -48,7 +47,7 @@ export function ProductFormModal({
   onSubmit,
   initialData,
   isLoading
-}: ProductFormModalProps) {
+}: Readonly<ProductFormModalProps>) {
   const {
     register,
     handleSubmit,
@@ -90,7 +89,7 @@ export function ProductFormModal({
         image_url: initialData.image_url,
         description: initialData.description || "",
         brand_id: initialData.brand_id?.toString() || null,
-        status: initialData.status as any,
+        status: (initialData.status as "draft" | "published" | "out_of_stock") || "draft",
         category_ids: initialData.categories?.map(c => c.id) || [],
       });
     } else {
@@ -107,14 +106,16 @@ export function ProductFormModal({
     }
   }, [initialData, reset, isOpen]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const currentStatus = watch("status");
+   
   const currentBrandId = watch("brand_id");
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
+      <button onClick={onClose} className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
 
       <div className="relative w-full max-w-2xl bg-card rounded-3xl border border-border shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
         <div className="p-6 border-b border-border flex items-center justify-between bg-card sticky top-0 z-10">
@@ -129,7 +130,7 @@ export function ProductFormModal({
           </button>
         </div>
 
-        <div className="overflow-y-auto flex-grow p-6 custom-scrollbar">
+        <div className="overflow-y-auto grow p-6 custom-scrollbar">
           <form id="product-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <SoftInput
@@ -154,7 +155,7 @@ export function ProductFormModal({
                 id="prod-price"
                 label="Price"
                 type="number"
-                icon={RpIcon as any}
+                icon={RpIcon as unknown as LucideIcon}
                 placeholder="0"
                 {...register("price", { valueAsNumber: true })}
                 error={errors.price?.message}
@@ -169,7 +170,7 @@ export function ProductFormModal({
                   { value: "out_of_stock", label: "Out of Stock" },
                 ]}
                 value={currentStatus}
-                onChange={(val) => setValue("status", val as any)}
+                onChange={(val) => setValue("status", val as ProductFormValues["status"])}
                 error={errors.status?.message}
               />
             </div>
@@ -214,7 +215,7 @@ export function ProductFormModal({
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground pl-1">Description</label>
+              <label htmlFor="prod-description" className="text-xs font-bold uppercase tracking-widest text-muted-foreground pl-1">Description</label>
               <textarea
                 {...register("description")}
                 className="w-full bg-muted/30 border border-border/50 rounded-2xl p-4 text-sm min-h-[120px] focus:outline-none focus:ring-8 focus:ring-primary/5 focus:border-primary/30 transition-all resize-none"
