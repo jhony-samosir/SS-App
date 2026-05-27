@@ -12,7 +12,8 @@ export function useAuth() {
   const auth = useAuthStore();
 
   useEffect(() => {
-    setHasHydrated(true);
+    const id = setTimeout(() => setHasHydrated(true), 0);
+    return () => clearTimeout(id);
   }, []);
 
   if (!hasHydrated) {

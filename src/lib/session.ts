@@ -28,7 +28,7 @@ export async function getServerSession() {
     });
 
     return mapBackendUserToFrontend(response.data);
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
       // 401 is expected when user is not logged in or session expired. Only log other statuses (e.g. 500, network errors).

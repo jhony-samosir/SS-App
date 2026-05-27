@@ -12,11 +12,20 @@ import {
   UpdateProfileRequest,
   ChangePasswordRequest
 } from "@/types/auth";
+import type { AxiosRequestConfig } from "axios";
+
+type BackendUserProfile = {
+  publicId: string;
+  fullName: string;
+  email: string;
+  role?: { name?: string | null } | null;
+  permissions?: string[] | null;
+};
 
 /**
  * Helper to map backend UserProfileDto to frontend User interface
  */
-export const mapBackendUserToFrontend = (backendUser: any) => {
+export const mapBackendUserToFrontend = (backendUser: BackendUserProfile | null | undefined) => {
   if (!backendUser) return null;
   return {
     id: backendUser.publicId,
@@ -78,7 +87,7 @@ export const authService = {
     // We pass _retry: true to prevent the interceptor from trying to refresh during a refresh call
     const response = await apiClient.post("/api/auth/refresh", {}, { 
       headers: { "X-Skip-Interceptor": "true" } 
-    } as any);
+    } as AxiosRequestConfig);
     return response.data;
   },
 
@@ -144,7 +153,7 @@ export const authService = {
   /**
    * Get current user session info (useful for initialization/sync)
    */
-  getCurrentUser: async (): Promise<{ user: any }> => {
+  getCurrentUser: async (): Promise<{ user: ReturnType<typeof mapBackendUserToFrontend> }> => {
     const response = await apiClient.get("/api/user/me");
     const data = response.data;
     

@@ -54,12 +54,12 @@ export const cartService = {
   },
 
   addItem: async (payload: AddCartItemPayload) => {
-    const response = await apiClient.post<{ data: { item: any } }>("/api/cart/items", payload);
+    const response = await apiClient.post<{ data: { item: CartItem } }>("/api/cart/items", payload);
     return response.data.data;
   },
 
   updateItemQuantity: async (publicId: string, quantity: number) => {
-    const response = await apiClient.put<{ data: { item: any } }>(`/api/cart/items/${publicId}`, { quantity });
+    const response = await apiClient.put<{ data: { item: CartItem } }>(`/api/cart/items/${publicId}`, { quantity });
     return response.data.data;
   },
 
