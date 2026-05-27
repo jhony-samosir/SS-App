@@ -16,7 +16,7 @@ import { motion } from "framer-motion";
 import { userService } from "@/services/user-service";
 import { securityService } from "@/services/security-service";
 import { roleService } from "@/services/role-service";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 export function DashboardOverview() {
   // 1. Fetch Stats
@@ -87,7 +87,7 @@ export function DashboardOverview() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
           >
-            <Card className="border-none shadow-xl bg-card/50 backdrop-blur-sm hover:translate-y-[-4px] transition-all duration-300">
+            <Card className="border-none shadow-xl bg-card/50 backdrop-blur-sm hover:-translate-y-1 transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color}`}>
@@ -120,7 +120,7 @@ export function DashboardOverview() {
           
           <div className="bg-card/40 backdrop-blur-md rounded-3xl border border-border shadow-2xl overflow-hidden">
             <div className="p-2">
-              {recentLogs?.items?.map((log, i) => (
+              {recentLogs?.items?.map(log => (
                 <div 
                   key={log.id} 
                   className={`flex items-center justify-between p-4 rounded-2xl transition-all hover:bg-muted/50 group`}
@@ -161,7 +161,7 @@ export function DashboardOverview() {
         {/* System Health Section */}
         <div className="space-y-6">
           <h2 className="text-2xl font-bold font-heading">Platform Health</h2>
-          <div className="bg-gradient-to-br from-primary/10 via-background to-background rounded-3xl border border-primary/20 shadow-2xl p-6 space-y-6">
+          <div className="bg-linear-to-br from-primary/10 via-background to-background rounded-3xl border border-primary/20 shadow-2xl p-6 space-y-6">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-bold">Auth Service</span>

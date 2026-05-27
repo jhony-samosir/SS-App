@@ -12,8 +12,7 @@ import {
   FolderTree,
   ChevronRight,
   ChevronDown,
-  X,
-  Link as LinkIcon
+  X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { menuService } from "@/services/menu-service";
@@ -21,7 +20,6 @@ import { MenuItem, MenuCreateRequest } from "@/types/menu";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import axios from "axios";
 import { useDebounce } from "@/hooks/use-debounce";
 import { DataTable } from "@/components/ui/DataTable";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
@@ -71,7 +69,10 @@ export function MenusManagement() {
       queryClient.invalidateQueries({ queryKey: ["menus"] });
       setIsFormOpen(false);
     },
-    onError: (err: any) => setError(err.response?.data?.message || "Failed to create menu")
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : (err && typeof err === "object" && "message" in err ? String((err as Record<string, unknown>).message) : "Failed to create menu");
+      setError(msg);
+    }
   });
 
   const updateMutation = useMutation({
@@ -80,7 +81,10 @@ export function MenusManagement() {
       queryClient.invalidateQueries({ queryKey: ["menus"] });
       setIsFormOpen(false);
     },
-    onError: (err: any) => setError(err.response?.data?.message || "Failed to update menu")
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : (err && typeof err === "object" && "message" in err ? String((err as Record<string, unknown>).message) : "Failed to update menu");
+      setError(msg);
+    }
   });
 
   const deleteMutation = useMutation({
@@ -89,7 +93,10 @@ export function MenusManagement() {
       queryClient.invalidateQueries({ queryKey: ["menus"] });
       setDeleteConfirmId(null);
     },
-    onError: (err: any) => setError(err.response?.data?.message || "Failed to delete menu")
+    onError: (err: unknown) => {
+      const msg = err instanceof Error ? err.message : (err && typeof err === "object" && "message" in err ? String((err as Record<string, unknown>).message) : "Failed to delete menu");
+      setError(msg);
+    }
   });
 
   // Declarative Detail Query
@@ -134,7 +141,7 @@ export function MenusManagement() {
     const targetNode = nodes.find(n => n.publicId === targetId);
     if (!targetNode || !targetNode.children) return [];
     
-    let ids: string[] = [];
+    const ids: string[] = [];
     const traverse = (children: MenuItem[]) => {
       children.forEach(child => {
         ids.push(child.publicId);
@@ -347,6 +354,8 @@ export function MenusManagement() {
                             <SoftSelect 
                               id="parent-menu"
                               label="Parent Menu"
+                               
+                              // eslint-disable-next-line react-hooks/incompatible-library
                               value={watch("parentId") || ""}
                               onChange={(val) => setValue("parentId", val === "" ? null : val)}
                               options={[

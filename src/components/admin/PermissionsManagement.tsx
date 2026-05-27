@@ -1,4 +1,4 @@
-import { Info, ShieldCheck } from "lucide-react";
+import { Info } from "lucide-react";
 import { ADMIN_PERMISSIONS } from "@/lib/constants";
 import { PermissionCard } from "./PermissionCard";
 

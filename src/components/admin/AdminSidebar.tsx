@@ -12,12 +12,10 @@ import {
   Settings,
   LayoutGrid,
   ChevronDown,
-  ChevronRight,
   LogOut,
   AppWindow,
   Activity,
   UserCircle,
-  Menu as MenuIcon,
   Tag,
   Warehouse,
   Package,
@@ -30,15 +28,11 @@ import {
   HelpCircle,
   Sparkles,
   Command,
-  Monitor,
-  Box,
-  Truck,
   Grid,
   ClipboardList,
   CreditCard,
   ShoppingBag,
   Bell,
-  Search,
   Zap
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -80,7 +74,7 @@ interface MenuTreeDto {
   children: MenuTreeDto[];
 }
 
-export function AdminSidebar({ className }: { className?: string }) {
+export function AdminSidebar({ className }: Readonly<{ className?: string }>) {
   const pathname = usePathname();
   const { user, hasPermission, isHydrated } = useAuth();
   const { isAdminSidebarCollapsed: isLocked, toggleAdminSidebar } = useUIStore();
@@ -130,7 +124,10 @@ export function AdminSidebar({ className }: { className?: string }) {
         activeParents[section.id] = true;
       }
     });
-    setOpenMenus(prev => ({ ...prev, ...activeParents }));
+    const timer = setTimeout(() => {
+      setOpenMenus(activeParents);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [pathname, navigation]);
 
   const toggleMenu = (id: string) => {
@@ -139,10 +136,10 @@ export function AdminSidebar({ className }: { className?: string }) {
 
   if (!isHydrated || isLoading) {
     return (
-      <aside className={cn("w-[76px] border-r border-border/40 bg-background/50 h-screen sticky top-0 lg:flex hidden flex-col items-center py-6 gap-6", className)}>
+      <aside className={cn("w-19 border-r border-border/40 bg-background/50 h-screen sticky top-0 hidden lg:flex flex-col items-center py-6 gap-6", className)}>
         <div className="w-10 h-10 bg-muted animate-pulse rounded-2xl" />
-        <div className="flex-grow space-y-4 w-full px-4 mt-8">
-          {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-10 w-full bg-muted/20 animate-pulse rounded-xl" />)}
+        <div className="grow space-y-4 w-full px-4 mt-8">
+          {[1, 2, 3, 4, 5, 6].map(i => <div key={`sidebar-skeleton-${i}`} className="h-10 w-full bg-muted/20 animate-pulse rounded-xl" />)}
         </div>
       </aside>
     );
@@ -151,7 +148,7 @@ export function AdminSidebar({ className }: { className?: string }) {
   const renderNavItems = (items: { name: string; href: string; icon: LucideIcon; permission: string }[], isSubItem = false) => (
     <div className={cn("flex flex-col gap-0.5", isSubItem ? "pl-11 pr-2 my-1 relative" : "")}>
       {isSubItem && (
-        <div className="absolute left-[26px] top-0 bottom-2 w-px bg-gradient-to-b from-primary/30 via-primary/10 to-transparent" />
+        <div className="absolute left-6.5 top-0 bottom-2 w-px bg-linear-to-b from-primary/30 via-primary/10 to-transparent" />
       )}
       {items
         .filter(item => {
@@ -166,13 +163,16 @@ export function AdminSidebar({ className }: { className?: string }) {
             ? pathname === "/admin"
             : pathname === item.href || pathname.startsWith(item.href + "/");
 
+          const expandedSpacingClass = isSubItem ? "py-2" : "py-3.5";
+          const sizingClass = isCollapsed ? "h-12 w-12 justify-center mx-auto" : cn("w-full px-4 gap-3", expandedSpacingClass);
+
           return (
             <Link
               key={item.name}
               href={item.href}
               className={cn(
                 "group relative flex items-center rounded-2xl transition-all duration-500",
-                isCollapsed ? "h-12 w-12 justify-center mx-auto" : cn("w-full px-4 py-3 gap-3", isSubItem ? "py-2" : "py-3.5"),
+                sizingClass,
                 isActive
                   ? "bg-primary/10 text-primary shadow-[0_0_20px_rgba(var(--primary),0.1)] border border-primary/20"
                   : "text-muted-foreground/70 hover:bg-muted/30 hover:text-foreground"
@@ -181,7 +181,7 @@ export function AdminSidebar({ className }: { className?: string }) {
               {isActive && isSubItem && (
                 <motion.div
                   layoutId={`sub-active-${item.name}`}
-                  className="absolute left-[-15px] w-2 h-px bg-primary"
+                  className="absolute -left-3.75 w-2 h-px bg-primary"
                 />
               )}
 
@@ -200,7 +200,7 @@ export function AdminSidebar({ className }: { className?: string }) {
 
               {!isCollapsed && (
                 <span className={cn(
-                  "font-bold tracking-tight truncate flex-grow transition-all",
+                  "font-bold tracking-tight truncate grow transition-all",
                   isSubItem ? "text-[12px]" : "text-[13.5px]",
                   isActive ? "text-primary" : "text-muted-foreground"
                 )}>
@@ -230,25 +230,25 @@ export function AdminSidebar({ className }: { className?: string }) {
       animate={{ width: isCollapsed ? 76 : 280 }}
       transition={{ type: "spring", stiffness: 350, damping: 35 }}
       className={cn(
-        "border-r border-border/5 bg-background/80 backdrop-blur-[40px] h-screen sticky top-0 flex flex-col z-40 hidden lg:flex select-none shadow-[25px_0_50px_-12px_rgba(0,0,0,0.1)]",
+        "border-r border-border/5 bg-background/80 backdrop-blur-2xl h-screen sticky top-0 hidden lg:flex flex-col z-40 select-none shadow-[25px_0_50px_-12px_rgba(0,0,0,0.1)]",
         className
       )}
     >
       {/* Brand Header */}
       <div className={cn("h-28 flex items-center relative overflow-hidden", isCollapsed ? "justify-center px-0" : "px-6")}>
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-transparent opacity-40" />
+        <div className="absolute inset-0 bg-linear-to-br from-primary/15 via-transparent to-transparent opacity-40" />
         <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-3xl" />
 
         <Link href="/admin" className={cn("flex items-center gap-4 group min-w-0 relative z-10", isCollapsed ? "justify-center w-full" : "")}>
           <div className={cn(
-            "bg-gradient-to-tr from-primary to-primary/40 text-white flex-shrink-0 flex items-center justify-center shadow-[0_8px_30px_rgb(var(--primary)/0.3)] border border-white/10 transition-all duration-700 group-hover:rotate-[15deg] group-hover:scale-110",
+            "bg-linear-to-tr from-primary to-primary/40 text-white shrink-0 flex items-center justify-center shadow-[0_8px_30px_rgb(var(--primary)/0.3)] border border-white/10 transition-all duration-700 group-hover:rotate-15 group-hover:scale-110",
             isCollapsed ? "w-11 h-11 rounded-[16px]" : "w-14 h-14 rounded-[22px]"
           )}>
             <Command size={isCollapsed ? 22 : 28} className="animate-pulse" />
           </div>
           {!isCollapsed && (
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col min-w-0">
-              <span className="font-black text-[22px] tracking-tighter truncate leading-none text-foreground uppercase italic bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/50">
+              <span className="font-black text-[22px] tracking-tighter truncate leading-none uppercase italic bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/50">
                 SamStore
               </span>
               <div className="flex items-center gap-2 mt-1.5">
@@ -266,7 +266,7 @@ export function AdminSidebar({ className }: { className?: string }) {
       </div>
 
       {/* Main Navigation */}
-      <div className="flex-grow overflow-y-auto py-4 space-y-3 custom-scrollbar px-3">
+      <div className="grow overflow-y-auto py-4 space-y-3 custom-scrollbar px-3">
         {navigation.map((section) => {
           const hasChildren = section.children.length > 0;
           const isOpen = openMenus[section.id];
@@ -281,7 +281,7 @@ export function AdminSidebar({ className }: { className?: string }) {
                     className={cn(
                       "group relative flex items-center rounded-2xl transition-all duration-500",
                       isCollapsed ? "h-12 w-12 justify-center mx-auto" : "w-full px-4 py-4 gap-3",
-                      isParentActive ? "text-primary bg-primary/[0.03] border border-primary/10 shadow-inner" : "text-muted-foreground/60 hover:bg-muted/20"
+                      isParentActive ? "text-primary bg-primary/3 border border-primary/10 shadow-inner" : "text-muted-foreground/60 hover:bg-muted/20"
                     )}
                   >
                     <div className={cn("flex shrink-0 items-center justify-center transition-all duration-500", isCollapsed ? "w-12" : "w-5", isParentActive && "scale-110 drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]")}>
@@ -289,7 +289,7 @@ export function AdminSidebar({ className }: { className?: string }) {
                     </div>
                     {!isCollapsed && (
                       <>
-                        <span className="font-black text-[13px] tracking-[0.2em] truncate flex-grow text-left uppercase">
+                        <span className="font-black text-[13px] tracking-[0.2em] truncate grow text-left uppercase">
                           {section.title}
                         </span>
                         <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
@@ -331,11 +331,11 @@ export function AdminSidebar({ className }: { className?: string }) {
           "flex items-center gap-4 p-4 rounded-[24px] transition-all duration-500 border border-white/5 bg-white/5 shadow-[0_8px_30px_rgba(0,0,0,0.04)]",
           isCollapsed ? "justify-center px-2" : "px-5"
         )}>
-          <div className="w-12 h-12 rounded-[18px] bg-gradient-to-tr from-primary to-primary/40 flex-shrink-0 flex items-center justify-center text-white shadow-[0_4px_20px_rgb(var(--primary)/0.3)] border border-white/20">
+          <div className="w-12 h-12 rounded-[18px] bg-linear-to-tr from-primary to-primary/40 shrink-0 flex items-center justify-center text-white shadow-[0_4px_20px_rgb(var(--primary)/0.3)] border border-white/20">
             <UserCircle size={24} />
           </div>
           {!isCollapsed && (
-            <div className="flex-grow min-w-0">
+            <div className="grow min-w-0">
               <p className="text-[14px] font-black truncate text-foreground leading-tight uppercase italic tracking-tight">{user?.name || "Administrator"}</p>
               <div className="flex items-center gap-2 mt-1">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
