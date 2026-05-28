@@ -1,30 +1,45 @@
 "use client";
 
+import { authService } from "@/services/auth-service";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Loader2,
+  Lock,
+  Mail,
+  User,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Loader2, Mail, Lock, User, ArrowRight, CheckCircle2 } from "lucide-react";
-import { authService } from "@/services/auth-service";
-import axios from "axios";
-import Link from "next/link";
 
 import { SoftInput } from "@/components/ui/SoftInput";
 import { Button } from "@/components/ui/button";
 
-const registerSchema = z.object({
-  fullName: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email(),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string().min(6, "Confirm password must be at least 6 characters"),
-  acceptTos: z.boolean().refine(val => val === true, "You must accept the Terms of Service"),
-  acceptPrivacyPolicy: z.boolean().refine(val => val === true, "You must accept the Privacy Policy"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const registerSchema = z
+  .object({
+    fullName: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email(),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Confirm password must be at least 6 characters"),
+    acceptTos: z
+      .boolean()
+      .refine((val) => val === true, "You must accept the Terms of Service"),
+    acceptPrivacyPolicy: z
+      .boolean()
+      .refine((val) => val === true, "You must accept the Privacy Policy"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
@@ -60,9 +75,23 @@ export function RegisterForm() {
       }, 3000);
     } catch (err: unknown) {
       let message = "Registration failed. Please try again.";
+
       if (axios.isAxiosError(err)) {
-        message = err.response?.data?.message || message;
+        const data = err.response?.data;
+
+        // default API message
+        message = data?.message || message;
+
+        // validation errors
+        if (data?.errors) {
+          message = Object.entries(data.errors)
+            .map(([field, msgs]) => {
+              return `${field}: ${(msgs as string[]).join(", ")}`;
+            })
+            .join("\n");
+        }
       }
+
       setError(message);
     } finally {
       setIsLoading(false);
@@ -82,7 +111,8 @@ export function RegisterForm() {
         <div className="space-y-2">
           <h2 className="text-3xl font-bold font-sans">Account Created!</h2>
           <p className="text-muted-foreground font-medium">
-            Your journey to authentic snacks starts now. <br /> Redirecting to login...
+            Your journey to authentic snacks starts now. <br /> Redirecting to
+            login...
           </p>
         </div>
         <div className="pt-4">
@@ -103,13 +133,19 @@ export function RegisterForm() {
         <span className="text-[9px] font-black uppercase tracking-[0.6em] text-primary mb-1 block">
           New Customer
         </span>
-        <h1 className="text-4xl font-medium tracking-tight text-foreground font-heading italic">Create Account</h1>
+        <h1 className="text-4xl font-medium tracking-tight text-foreground font-heading italic">
+          Create Account
+        </h1>
         <p className="text-muted-foreground/60 text-[10px] font-bold uppercase tracking-[0.2em]">
           Start your premium snack journey today
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" aria-label="Registration form">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-4"
+        aria-label="Registration form"
+      >
         {error && (
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
@@ -179,22 +215,36 @@ export function RegisterForm() {
                     className="peer sr-only"
                   />
                   <div className="w-4 h-4 rounded-md border border-border/40 bg-white/40 peer-checked:bg-primary peer-checked:border-primary transition-all duration-500 shadow-sm group-hover:border-primary/50" />
-                  <svg 
-                    className="absolute w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-500 pointer-events-none" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor" 
+                  <svg
+                    className="absolute w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                     strokeWidth="4"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
                 <span className="text-[10px] text-muted-foreground/50 font-black leading-tight group-hover:text-muted-foreground transition-colors uppercase tracking-[0.15em]">
-                  Accept <Link href="/tos" className="text-primary hover:underline underline-offset-4">TOS</Link>
+                  Accept{" "}
+                  <Link
+                    href="/tos"
+                    className="text-primary hover:underline underline-offset-4"
+                  >
+                    TOS
+                  </Link>
                 </span>
               </label>
               {errors.acceptTos && (
-                <motion.p initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} className="text-[7px] text-destructive font-black leading-none pl-7">
+                <motion.p
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="text-[7px] text-destructive font-black leading-none pl-7"
+                >
                   {errors.acceptTos.message}
                 </motion.p>
               )}
@@ -210,22 +260,36 @@ export function RegisterForm() {
                     className="peer sr-only"
                   />
                   <div className="w-4 h-4 rounded-md border border-border/40 bg-white/40 peer-checked:bg-primary peer-checked:border-primary transition-all duration-500 shadow-sm group-hover:border-primary/50" />
-                  <svg 
-                    className="absolute w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-500 pointer-events-none" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor" 
+                  <svg
+                    className="absolute w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                     strokeWidth="4"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
                 <span className="text-[10px] text-muted-foreground/50 font-black leading-tight group-hover:text-muted-foreground transition-colors uppercase tracking-[0.15em]">
-                  Accept <Link href="/privacy" className="text-primary hover:underline underline-offset-4">Privacy</Link>
+                  Accept{" "}
+                  <Link
+                    href="/privacy"
+                    className="text-primary hover:underline underline-offset-4"
+                  >
+                    Privacy
+                  </Link>
                 </span>
               </label>
               {errors.acceptPrivacyPolicy && (
-                <motion.p initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} className="text-[7px] text-destructive font-black leading-none pl-7">
+                <motion.p
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="text-[7px] text-destructive font-black leading-none pl-7"
+                >
                   {errors.acceptPrivacyPolicy.message}
                 </motion.p>
               )}
@@ -248,7 +312,10 @@ export function RegisterForm() {
           ) : (
             <span className="relative z-10 flex items-center justify-center">
               Register Account
-              <ArrowRight size={14} className="ml-2 transition-transform duration-500 group-hover:translate-x-1" />
+              <ArrowRight
+                size={14}
+                className="ml-2 transition-transform duration-500 group-hover:translate-x-1"
+              />
             </span>
           )}
         </Button>
@@ -256,8 +323,8 @@ export function RegisterForm() {
 
       <div className="text-center text-[8px] text-muted-foreground/40 font-black pt-2 uppercase tracking-[0.4em]">
         ALREADY HAVE AN ACCOUNT?{" "}
-        <Link 
-          href="/login" 
+        <Link
+          href="/login"
           className="text-primary hover:text-primary/80 hover:underline underline-offset-4 transition-all duration-500"
         >
           SIGN IN HERE
