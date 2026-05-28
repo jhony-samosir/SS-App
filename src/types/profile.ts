@@ -36,5 +36,4 @@ export interface UpdateProfileRequest {
   bio: string | null;
   gender: string | null;
   dateOfBirth: string | null; // ISO date string (YYYY-MM-DD)
-  addresses?: Address[];
 }
