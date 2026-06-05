@@ -1,124 +1,152 @@
-﻿# SS-App
+# SS-App
 
 ## Overview
 
-SS-App is the main customer-facing frontend application for the SamStore e-commerce platform. Built with Next.js 16 and React 19, it serves as the storefront, admin dashboard, and seller portal.
+`SS-App` adalah aplikasi antarmuka klien utama (frontend) untuk platform e-commerce SamStore. Berfungsi sebagai etalase toko (Storefront), Dasbor Admin, serta Portal Penjual (Seller).
 
-The application interacts with various downstream microservices via the `SS-APIGateway` to provide features like authentication, product catalog browsing, cart management, and order processing, providing a unified and responsive user experience.
+Aplikasi ini tidak memiliki koneksi database langsung; semua operasi data dikoordinasikan melalui panggilan REST API ke `SS-APIGateway`. Menggunakan fitur canggih dari **Next.js 16 (App Router)** dan **React 19**, frontend ini menawarkan rendering hybrid (SSR, SSG, CSR) yang optimal untuk SEO maupun interaktivitas pengguna tingkat tinggi.
 
-## Features
-
-- **Storefront & Catalog**: Browse products, view categories, and search the catalog.
-- **User Authentication & Authorization**: Registration, login, password reset, MFA, and role-based permissions (JWT integration).
-- **Shopping Cart & Checkout**: Manage cart items and process checkouts.
-- **User Account Management**: User profile settings and order history.
-- **Admin Dashboard**: Catalog management, user role assignments, system logs, and security configuration.
-- **Seller Portal**: Tools for sellers to manage products and track orders.
-- **Theming**: Integrated Dark/Light mode support.
+---
 
 ## Tech Stack
 
-| Category   | Technology                                      |
-| ---------- | ----------------------------------------------- |
-| Frontend   | Next.js 16, React 19, TypeScript                |
-| Styling    | Tailwind CSS 4, Radix UI, Shadcn, Framer Motion |
-| State Mgmt | Zustand (client), React Query (server)          |
-| Forms      | React Hook Form, Zod                            |
-| Utilities  | Axios, Pino (Logging)                           |
+| Kategori              | Teknologi                                               |
+| --------------------- | ------------------------------------------------------- |
+| Framework             | Next.js 16 (App Router)                                 |
+| UI Library            | React 19                                                |
+| Bahasa                | TypeScript                                              |
+| Styling               | Tailwind CSS 4, Radix UI, Shadcn UI                     |
+| Animasi               | Framer Motion                                           |
+| State Management      | Zustand (Client State), React Query v5 (Server State)   |
+| Form & Validasi       | React Hook Form, Zod                                    |
+| HTTP Client & Logging | Axios, Pino (dengan pino-pretty)                        |
 
-## Project Structure
+---
+
+## Arsitektur
+
+### Struktur Direktori
 
 ```text
 SS-App/
-├── public/
-│   └── images/               # Static assets and images
+├── public/               # File aset statis (gambar, favicon) yang bisa diakses langsung via URL
 └── src/
-    ├── app/                  # Next.js App Router pages and layouts
-    ├── assets/               # Local UI assets
-    ├── components/           # Reusable UI components (auth, admin, layout)
-    ├── config/               # Application configuration constants
-    ├── hooks/                # Custom React hooks
-    ├── lib/                  # Utilities (logger, api-client, session)
-    ├── services/             # API integration and service calls
-    ├── store/                # Zustand global state stores
-    └── types/                # TypeScript type definitions
+    ├── app/              # Struktur Next.js App Router (Halaman dan Layout)
+    │   ├── (auth)/       # Route Grouping: Halaman otentikasi (login, register, forgot-password)
+    │   ├── (main)/       # Route Grouping: Storefront pembeli (home, product detail, cart, checkout)
+    │   ├── admin/        # Route Grouping: Dasbor manajemen admin (catalog, users, roles)
+    │   ├── seller/       # Route Grouping: Portal penjual toko
+    │   ├── globals.css   # Variabel dasar Tailwind CSS
+    │   └── layout.tsx    # Root layout HTML (Inject providers, fonts)
+    ├── components/       # Komponen presentasional React yang dapat digunakan ulang
+    │   ├── ui/           # Base component dari Shadcn UI (buttons, inputs, dialogs)
+    │   ├── auth/         # Form login/register khusus
+    │   ├── admin/        # Layout dan navigasi admin
+    │   └── shared/       # Komponen general
+    ├── config/           # File pengaturan statis aplikasi (menu navigasi, list konstanta)
+    ├── hooks/            # Custom React Hooks (mis. useAuth, useCart)
+    ├── lib/              # Fungsi utilitas murni (formatter uang, tanggal, Pino logger)
+    ├── proxy.ts          # Konfigurasi proxy bypass untuk dev server Next.js (bila digunakan)
+    ├── services/         # Layer API Client (Bungkus axios ke berbagai endpoint microservices)
+    ├── store/            # Store Zustand (misal: cartStore, uiStore untuk tema)
+    └── types/            # Tipe / antarmuka (interfaces) TypeScript global
 ```
 
-## Requirements
+### Route Groups Next.js
+
+Penggunaan folder bergaris kurung `(folder_name)` di `src/app/` mengelompokkan halaman secara logis *tanpa memengaruhi pola URL*.
+- Halaman Login berada di `src/app/(auth)/login/page.tsx` namun diakses pada `/login`.
+- Dasbor Admin memiliki sub-jalur eksplisit `src/app/admin/...` yang diakses pada `/admin/...`.
+
+---
+
+## Fitur Utama
+
+- **Storefront & Katalog**: Menelusuri, memfilter (*faceted search*), serta melihat detil produk e-commerce.
+- **Autentikasi Aman**: Login, Pendaftaran, Verifikasi Email, pengaturan Multi-Factor Authentication (MFA), Reset Password.
+- **Keranjang Belanja (Cart)**: Tambah, hapus, dan update item. Menampilkan status *out of stock*.
+- **Admin Dashboard**: RBAC (Role-Based Access Control) yang dikelola lewat antarmuka khusus admin untuk mengontrol pengguna, roles, menu dinamis.
+- **Theme Switcher**: Menyediakan integrasi peralihan mode gelap/terang (Dark Mode) bawaan Tailwind & Shadcn.
+- **Form Interaktif**: Validasi formulir menggunakan skema Zod secara *real-time* (sisi client) yang dicocokkan dengan skema API backend.
+
+---
+
+## Pengaturan HTTP Client (Services)
+
+Aplikasi berkomunikasi via **Axios**, yang telah dikonfigurasi melalui instans interseptor kustom.
+Lokasi: `src/services/`
+- Interseptor secara otomatis menambahkan JWT `Authorization: Bearer <token>` dari persistensi lokal (cookie access_token/zustand).
+- Ketika API melempar balasan *401 Unauthorized*, interseptor mencoba melakukan panggilan pembaharuan ke endpoint Refresh Token secara senyap sebelum mengulang request (Silent Refresh).
+
+### Rincian Service:
+- `auth-service.ts`: Sign-in, sign-up, refresh token, log out.
+- `user-service.ts`: Pengaturan akun pengguna mandiri.
+- `profile-service.ts`: Manajemen buku alamat.
+- `catalog-service.ts`: Fetches katalog produk.
+- `cart-service.ts`: Manajemen isi keranjang.
+- Dan layanan manajemen peranan (roles/menus) untuk admin.
+
+---
+
+## Environment Variables
+
+Salin `.env.example` ke `.env.local` pada environment lokal.
+
+| Variable                   | Deskripsi                                                        |
+| -------------------------- | ---------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_BASE_URL` | URL absolut untuk memanggil API Gateway dari browser klien       |
+| `API_BASE_URL`             | URL absolut panggilan API Gateway dari komponen server (SSR)     |
+| `LOG_LEVEL`                | Batas pencatatan logger Pino (`info`, `debug`, `error`)          |
+| `NODE_ENV`                 | Lingkungan Node (`development` / `production`)                   |
+
+---
+
+## Instalasi & Menjalankan
+
+### Prasyarat
 
 - Node.js v20+
-- NPM or Yarn
+- Pengelola paket NPM
 
-## Installation
+### Setup Proyek
 
 ```bash
 git clone <repository>
 cd SamStore/SS-App
-```
 
-Install dependencies:
-
-```bash
+# Instal dependensi
 npm install
 ```
 
-## Configuration
+### Menjalankan Server Pengembangan
 
-Daftar environment variable yang ditemukan:
-
-```env
-API_BASE_URL=             # Server-side API base URL targeting the backend Gateway
-NEXT_PUBLIC_API_BASE_URL= # Client-side API base URL targeting the backend Gateway
-LOG_LEVEL=                # Configures the application log level (e.g., info, debug)
-NODE_ENV=                 # Node environment mode (development/production)
-```
-
-## Running Locally
+Memulai server dev Next.js dengan hot module replacement (HMR).
 
 ```bash
 npm run dev
 ```
 
-## Build
+Aplikasi bisa diakses di `http://localhost:3000`. Pastikan **SS-APIGateway** telah berjalan agar data dinamis berfungsi.
+
+### Build untuk Produksi
 
 ```bash
 npm run build
+npm start
 ```
 
-## Testing
-
+### Linter
 ```bash
 npm run lint
 ```
 
-## API Documentation
-
-Not identified from source code. (This is a frontend client).
-
-## Database
-
-Not identified from source code. (Uses backend microservices for data persistence).
-
-## Deployment
-
-- **Next.js Production Start**: Build the Next.js app and run `npm run start`.
-- **Containerization**: Deployable via Docker (Dockerfile not explicitly present in the root but common Next.js build patterns apply).
-
-## Architecture Notes
-
-- **Client/Server Rendering**: Uses Next.js App Router for optimized Server Components and Client Components.
-- **Modular Structure**: Strict separation of concerns between UI components (`components/`), API integrations (`services/`), and state (`store/`).
+---
 
 ## Known Issues
 
-Not identified from source code.
+- Saat ini, *refresh token loop* sesekali memerlukan relogin manual apabila durasi koneksi gateway terputus panjang.
 
 ## Future Improvements
 
-- Add end-to-end (E2E) testing suite with Cypress or Playwright.
-
-## License
-
-```text
-License information not specified.
-```
+- Menerapkan pengujian E2E (End-to-End Test) dengan Cypress atau Playwright.
+- Migrasi secara parsial request fetch standar `axios` murni menjadi pola `React Server Components (RSC)` secara optimal.
