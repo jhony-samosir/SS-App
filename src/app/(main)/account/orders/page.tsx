@@ -24,6 +24,8 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { paymentService } from "@/services/payment-service";
+import Script from "next/script";
 
 const STATUS_CONFIGS: Record<
   string,
@@ -334,11 +336,15 @@ function OrderListSection({
 interface OrderDetailSectionProps {
   selectedOrder: Order;
   onBack: () => void;
+  onPay: (order: Order) => void;
+  isPaying: boolean;
 }
 
 function OrderDetailSection({
   selectedOrder,
   onBack,
+  onPay,
+  isPaying,
 }: Readonly<OrderDetailSectionProps>) {
   return (
     <motion.div
@@ -389,6 +395,18 @@ function OrderDetailSection({
           >
             Payment: {selectedOrder.paymentStatus.toUpperCase()}
           </span>
+          {selectedOrder.paymentStatus.toLowerCase() !== "paid" &&
+            selectedOrder.paymentStatus.toLowerCase() !== "refunded" &&
+            selectedOrder.status.toLowerCase() !== "cancelled" && (
+              <Button
+                size="sm"
+                onClick={() => onPay(selectedOrder)}
+                disabled={isPaying}
+                className="rounded-full px-4 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
+              >
+                {isPaying ? "Processing..." : "Pay Now"}
+              </Button>
+            )}
         </div>
       </div>
 
@@ -600,17 +618,56 @@ export default function OrdersPage() {
   const { user, isHydrated } = useAuth();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [isPaying, setIsPaying] = useState(false);
   const router = useRouter();
 
   const {
     data: orders = [],
     isLoading,
     error,
+    refetch,
   } = useQuery<Order[]>({
     queryKey: ["orders"],
     queryFn: orderService.getOrders,
     enabled: isHydrated && !!user,
   });
+
+  const handlePay = async (order: Order) => {
+    setIsPaying(true);
+    try {
+      const payment = await paymentService.getPaymentByOrder(order.publicId);
+      if (payment && payment.snapToken) {
+        // @ts-ignore
+        window.snap.pay(payment.snapToken, {
+          onSuccess: function (result: any) {
+            console.log("payment success", result);
+            refetch();
+            setSelectedOrder((prev) =>
+              prev ? { ...prev, paymentStatus: "paid", status: "processing" } : null
+            );
+          },
+          onPending: function (result: any) {
+            console.log("payment pending", result);
+            refetch();
+          },
+          onError: function (result: any) {
+            console.error("payment error", result);
+            alert("Payment failed or was declined.");
+          },
+          onClose: function () {
+            console.log("customer closed the popup without finishing the payment");
+          },
+        });
+      } else {
+        alert("Failed to retrieve payment Snap token.");
+      }
+    } catch (err) {
+      console.error("Failed to pay", err);
+      alert("Error initiating payment checkout.");
+    } finally {
+      setIsPaying(false);
+    }
+  };
 
   const filteredOrders = orders.filter(
     (order) =>
@@ -637,7 +694,7 @@ export default function OrdersPage() {
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div
-              key={`order-skeleton-${i}`}
+               key={`order-skeleton-${i}`}
               className="h-44 w-full bg-muted/50 border border-border animate-pulse rounded-3xl"
             />
           ))}
@@ -661,6 +718,11 @@ export default function OrdersPage() {
 
   return (
     <div className="container max-w-5xl mx-auto px-6 py-24 min-h-screen">
+      <Script
+        src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="SB-Mid-client-r24mD6a4g9sE_FhL"
+        strategy="lazyOnload"
+      />
       <AnimatePresence mode="wait">
         {selectedOrder === null ? (
           <OrderListSection
@@ -675,6 +737,8 @@ export default function OrdersPage() {
           <OrderDetailSection
             selectedOrder={selectedOrder}
             onBack={() => setSelectedOrder(null)}
+            onPay={handlePay}
+            isPaying={isPaying}
           />
         )}
       </AnimatePresence>
