@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { ShieldCheck, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { paymentService } from "@/services/payment-service";
+import Script from "next/script";
 
 export default function CheckoutPage() {
   const { items, total, checkout, fetchCart } = useCartStore();
@@ -19,12 +21,58 @@ export default function CheckoutPage() {
     fetchCart();
   }, [fetchCart]);
 
+  const fetchPaymentWithRetry = async (orderId: string, retries = 5, delay = 1000): Promise<any> => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const payment = await paymentService.getPaymentByOrder(orderId);
+        if (payment && payment.snapToken) {
+          return payment;
+        }
+      } catch (err) {
+        console.warn(`Attempt ${i + 1} to fetch payment failed:`, err);
+      }
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+    throw new Error("Payment initialization timed out. You can complete payment from your Orders page.");
+  };
+
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
     setError(null);
     const result = await checkout();
-    if (result.success) {
-      setOrderSuccess(result.orderId || "success");
+    if (result.success && result.orderId) {
+      try {
+        // Wait for RabbitMQ event processing & payment generation
+        const payment = await fetchPaymentWithRetry(result.orderId);
+        if (payment && payment.snapToken) {
+          // @ts-ignore
+          window.snap.pay(payment.snapToken, {
+            onSuccess: function (res: any) {
+              console.log("checkout payment success", res);
+              setOrderSuccess(result.orderId || "success");
+            },
+            onPending: function (res: any) {
+              console.log("checkout payment pending", res);
+              setOrderSuccess(result.orderId || "success");
+            },
+            onError: function (res: any) {
+              console.error("checkout payment error", res);
+              setError("Payment transaction failed. You can retry from My Orders.");
+              setOrderSuccess(result.orderId || "success"); // Show success screen anyway so they know the order is placed
+            },
+            onClose: function () {
+              console.log("customer closed snap popup at checkout");
+              setOrderSuccess(result.orderId || "success"); // Show success screen so they can pay from orders page
+            }
+          });
+        } else {
+          setOrderSuccess(result.orderId || "success");
+        }
+      } catch (err: any) {
+        console.error("Failed to fetch payment at checkout", err);
+        setError(err.message || "Failed to initiate payment. You can pay from My Orders.");
+        setOrderSuccess(result.orderId || "success"); // Still show order success
+      }
     } else {
       setError(result.error || "Failed to process checkout");
       setIsProcessing(false);
@@ -65,6 +113,11 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen pt-24 pb-24 bg-muted/10">
+      <Script
+        src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="SB-Mid-client-r24mD6a4g9sE_FhL"
+        strategy="lazyOnload"
+      />
       <div className="max-w-7xl mx-auto px-6">
         <button 
           onClick={() => router.back()}
