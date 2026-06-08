@@ -7,6 +7,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { ThemeToggle } from "./ThemeToggle";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { authService } from "@/services/auth-service";
 import { useRouter } from "next/navigation";
 import { STORE_NAVIGATION } from "@/config/navigation";
@@ -157,6 +158,9 @@ export function Navbar() {
               return (
                 <div className="flex items-center gap-2">
               <DropdownMenu>
+                <div className="flex items-center gap-1 mr-1">
+                  <NotificationBell />
+                </div>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 p-1.5 pr-3 hover:bg-muted rounded-2xl transition-all group outline-none">
                     <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all overflow-hidden border border-primary/20">
