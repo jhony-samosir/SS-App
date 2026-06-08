@@ -25,6 +25,7 @@ export const metadata: Metadata = {
 import { Providers } from "@/components/providers";
 import { getServerSession } from "@/lib/session";
 import { StoreHydrator } from "@/components/auth/StoreHydrator";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 
 export default async function RootLayout({
   children,
@@ -43,6 +44,7 @@ export default async function RootLayout({
         <StoreHydrator user={user} />
         <Providers>
           {children}
+          <ChatWidget />
         </Providers>
       </body>
     </html>
